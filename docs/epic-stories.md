@@ -1,7 +1,7 @@
-# DriveShare - Epic Stories
+# Rent-A-Car - Epic Stories
 
 ## Overview
-This document contains high-level user stories (epics) that define the core functionality and user journeys for the DriveShare car booking platform. Each epic represents a major feature area with multiple user stories.
+This document contains high-level user stories (epics) that define the core functionality and user journeys for the Rent-A-Car booking platform. Each epic represents a major feature area with multiple user stories.
 
 ## Epic Categories
 

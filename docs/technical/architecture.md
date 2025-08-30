@@ -1,7 +1,7 @@
-# System Architecture - DriveShare
+# System Architecture - Rent-A-Car
 
 ## Overview
-DriveShare is a simple Next.js application that combines frontend and backend in a single framework. The system is designed for easy deployment on cPanel hosting with minimal complexity.
+Rent-A-Car is a simple Next.js application that combines frontend and backend in a single framework. The system is designed for easy deployment on cPanel hosting with minimal complexity.
 
 ## Architecture Overview
 
@@ -99,7 +99,7 @@ prisma/
 
 ## File Structure
 ```
-driveshare/
+rent-a-car/
 ├── src/
 │   ├── app/              # Next.js App Router
 │   │   ├── page.tsx      # Landing page
@@ -176,7 +176,7 @@ POST   /api/whatsapp/notify   # Send WhatsApp notification
 ### Environment Configuration
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/driveshare"
+DATABASE_URL="postgresql://user:password@localhost:5432/rentacar"
 
 # WhatsApp
 WHATSAPP_API_KEY="your_whatsapp_api_key"
@@ -229,7 +229,7 @@ ADMIN_PASSWORD="secure_password"
 
 ### Features
 - **Analytics**: Basic booking analytics
-- **Notifications**: Enhanced notification system
+- **Enhanced Notifications**: Advanced notification system
 - **Mobile App**: React Native or PWA enhancement
 - **Multi-language**: Internationalization support
 

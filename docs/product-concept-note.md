@@ -1,7 +1,7 @@
-# DriveShare - Product Concept Note
+# Rent-A-Car - Product Concept Note
 
 ## Vision Statement
-DriveShare is a simple, professional car booking platform that connects passengers with a car rental company, providing a seamless booking experience through a mobile-first Progressive Web App.
+Rent-A-Car is a simple, professional car booking platform that connects passengers with a car rental company, providing a seamless booking experience through a mobile-first Progressive Web App.
 
 ## Problem Statement
 Traditional car booking processes often involve:
@@ -12,7 +12,7 @@ Traditional car booking processes often involve:
 - Lack of booking history and tracking
 
 ## Solution Overview
-DriveShare addresses these pain points by offering:
+Rent-A-Car addresses these pain points by offering:
 - **Simple Booking Process**: 4-step booking with clear progression
 - **Vehicle Gallery**: Visual browsing of available vehicles
 - **Mobile-First Design**: Progressive Web App for best mobile experience

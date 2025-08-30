@@ -1,4 +1,4 @@
-# DriveShare - Car Booking Application
+# Rent-A-Car - Car Booking Application
 
 A simple, professional car booking application built with Next.js for a car rental company. This project demonstrates the power of Cursor AI in building modern web applications.
 
@@ -35,7 +35,7 @@ A simple, professional car booking application built with Next.js for a car rent
 ## 🏗️ Project Structure
 
 ```
-driveshare/
+rent-a-car/
 ├── src/
 │   ├── app/              # Next.js App Router
 │   │   ├── page.tsx      # Landing page
@@ -63,8 +63,8 @@ driveshare/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/driveshare.git
-   cd driveshare
+   git clone https://github.com/yourusername/rent-a-car.git
+   cd rent-a-car
    ```
 
 2. **Install dependencies**
@@ -79,7 +79,7 @@ driveshare/
    
    Edit `.env.local` with your configuration:
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/driveshare"
+   DATABASE_URL="postgresql://user:password@localhost:5432/rentacar"
    WHATSAPP_API_KEY="your_whatsapp_api_key"
    WHATSAPP_PHONE_NUMBER="your_whatsapp_number"
    GOOGLE_MAPS_API_KEY="your_google_maps_key"

@@ -1,7 +1,7 @@
-# Database Design - DriveShare
+# Database Design - Rent-A-Car
 
 ## Overview
-The DriveShare database is designed using PostgreSQL with a simplified schema that supports the core functionality of the car booking platform. The design focuses on passenger bookings, vehicle management, and admin operations.
+The Rent-A-Car database is designed using PostgreSQL with a simplified schema that supports the core functionality of the car booking platform. The design focuses on passenger bookings, vehicle management, and admin operations.
 
 ## Entity Relationship Diagram (ERD)
 
@@ -210,10 +210,10 @@ erDiagram
 ```javascript
 // Sample company data
 {
-  company_name: "DriveShare",
+  company_name: "Rent-A-Car",
   tagline: "Your trusted car rental partner",
   phone: "+1234567890",
-  email: "info@driveshare.com",
+  email: "info@rentacar.com",
   whatsapp: "+1234567890",
   address: "123 Main Street, City, Country",
   latitude: 40.7128,

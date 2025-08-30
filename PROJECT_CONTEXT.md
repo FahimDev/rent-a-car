@@ -1,7 +1,7 @@
-# DriveShare - Simple Car Booking Application
+# Rent-A-Car - Simple Car Booking Application
 
 ## Project Overview
-DriveShare is a simple, professional car booking application designed for a car rental company. The platform provides a seamless booking experience for passengers while giving admins easy vehicle and booking management capabilities.
+Rent-A-Car is a simple, professional car booking application designed for a car rental company. The platform provides a seamless booking experience for passengers while giving admins easy vehicle and booking management capabilities.
 
 ## Project Structure
 ```
