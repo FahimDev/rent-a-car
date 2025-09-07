@@ -223,20 +223,20 @@ export default async function VehiclesPage({ searchParams }: VehiclesPageProps) 
         )}
 
         {/* CTA Section */}
-        <div className="mt-12 bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl p-8 text-white text-center">
+        <div className="mt-12 bg-gradient-to-r from-gray-900 to-black rounded-xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to Book Your Ride?</h2>
           <p className="text-lg opacity-90 mb-6 max-w-2xl mx-auto">
             Choose from our well-maintained vehicles and enjoy a comfortable journey across Bangladesh.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/booking">
-              <Button size="lg" className="btn-mobile bg-white text-primary-600 hover:bg-gray-100">
+              <Button size="lg" className="btn-mobile bg-primary-600 text-white hover:bg-primary-700">
                 <Calendar className="mr-2 h-5 w-5" />
                 Book Now
               </Button>
             </Link>
             <Link href="/">
-              <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-primary-600">
+              <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-black">
                 <ArrowLeft className="mr-2 h-5 w-5" />
                 Back to Home
               </Button>

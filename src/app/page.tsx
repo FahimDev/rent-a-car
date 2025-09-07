@@ -121,7 +121,7 @@ export default async function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-primary-600 to-primary-800 text-white">
+      <section className="relative bg-gradient-to-r from-gray-900 to-black text-white">
         <div className="container-mobile py-16 sm:py-24">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="heading-responsive font-bold mb-6 leading-tight">
@@ -136,13 +136,13 @@ export default async function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/vehicles">
-                <Button size="lg" className="btn-mobile bg-white text-primary-600 hover:bg-gray-100">
+                <Button size="lg" className="btn-mobile bg-primary-600 text-white hover:bg-primary-700">
                   <Car className="mr-2 h-5 w-5" />
                   View Our Vehicles
                 </Button>
               </Link>
               <Link href="/booking">
-                <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-primary-600">
+                <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-black">
                   <Clock className="mr-2 h-5 w-5" />
                   Book Now
                 </Button>
@@ -166,9 +166,11 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <div key={index} className="text-center">
-                <div className="flex justify-center mb-4">
-                  {feature.icon}
-                </div>
+                  <div className="flex justify-center mb-4">
+                    <div className="p-2 bg-primary-100 rounded-lg">
+                      {feature.icon}
+                    </div>
+                  </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{feature.text}</h3>
                 <p className="text-sm text-gray-600 font-bangla">{feature.textBn}</p>
               </div>
@@ -264,7 +266,7 @@ export default async function HomePage() {
       )}
 
       {/* Contact Section */}
-      <section className="py-16 bg-primary-600 text-white">
+      <section className="py-16 bg-gray-900 text-white">
         <div className="container-mobile">
           <div className="text-center mb-12">
             <h2 className="heading-responsive font-bold mb-4">
@@ -328,7 +330,7 @@ export default async function HomePage() {
       )}
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary-600 to-primary-800 text-white">
+      <section className="py-16 bg-gradient-to-r from-gray-900 to-black text-white">
         <div className="container-mobile text-center">
           <h2 className="heading-responsive font-bold mb-4">
             Ready to Book Your Ride?
@@ -338,13 +340,13 @@ export default async function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/booking">
-              <Button size="lg" className="btn-mobile bg-white text-primary-600 hover:bg-gray-100">
+              <Button size="lg" className="btn-mobile bg-primary-600 text-white hover:bg-primary-700">
                 <Clock className="mr-2 h-5 w-5" />
                 Book Now
               </Button>
             </Link>
             <Link href="/vehicles">
-              <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-primary-600">
+              <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-black">
                 <Car className="mr-2 h-5 w-5" />
                 View Vehicles
               </Button>

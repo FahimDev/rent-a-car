@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -62,7 +62,7 @@ export default function AdminLoginPage() {
             </Button>
           </Link>
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center">
               <Shield className="h-8 w-8 text-white" />
             </div>
           </div>

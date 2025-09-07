@@ -197,7 +197,7 @@ export default function BookingPage() {
               <div key={step.id} className="flex items-center">
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                   currentStep >= step.id
-                    ? 'bg-primary-500 border-primary-500 text-white'
+                    ? 'bg-primary-600 border-primary-600 text-white'
                     : 'border-gray-300 text-gray-400'
                 }`}>
                   {currentStep > step.id ? (
@@ -215,7 +215,7 @@ export default function BookingPage() {
                 </div>
                 {index < steps.length - 1 && (
                   <div className={`hidden sm:block w-16 h-0.5 mx-4 ${
-                    currentStep > step.id ? 'bg-primary-500' : 'bg-gray-300'
+                    currentStep > step.id ? 'bg-primary-600' : 'bg-gray-300'
                   }`} />
                 )}
               </div>
