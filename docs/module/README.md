@@ -28,14 +28,7 @@ This directory contains detailed technical specifications for each module of the
 - Pickup/drop-off coordination
 - Booking history and analytics
 
-#### 4. [Payment Module](payment-module.md)
-- Payment processing and gateway integration
-- Fee calculation and management
-- Refund processing
-- Payment security and compliance
-- Transaction logging and auditing
-
-#### 5. [Notification Module](notification-module.md)
+#### 4. [Notification Module](notification-module.md)
 - Email notifications
 - SMS notifications
 - Push notifications

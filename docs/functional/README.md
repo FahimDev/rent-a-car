@@ -1,118 +1,239 @@
-# Functional Requirements - DriveShare
+# Functional Requirements
 
 ## Overview
-This directory contains detailed functional requirements for each major feature area of the DriveShare car booking platform. Each document provides comprehensive specifications for implementation.
+This document outlines the functional requirements for the Rent-A-Car booking platform. The application serves as a simple vehicle booking system with admin management capabilities, built with Next.js full-stack architecture for shared hosting deployment.
 
-## Functional Areas
+## Core Modules
 
-### 1. [Passenger Booking](passenger-booking.md)
-- Landing page with company information
-- Vehicle gallery and filtering
-- 4-step booking process
-- Mobile-first user experience
-- Progressive Web App features
+### 1. Customer-Facing Module
+**Purpose**: Enable customers to browse vehicles and submit booking requests
 
-### 2. [Admin Management](admin-management.md)
-- Vehicle management (add, edit, delete)
-- Booking viewing and management
-- Simple admin login system
-- WhatsApp notification integration
-- Booking details access
+#### Features:
+- **Landing Page**
+  - Company information and services
+  - Contact details and location
+  - Call-to-action for vehicle browsing
 
-### 3. [Vehicle Management](vehicle-management.md)
-- Vehicle data upload and management
-- Photo management and storage
-- Vehicle categorization (Sedan, Noah, Hiace)
-- Availability status management
-- Vehicle information display
+- **Vehicle Gallery**
+  - Display all available vehicles with photos
+  - Filter by vehicle type (sedan, SUV, hatchback, luxury)
+  - Vehicle details (specifications, features, daily rates)
+  - Responsive grid layout
 
-## Functional Requirements Structure
+- **Booking System**
+  - Simple 4-step booking process
+  - Date selection (pickup/return)
+  - Customer information form
+  - Booking confirmation
 
-Each functional requirement document follows this structure:
+- **Quick Book System**
+  - **Purpose**: Simplified booking for senior citizens
+  - **3-Step Process**: Dates → Vehicle Type → Contact
+  - **Vehicle Selection**: Icon-based (Small Car, Large SUV, Electric)
+  - **Contact Management**: UUID-like phone number system
+  - **No Registration**: Direct booking without account creation
+  - **Accessibility**: Large buttons, clear text, minimal options
 
-### 1. Overview
-- Purpose and scope
-- Key stakeholders
-- Success criteria
+- **Company Information**
+  - About the company
+  - Services offered
+  - Location map integration
+  - Contact information
 
-### 2. Functional Requirements
-- Detailed feature specifications
-- User interface requirements
-- Business logic requirements
-- Data requirements
+#### User Flow:
+1. Customer visits landing page
+2. Browses vehicle gallery
+3. Selects desired vehicle
+4. Completes booking form
+5. Receives confirmation
 
-### 3. Non-Functional Requirements
-- Performance requirements
-- Security requirements
-- Usability requirements
-- Reliability requirements
+### 2. Admin Management Module
+**Purpose**: Enable admin to manage vehicles, bookings, and system settings
 
-### 4. User Stories
-- Detailed user stories with acceptance criteria
-- Edge cases and error scenarios
-- User journey flows
+#### Features:
+- **Admin Authentication**
+  - Secure login system
+  - Session management
+  - Protected admin routes
 
-### 5. Technical Specifications
-- API requirements
-- Database requirements
-- Integration requirements
-- Testing requirements
+- **Vehicle Management**
+  - Add/edit/delete vehicles
+  - Upload and manage vehicle photos
+  - Set vehicle availability
+  - Manage vehicle specifications
 
-## Implementation Priority
+- **Booking Management**
+  - View all booking requests
+  - Access detailed booking information
+  - Update booking status
+  - Customer contact management
 
-### Phase 1 (MVP)
-1. **Landing Page** - Company information and contact details
-2. **Vehicle Gallery** - Vehicle display and filtering
-3. **Booking System** - 4-step booking process
-4. **Admin Panel** - Basic vehicle and booking management
+- **Dashboard**
+  - Recent bookings overview
+  - Quick stats (total vehicles, pending bookings)
+  - Quick actions
 
-### Phase 2 (Enhanced Features)
-1. **WhatsApp Integration** - Booking notifications
-2. **Mobile Optimization** - PWA features
-3. **Enhanced Admin Features** - Advanced management tools
-4. **Google Maps Integration** - Location services
+#### Admin Flow:
+1. Admin logs into dashboard
+2. Manages vehicles and bookings
+3. Responds to booking notifications
+4. Updates system as needed
 
-### Phase 3 (Advanced Features)
-1. **Booking Analytics** - Reporting and insights
-2. **Advanced Filtering** - More vehicle options
-3. **Multi-language Support** - Internationalization
-4. **Advanced Notifications** - Multiple channels
+### 3. Notification Module
+**Purpose**: Enable real-time communication between customers and admin
 
-## Quality Assurance
+#### Features:
+- **WhatsApp Integration**
+  - Instant booking notifications to admin
+  - Direct link to booking details
+  - Customer contact information
 
-### Testing Requirements
-- Unit testing for all business logic
-- Integration testing for API endpoints
-- End-to-end testing for user journeys
-- Performance testing for mobile experience
-- PWA testing for offline functionality
+- **Email Notifications** (Future)
+  - Booking confirmations
+  - Status updates
+  - Communication management
 
-### Documentation Requirements
-- API documentation with examples
-- User guides and help documentation
-- Technical documentation for developers
-- Deployment and maintenance guides
+### 4. Progressive Web App Module
+**Purpose**: Provide app-like experience on mobile devices
 
-## Compliance and Standards
+#### Features:
+- **PWA Capabilities**
+  - Installable web app
+  - Offline functionality
+  - App-like navigation
 
-### Security Standards
-- Basic security best practices
-- Data protection for user information
-- Secure admin access
-- Input validation and sanitization
+- **Mobile Optimization**
+  - Touch-friendly interface
+  - Responsive design
+  - Fast loading times
 
-### Accessibility Standards
-- Mobile accessibility guidelines
-- Touch-friendly interface design
-- Responsive design principles
-- Progressive Web App standards
+## Detailed Feature Specifications
+
+### Vehicle Management
+- **Vehicle Information**
+  - Name, brand, model, year
+  - Type categorization
+  - Seating capacity
+  - Transmission type
+  - Fuel type
+  - Daily rental rate
+  - Features list
+  - Description
+
+- **Image Management**
+  - Multiple photos per vehicle
+  - Primary image selection
+  - Image optimization
+  - Alt text for accessibility
+
+### Booking Process
+- **Step 1: Vehicle Selection**
+  - Choose from available vehicles
+  - View vehicle details
+  - Check availability
+
+- **Step 2: Date Selection**
+  - Calendar-based date picker
+  - Pickup and return dates
+  - Duration calculation
+  - Rate calculation
+
+- **Step 3: Customer Information**
+  - Name, email, phone number
+  - Pickup location preference
+  - Additional requirements
+
+- **Step 4: Confirmation**
+  - Booking summary
+  - Terms and conditions
+  - Submit booking request
+
+### Data Management
+- **Database Structure**
+  - Vehicles table
+  - Bookings table
+  - Vehicle images table
+  - Admin users table
+  - Settings table
+
+- **File Storage**
+  - Local file system for images
+  - Organized folder structure
+  - File size and type validation
+
+## Technical Requirements
+
+### Performance
+- **Page Load Speed**: < 3 seconds on 3G connection
+- **Image Loading**: Lazy loading and optimization
+- **Database Queries**: Optimized with proper indexing
+- **Caching**: Static file caching for better performance
+
+### Security
+- **Admin Authentication**: Secure login system
+- **Data Validation**: Input sanitization and validation
+- **File Upload Security**: Type and size restrictions
+- **Environment Variables**: Secure configuration management
+
+### Accessibility
+- **WCAG 2.1 AA Compliance**: Accessible design patterns
+- **Keyboard Navigation**: Full keyboard accessibility
+- **Screen Reader Support**: Proper ARIA labels
+- **Color Contrast**: Accessible color schemes
+
+### Browser Compatibility
+- **Modern Browsers**: Chrome, Firefox, Safari, Edge (latest 2 versions)
+- **Mobile Browsers**: iOS Safari, Chrome Mobile
+- **Progressive Enhancement**: Graceful degradation
+
+## Business Rules
+
+### Vehicle Availability
+- Vehicles can be marked as available/unavailable
+- Admin can control which vehicles appear in gallery
+- Vehicle information must be complete before showing to customers
+
+### Booking Rules
+- Pickup date must be today or future date
+- Return date must be after pickup date
+- Customer contact information is required
+- Booking reference is auto-generated
+
+### Admin Access
+- Single admin role for simplicity
+- Secure authentication required
+- Session timeout for security
+
+## Integration Points
+
+### External Services
+- **Google Maps**: Company location display
+- **WhatsApp**: Booking notifications
+- **Email Service**: Confirmation emails (future)
+
+### File System
+- **Image Storage**: Local file system
+- **Database**: SQLite (dev) / MySQL (production)
+- **Configuration**: Environment variables
+
+## Success Metrics
+- **Booking Completion Rate**: > 80%
+- **Page Load Time**: < 3 seconds
+- **Mobile Usage**: > 60% of traffic
+- **Admin Response Time**: < 30 seconds for notifications
+
+## Future Enhancements (Out of Scope)
+- Payment processing integration
+- Customer review and rating system
+- Advanced booking management
+- Multi-language support
+- Advanced analytics and reporting
 
 ---
 **Related Documents:**
-- [Product Concept Note](../product-concept-note.md) - Overall product vision
-- [Epic Stories](../epic-stories.md) - High-level user stories
+- [Epic Stories](../epic-stories.md) - User stories and acceptance criteria
 - [Module Specifications](../module/README.md) - Technical module breakdown
-- [Technical Architecture](../technical/architecture.md) - System design
+- [API Specifications](../technical/api-specifications.md) - API endpoint details
 
 *Last Updated: [Current Date]*
 *Document Owner: Product Team*

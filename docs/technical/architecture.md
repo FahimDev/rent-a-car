@@ -110,7 +110,7 @@ rent-a-car/
 │   ├── components/       # React components
 │   ├── lib/             # Utilities
 │   └── types/           # TypeScript types
-├── prisma/              # Database schema
+├── mysql/              # Database schema
 ├── public/              # Static assets
 ├── package.json
 ├── next.config.js

@@ -1,6 +1,6 @@
 # Rent-A-Car - Car Booking Application
 
-A simple, professional car booking application built with Next.js for a car rental company. This project demonstrates the power of Cursor AI in building modern web applications.
+A comprehensive car rental management system designed for manual admin operations with offline payment processing.
 
 ## 🚀 Features
 
@@ -8,8 +8,10 @@ A simple, professional car booking application built with Next.js for a car rent
 - **Landing Page**: Company information and contact details
 - **Vehicle Gallery**: Browse available vehicles with filtering
 - **4-Step Booking**: Simple booking process (Date/Time → Locations → Contact → Confirm)
+- **Quick Book**: Simplified 3-step booking interface for senior citizens
 - **Mobile-First**: Progressive Web App experience
 - **No Registration**: Book without creating an account
+- **Quick Book**: Simplified booking interface for senior citizens
 
 ### For Admins
 - **Vehicle Management**: Add, edit, and manage vehicles
@@ -22,7 +24,7 @@ A simple, professional car booking application built with Next.js for a car rent
 - **Framework**: Next.js 14+ with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Database**: PostgreSQL with Prisma ORM
+- **Database**: MySQL
 - **External APIs**: WhatsApp Business API, Google Maps API
 - **Hosting**: cPanel compatible
 
@@ -35,7 +37,21 @@ A simple, professional car booking application built with Next.js for a car rent
 ## 🏗️ Project Structure
 
 ```
-rent-a-car/
+car-rental-app/
+├── docs/
+│   ├── business/
+│   │   ├── requirements.md
+│   │   ├── user-stories.md
+│   │   └── business-rules.md
+│   ├── technical/
+│   │   ├── architecture.md
+│   │   ├── api-design.md
+│   │   ├── database-schema.md
+│   │   └── deployment.md
+│   └── ui-ux/
+│       ├── wireframes.md
+│       ├── user-flows.md
+│       └── design-system.md
 ├── src/
 │   ├── app/              # Next.js App Router
 │   │   ├── page.tsx      # Landing page
@@ -55,9 +71,9 @@ rent-a-car/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm
-- PostgreSQL database
-- Git
+- Node.js (v16 or higher)
+- MySQL (v8.0 or higher)
+- npm or yarn package manager
 
 ### Installation
 
@@ -79,19 +95,12 @@ rent-a-car/
    
    Edit `.env.local` with your configuration:
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/rentacar"
-   WHATSAPP_API_KEY="your_whatsapp_api_key"
-   WHATSAPP_PHONE_NUMBER="your_whatsapp_number"
-   GOOGLE_MAPS_API_KEY="your_google_maps_key"
-   ADMIN_USERNAME="admin"
-   ADMIN_PASSWORD="secure_password"
+   DATABASE_URL="mysql://user:password@localhost:3306/carrental"
+   JWT_SECRET="your_jwt_secret"
    ```
 
 4. **Set up database**
-   ```bash
-   npx prisma migrate dev
-   npx prisma db seed
-   ```
+   Use the schema provided in `/docs/technical/database-schema.md`.
 
 5. **Start development server**
    ```bash
@@ -105,26 +114,9 @@ rent-a-car/
 
 Comprehensive documentation is available in the `docs/` directory:
 
-- **[Project Context](docs/PROJECT_CONTEXT.md)** - Project overview and navigation
-- **[Product Concept](docs/product-concept-note.md)** - Product vision and requirements
-- **[Epic Stories](docs/epic-stories.md)** - User stories and scenarios
-- **[Functional Requirements](docs/functional/README.md)** - Detailed feature specifications
-- **[Technical Architecture](docs/technical/architecture.md)** - System design and architecture
-- **[Database Design](docs/technical/database-design.md)** - Database schema with Mermaid ERD
-
-## 🗄️ Database Schema
-
-The application uses a simple PostgreSQL schema with the following entities:
-
-- **Vehicles**: Vehicle information and availability
-- **Vehicle_Photos**: Multiple photos per vehicle
-- **Passengers**: Passenger information (phone-based)
-- **Bookings**: Booking details and status
-- **Admins**: Admin user management
-- **Company_Info**: Company details for landing page
-- **Notifications**: WhatsApp notification tracking
-
-See the [Database Design](docs/technical/database-design.md) for the complete Mermaid ERD.
+- **Business Requirements**: `/docs/business/`
+- **Technical Specifications**: `/docs/technical/`
+- **UI/UX Guidelines**: `/docs/ui-ux/`
 
 ## 🔧 Development
 
@@ -134,14 +126,13 @@ See the [Database Design](docs/technical/database-design.md) for the complete Me
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript type checking
+- `npm run test` - Run tests
 
 ### Code Structure
 
 - **Components**: Reusable React components in `src/components/`
 - **API Routes**: Next.js API routes in `src/app/api/`
 - **Pages**: Next.js pages in `src/app/`
-- **Database**: Prisma schema in `prisma/schema.prisma`
 
 ## 🚀 Deployment
 
@@ -154,23 +145,35 @@ See the [Database Design](docs/technical/database-design.md) for the complete Me
 
 2. **Upload files** to your cPanel hosting via FTP or Git
 
-3. **Set up PostgreSQL database** in cPanel
+3. **Set up MySQL database** in cPanel
 
 4. **Configure environment variables** in cPanel
 
-5. **Run database migrations**
-   ```bash
-   npx prisma migrate deploy
-   ```
-
-6. **Start the application**
+5. **Start the application**
    ```bash
    npm start
    ```
 
+## Quick Book Feature
+
+A simplified booking experience designed specifically for senior citizens who prefer straightforward technology interactions.
+
+### Key Benefits:
+- **Simple 3-step process**: Dates → Vehicle Type → Contact
+- **Large, clear interface elements**
+- **No complex vehicle galleries or confusing options**
+- **Icon-based vehicle selection**
+- **Smart contact management** with UUID-like system
+
+### Contact System:
+- Phone numbers act as unique identifiers (UUID-like)
+- Returning customers are automatically recognized
+- One-to-many relationship between contacts and bookings
+- No duplicate contact storage
+
 ## 🤝 Contributing
 
-This is an experimental project for learning Cursor AI capabilities. Feel free to:
+This is an experimental project for learning purposes. Feel free to:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -194,7 +197,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For support and questions:
 - Create an issue in this repository
 - Contact the development team
-
----
-
-**Built with ❤️ using Cursor AI**

@@ -86,6 +86,48 @@ This project is designed to leverage Cursor AI's capabilities:
 - Simple, professional UI design
 - Streamlined booking flow
 
+## Project Clarifications (Updated)
+
+### Core Business Model
+- **Simple Form Submission System**: No complex inventory or real-time availability
+- **Mobile-First Design**: 90% mobile users, 10% desktop
+- **Manual Admin Process**: Trust-based system with manual verification
+- **Offline Payments**: No online payment integration required
+
+### Authentication Strategy
+- **Admin**: Username/password with NextAuth.js (Super Admin + Regular Admin roles)
+- **Passengers**: No authentication portal - simple form submission only
+- **Verification**: Manual phone verification by admin (no OTP system)
+
+### Key Features (Simplified)
+1. **Vehicle Gallery**: Browse and select vehicles
+2. **Booking Form**: Mobile number + details submission
+3. **Admin Dashboard**: Manage bookings, verify passengers, track payments
+4. **WhatsApp Integration**: Notifications for verified WhatsApp users
+5. **Manual Payment Tracking**: Offline payment with Excel export
+6. **Basic Analytics**: Simple business metrics dashboard
+
+### Mobile Number as Primary Key
+- **Unique Identifier**: One mobile number = One passenger record
+- **Multiple Bookings**: Same number can book multiple times
+- **Manual Verification**: Admin calls to verify legitimacy
+- **Country Code Validation**: Required for all mobile numbers
+- **Immutable**: Cannot change mobile number in existing bookings
+
+### Admin Capabilities
+- **Passenger Verification**: Mark mobile numbers as verified after call
+- **WhatsApp Status**: Track which passengers use WhatsApp
+- **Payment Management**: Manual payment entry and tracking
+- **Booking Modification**: Super Admin can modify (except mobile number)
+- **Analytics Dashboard**: View booking stats and revenue metrics
+
+### Technical Priorities
+- **Mobile Responsiveness**: Primary focus on mobile experience
+- **Simple Architecture**: No complex inventory or availability systems
+- **Manual Workflow**: Admin-centered process management
+- **Data Export**: Excel reports for business tracking
+- **Change Tracking**: Audit trail for booking modifications
+
 ---
 *Last Updated: [Current Date]*
 *Project Status: Planning Phase*
