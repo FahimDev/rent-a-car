@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  email     String?
+  phone     String?
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Vehicle {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // "sedan", "noah", "hiace"
+  seats       Int
+  description String?
+  features    String?  // JSON string of features
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  photos      VehiclePhoto[]
+  bookings    Booking[]
+
+  @@map("vehicles")
+}
+
+model VehiclePhoto {
+  id        String   @id @default(cuid())
+  vehicleId String
+  url       String
+  alt       String?
+  isPrimary Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_photos")
+}
+
+model Passenger {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  name      String?
+  email     String?
+  isVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings  Booking[]
+
+  @@map("passengers")
+}
+
+model Booking {
+  id            String   @id @default(cuid())
+  passengerId   String
+  vehicleId     String
+  bookingDate   DateTime
+  pickupTime    String
+  tripType      String   // "single" or "round"
+  pickupLocation String
+  dropoffLocation String?
+  status        String   @default("pending") // "pending", "confirmed", "completed", "cancelled"
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  passenger     Passenger @relation(fields: [passengerId], references: [id])
+  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id])
+  notifications Notification[]
+
+  @@map("bookings")
+}
+
+model CompanyInfo {
+  id          String   @id @default(cuid())
+  name        String
+  tagline     String?
+  description String?
+  address     String?
+  phone       String?
+  email       String?
+  whatsapp    String?
+  latitude    Float?
+  longitude   Float?
+  services    String?  // JSON string of services
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("company_info")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  bookingId String
+  type      String   // "whatsapp", "email", "sms"
+  status    String   @default("pending") // "pending", "sent", "failed"
+  message   String?
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
