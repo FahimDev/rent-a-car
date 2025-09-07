@@ -103,6 +103,23 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen">
+      {/* Header with Admin Login */}
+      <header className="absolute top-0 left-0 right-0 z-50 p-4">
+        <div className="container-mobile">
+          <div className="flex justify-between items-center">
+            <Link href="/admin/login">
+              <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
+                <Shield className="mr-2 h-4 w-4" />
+                Admin Login
+              </Button>
+            </Link>
+            <div className="text-white/60 text-sm">
+              Rent-A-Car Bangladesh
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="container-mobile py-16 sm:py-24">
@@ -128,14 +145,6 @@ export default async function HomePage() {
                 <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-primary-600">
                   <Clock className="mr-2 h-5 w-5" />
                   Book Now
-                </Button>
-              </Link>
-            </div>
-            <div className="mt-4">
-              <Link href="/admin/login">
-                <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
-                  <Shield className="mr-2 h-4 w-4" />
-                  Admin Login
                 </Button>
               </Link>
             </div>
