@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { saveUploadedFile, validateImageFile } from '@/lib/fileUpload'
 import jwt from 'jsonwebtoken'
 
 // GET /api/admin/vehicles - Get all vehicles
@@ -100,19 +101,33 @@ export async function POST(request: NextRequest) {
     for (let i = 0; i < 10; i++) { // Allow up to 10 photos
       const photoFile = formData.get(`photo_${i}`) as File
       if (photoFile && photoFile.size > 0) {
-        // For now, we'll store the file name and create a placeholder URL
-        // In production, you'd upload to a cloud storage service
-        const fileName = `${vehicle.id}_${i}_${Date.now()}.${photoFile.name.split('.').pop()}`
+        // Validate the image file
+        if (!validateImageFile(photoFile)) {
+          return NextResponse.json({ 
+            error: `Invalid image file: ${photoFile.name}. Please upload a valid image (JPEG, PNG, WebP) under 5MB.` 
+          }, { status: 400 })
+        }
         
-        const photo = await prisma.vehiclePhoto.create({
-          data: {
-            vehicleId: vehicle.id,
-            url: `/images/vehicles/${fileName}`,
-            alt: `${vehicle.name} - Photo ${i + 1}`,
-            order: i
-          }
-        })
-        photos.push(photo)
+        try {
+          // Save the uploaded file to filesystem
+          const fileUrl = await saveUploadedFile(photoFile, vehicle.id, i)
+          
+          // Create photo record in database
+          const photo = await prisma.vehiclePhoto.create({
+            data: {
+              vehicleId: vehicle.id,
+              url: fileUrl,
+              alt: `${vehicle.name} - Photo ${i + 1}`,
+              order: i
+            }
+          })
+          photos.push(photo)
+        } catch (error) {
+          console.error('Error saving photo:', error)
+          return NextResponse.json({ 
+            error: `Failed to save image: ${photoFile.name}` 
+          }, { status: 500 })
+        }
       }
     }
 

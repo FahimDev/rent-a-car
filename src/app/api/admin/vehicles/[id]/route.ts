@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { saveUploadedFile, validateImageFile, deleteUploadedFile } from '@/lib/fileUpload'
 import jwt from 'jsonwebtoken'
 
 export async function GET(
@@ -109,8 +110,51 @@ export async function PUT(
       }
     })
 
+    // Handle new photo uploads
+    const newPhotos = []
+    for (let i = 0; i < 10; i++) { // Allow up to 10 photos
+      const photoFile = formData.get(`photo_${i}`) as File
+      if (photoFile && photoFile.size > 0) {
+        // Validate the image file
+        if (!validateImageFile(photoFile)) {
+          return NextResponse.json({ 
+            error: `Invalid image file: ${photoFile.name}. Please upload a valid image (JPEG, PNG, WebP) under 5MB.` 
+          }, { status: 400 })
+        }
+        
+        try {
+          // Save the uploaded file to filesystem
+          const fileUrl = await saveUploadedFile(photoFile, vehicle.id, i)
+          
+          // Create photo record in database
+          const photo = await prisma.vehiclePhoto.create({
+            data: {
+              vehicleId: vehicle.id,
+              url: fileUrl,
+              alt: `${vehicle.name} - Photo ${i + 1}`,
+              order: i
+            }
+          })
+          newPhotos.push(photo)
+        } catch (error) {
+          console.error('Error saving photo:', error)
+          return NextResponse.json({ 
+            error: `Failed to save image: ${photoFile.name}` 
+          }, { status: 500 })
+        }
+      }
+    }
+
+    // Get updated vehicle with all photos
+    const updatedVehicle = await prisma.vehicle.findUnique({
+      where: { id: params.id },
+      include: {
+        photos: true
+      }
+    })
+
     return NextResponse.json({ 
-      vehicle,
+      vehicle: updatedVehicle,
       message: 'Vehicle updated successfully' 
     })
   } catch (error) {
@@ -196,6 +240,19 @@ export async function DELETE(
       return NextResponse.json({ 
         error: 'Cannot delete vehicle with existing bookings' 
       }, { status: 400 })
+    }
+
+    // Get vehicle photos before deletion to clean up files
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { id: params.id },
+      include: { photos: true }
+    })
+
+    if (vehicle) {
+      // Delete uploaded files
+      for (const photo of vehicle.photos) {
+        await deleteUploadedFile(photo.url)
+      }
     }
 
     // Delete vehicle (photos will be deleted automatically due to cascade)
