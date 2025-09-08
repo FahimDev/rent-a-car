@@ -480,12 +480,20 @@ export default function VehicleManagement() {
                     width={400}
                     height={250}
                     className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
                   />
-                ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                    <Car className="h-12 w-12 text-gray-400" />
-                  </div>
-                )}
+                ) : null}
+                <div 
+                  className="w-full h-48 bg-gray-200 flex items-center justify-center"
+                  style={{ display: vehicle.photos.length > 0 ? 'none' : 'flex' }}
+                >
+                  <Car className="h-12 w-12 text-gray-400" />
+                </div>
                 <div className="absolute top-2 right-2">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     vehicle.isAvailable 
