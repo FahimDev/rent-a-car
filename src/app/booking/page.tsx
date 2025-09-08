@@ -68,10 +68,28 @@ export default function BookingPage() {
     const vehicleId = searchParams.get('vehicle')
     if (vehicleId) {
       setFormData(prev => ({ ...prev, vehicleId }))
-      // In a real app, you'd fetch the vehicle details
-      setSelectedVehicle({ id: vehicleId, name: 'Selected Vehicle', type: 'sedan', seats: 4 })
+      // Fetch the actual vehicle details
+      fetchVehicleDetails(vehicleId)
     }
   }, [searchParams])
+
+  const fetchVehicleDetails = async (vehicleId: string) => {
+    try {
+      const response = await fetch(`/api/vehicles/${vehicleId}`)
+      if (response.ok) {
+        const vehicle = await response.json()
+        setSelectedVehicle(vehicle)
+      } else {
+        console.error('Failed to fetch vehicle details')
+        // Fallback to a basic vehicle object
+        setSelectedVehicle({ id: vehicleId, name: 'Selected Vehicle', type: 'sedan', capacity: 4 })
+      }
+    } catch (error) {
+      console.error('Error fetching vehicle details:', error)
+      // Fallback to a basic vehicle object
+      setSelectedVehicle({ id: vehicleId, name: 'Selected Vehicle', type: 'sedan', capacity: 4 })
+    }
+  }
 
   const steps = [
     { id: 1, title: 'Date & Time', icon: <Calendar className="h-5 w-5" /> },

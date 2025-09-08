@@ -58,7 +58,7 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
 
   const filteredVehicles = vehicles.filter(vehicle => {
     const matchesSearch = vehicle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vehicle.description.toLowerCase().includes(searchTerm.toLowerCase())
+                         (vehicle.description && vehicle.description.toLowerCase().includes(searchTerm.toLowerCase()))
     const matchesType = !selectedType || vehicle.type === selectedType
     return matchesSearch && matchesType && vehicle.isAvailable
   })
@@ -113,8 +113,8 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
                 >
                   <option value="">All Types</option>
                   {VEHICLE_TYPES.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
+                    <option key={type.id} value={type.id}>
+                      {type.name}
                     </option>
                   ))}
                 </select>
@@ -174,7 +174,7 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
                         {vehicle.name}
                       </CardTitle>
                       <CardDescription className="text-gray-600 mt-1">
-                        {VEHICLE_TYPES.find(t => t.value === vehicle.type)?.label || vehicle.type}
+                        {VEHICLE_TYPES.find(t => t.id === vehicle.type)?.name || vehicle.type}
                       </CardDescription>
                     </div>
                     <div className="text-right">
@@ -225,7 +225,7 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
                   </div>
 
                   {/* Book Now Button */}
-                  <Link href={`/booking?vehicleId=${vehicle.id}`}>
+                  <Link href={`/booking?vehicle=${vehicle.id}`}>
                     <Button className="w-full btn-mobile group-hover:bg-blue-600 transition-colors">
                       <Calendar className="w-4 h-4 mr-2" />
                       Book Now
