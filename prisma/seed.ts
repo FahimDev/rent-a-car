@@ -49,26 +49,32 @@ async function main() {
     {
       name: 'Toyota Corolla',
       type: 'sedan',
-      seats: 4,
+      capacity: 4,
+      pricePerDay: 2500,
       description: 'Comfortable sedan perfect for city travel and short trips.',
       features: JSON.stringify(['AC', 'Music System', 'Comfortable Seats', 'Professional Driver']),
-      isAvailable: true
+      isAvailable: true,
+      adminId: admin.id
     },
     {
       name: 'Toyota Noah',
       type: 'noah',
-      seats: 7,
+      capacity: 7,
+      pricePerDay: 3500,
       description: 'Spacious 7-seater perfect for family trips and group travel.',
       features: JSON.stringify(['AC', 'Music System', 'Spacious Interior', 'Professional Driver', 'Child Safety Features']),
-      isAvailable: true
+      isAvailable: true,
+      adminId: admin.id
     },
     {
       name: 'Toyota Hiace',
       type: 'hiace',
-      seats: 12,
+      capacity: 12,
+      pricePerDay: 4500,
       description: 'Large capacity vehicle ideal for corporate events and large groups.',
       features: JSON.stringify(['AC', 'Music System', 'Large Capacity', 'Professional Driver', 'Luggage Space']),
-      isAvailable: true
+      isAvailable: true,
+      adminId: admin.id
     }
   ]
 

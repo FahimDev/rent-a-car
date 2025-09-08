@@ -2,10 +2,12 @@ export interface Vehicle {
   id: string
   name: string
   type: 'sedan' | 'noah' | 'hiace'
-  seats: number
+  capacity: number
+  pricePerDay: number
   description?: string
-  features?: string[]
+  features?: string
   isAvailable: boolean
+  adminId?: string
   createdAt: Date
   updatedAt: Date
   photos: VehiclePhoto[]
@@ -96,7 +98,7 @@ export interface BookingFormData {
 export interface VehicleType {
   id: 'sedan' | 'noah' | 'hiace'
   name: string
-  seats: number
+  capacity: number
   description: string
   icon: string
 }
@@ -105,21 +107,21 @@ export const VEHICLE_TYPES: VehicleType[] = [
   {
     id: 'sedan',
     name: '4-Seat Sedan',
-    seats: 4,
+    capacity: 4,
     description: 'Comfortable sedan perfect for city travel and short trips',
     icon: '🚗'
   },
   {
     id: 'noah',
     name: '7-Seat Noah',
-    seats: 7,
+    capacity: 7,
     description: 'Spacious 7-seater perfect for family trips and group travel',
     icon: '🚐'
   },
   {
     id: 'hiace',
     name: '12-Seat Hiace',
-    seats: 12,
+    capacity: 12,
     description: 'Large capacity vehicle ideal for corporate events and large groups',
     icon: '🚌'
   }

@@ -243,7 +243,7 @@ export default async function HomePage() {
                     <p className="text-sm text-gray-600 mb-4">{vehicle.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-primary-600">
-                        {vehicle.seats} Seats
+                        {vehicle.capacity} Seats
                       </span>
                       <span className="text-sm text-gray-500 capitalize">
                         {vehicle.type}

@@ -184,7 +184,7 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
                   <div>
                     <h4 className="font-semibold">{booking.vehicle.name}</h4>
                     <p className="text-sm text-gray-600 capitalize">{booking.vehicle.type}</p>
-                    <p className="text-sm text-gray-600">{booking.vehicle.seats} seats</p>
+                    <p className="text-sm text-gray-600">{booking.vehicle.capacity} seats</p>
                   </div>
                 </div>
               </div>

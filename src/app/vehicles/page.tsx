@@ -104,7 +104,7 @@ export default async function VehiclesPage({ searchParams }: VehiclesPageProps) 
                 <div className="text-center">
                   <div className="text-3xl mb-2">{type.icon}</div>
                   <h3 className="font-semibold text-gray-900 mb-1">{type.name}</h3>
-                  <p className="text-sm text-gray-600">{type.seats} Seats</p>
+                  <p className="text-sm text-gray-600">{type.capacity} Seats</p>
                   <p className="text-xs text-gray-500 mt-1">{type.description}</p>
                 </div>
               </Link>
@@ -143,7 +143,7 @@ export default async function VehiclesPage({ searchParams }: VehiclesPageProps) 
                   )}
                   <div className="absolute top-4 right-4">
                     <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-medium text-gray-900">
-                      {vehicle.seats} Seats
+                      {vehicle.capacity} Seats
                     </div>
                   </div>
                   <div className="absolute top-4 left-4">
@@ -192,7 +192,7 @@ export default async function VehiclesPage({ searchParams }: VehiclesPageProps) 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center text-sm text-gray-600">
                       <Users className="h-4 w-4 mr-1" />
-                      <span>{vehicle.seats} passengers</span>
+                      <span>{vehicle.capacity} passengers</span>
                     </div>
                     <Link href={`/booking?vehicle=${vehicle.id}`}>
                       <Button size="sm" className="btn-mobile">
