@@ -16,6 +16,7 @@ import {
   CheckCircle
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 async function getCompanyInfo() {
   try {
@@ -229,9 +230,11 @@ export default async function HomePage() {
                 <Card key={vehicle.id} className="card-mobile overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   <div className="aspect-video bg-gray-200 flex items-center justify-center">
                     {vehicle.photos.length > 0 ? (
-                      <img 
+                      <Image 
                         src={vehicle.photos[0].url} 
                         alt={vehicle.photos[0].alt || vehicle.name}
+                        width={400}
+                        height={225}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -273,7 +276,7 @@ export default async function HomePage() {
               Contact Us
             </h2>
             <p className="text-responsive opacity-90 max-w-2xl mx-auto">
-              Get in touch with us for your transportation needs. We're here to help!
+              Get in touch with us for your transportation needs. We&apos;re here to help!
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

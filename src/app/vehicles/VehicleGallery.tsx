@@ -15,6 +15,7 @@ import {
   ArrowLeft
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { VEHICLE_TYPES } from '@/types'
 
 interface Vehicle {
@@ -137,16 +138,12 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
               <Card key={vehicle.id} className="card-mobile overflow-hidden hover:shadow-xl transition-all duration-300 group">
                 <div className="aspect-video bg-gray-200 relative overflow-hidden">
                   {vehicle.photos.length > 0 ? (
-                    <img 
+                    <Image 
                       src={vehicle.photos[0].url} 
                       alt={vehicle.photos[0].alt || vehicle.name}
+                      width={400}
+                      height={225}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const fallback = target.nextElementSibling as HTMLElement;
-                        if (fallback) fallback.style.display = 'flex';
-                      }}
                     />
                   ) : null}
                   <div 

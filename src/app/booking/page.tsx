@@ -65,7 +65,7 @@ export default function BookingPage() {
 
   // Get vehicle from URL params
   useEffect(() => {
-    const vehicleId = searchParams.get('vehicle')
+    const vehicleId = searchParams?.get('vehicle')
     if (vehicleId) {
       setFormData(prev => ({ ...prev, vehicleId }))
       // Fetch the actual vehicle details

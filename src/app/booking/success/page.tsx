@@ -15,6 +15,7 @@ import {
   ArrowLeft
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { formatDate, formatTime, formatPhoneNumber } from '@/lib/utils'
 
 interface SuccessPageProps {
@@ -54,7 +55,7 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Booking Not Found</h2>
             <p className="text-gray-600 mb-6">
-              The booking you're looking for doesn't exist or has been removed.
+              The booking you&apos;re looking for doesn&apos;t exist or has been removed.
             </p>
             <Link href="/">
               <Button className="btn-mobile">
@@ -102,7 +103,7 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
                 Booking Confirmed! 🎉
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                Thank you for choosing Rent-A-Car Bangladesh. Your booking has been successfully created and we'll contact you soon.
+                Thank you for choosing Rent-A-Car Bangladesh. Your booking has been successfully created and we&apos;ll contact you soon.
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p className="text-blue-800 font-medium">
@@ -171,9 +172,11 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
                 </h3>
                 <div className="flex items-center space-x-4">
                   {booking.vehicle.photos.length > 0 ? (
-                    <img 
+                    <Image 
                       src={booking.vehicle.photos[0].url} 
                       alt={booking.vehicle.photos[0].alt || booking.vehicle.name}
+                      width={64}
+                      height={64}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
                   ) : (
@@ -218,9 +221,9 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
           {/* Next Steps */}
           <Card className="card-mobile mb-8">
             <CardHeader>
-              <CardTitle>What's Next?</CardTitle>
+              <CardTitle>What&apos;s Next?</CardTitle>
               <CardDescription>
-                Here's what happens after your booking
+                Here&apos;s what happens after your booking
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -232,7 +235,7 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
                   <div>
                     <h4 className="font-medium">Confirmation Call</h4>
                     <p className="text-sm text-gray-600">
-                      We'll call you within 30 minutes to confirm your booking details.
+                      We&apos;ll call you within 30 minutes to confirm your booking details.
                     </p>
                   </div>
                 </div>

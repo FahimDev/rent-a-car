@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,6 +21,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import toast from 'react-hot-toast'
 
 interface Booking {
@@ -68,18 +69,7 @@ export default function BookingDetail({ params }: { params: { id: string } }) {
   const [status, setStatus] = useState('')
   const [notes, setNotes] = useState('')
 
-  useEffect(() => {
-    // Check if admin is logged in
-    const token = localStorage.getItem('adminToken')
-    if (!token) {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchBooking()
-  }, [router, params.id])
-
-  const fetchBooking = async () => {
+  const fetchBooking = useCallback(async () => {
     try {
       const token = localStorage.getItem('adminToken')
       const response = await fetch(`/api/admin/bookings/${params.id}`, {
@@ -101,7 +91,18 @@ export default function BookingDetail({ params }: { params: { id: string } }) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [params.id, router])
+
+  useEffect(() => {
+    // Check if admin is logged in
+    const token = localStorage.getItem('adminToken')
+    if (!token) {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchBooking()
+  }, [router, params.id, fetchBooking])
 
   const handleUpdateBooking = async () => {
     if (!booking) return
@@ -190,7 +191,7 @@ export default function BookingDetail({ params }: { params: { id: string } }) {
             <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Booking Not Found</h2>
             <p className="text-gray-600 mb-6">
-              The booking you're looking for doesn't exist or has been removed.
+              The booking you&apos;re looking for doesn&apos;t exist or has been removed.
             </p>
             <Link href="/admin/bookings">
               <Button className="btn-mobile">
@@ -344,9 +345,11 @@ export default function BookingDetail({ params }: { params: { id: string } }) {
               <CardContent>
                 <div className="flex items-center space-x-4">
                   {booking.vehicle.photos.length > 0 ? (
-                    <img 
+                    <Image 
                       src={booking.vehicle.photos[0].url} 
                       alt={booking.vehicle.photos[0].alt}
+                      width={80}
+                      height={80}
                       className="w-20 h-20 object-cover rounded-lg"
                     />
                   ) : (

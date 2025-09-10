@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -48,18 +48,7 @@ export default function AdminPassengers() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  useEffect(() => {
-    // Check if admin is logged in
-    const token = localStorage.getItem('adminToken')
-    if (!token) {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchPassengers()
-  }, [router, currentPage, verificationFilter])
-
-  const fetchPassengers = async () => {
+  const fetchPassengers = useCallback(async () => {
     try {
       const token = localStorage.getItem('adminToken')
       const params = new URLSearchParams({
@@ -88,7 +77,18 @@ export default function AdminPassengers() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [currentPage, verificationFilter])
+
+  useEffect(() => {
+    // Check if admin is logged in
+    const token = localStorage.getItem('adminToken')
+    if (!token) {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchPassengers()
+  }, [router, currentPage, verificationFilter, fetchPassengers])
 
   const handleVerificationToggle = async (passengerId: string, currentStatus: boolean) => {
     try {

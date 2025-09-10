@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -54,18 +54,7 @@ export default function AdminBookings() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  useEffect(() => {
-    // Check if admin is logged in
-    const token = localStorage.getItem('adminToken')
-    if (!token) {
-      router.push('/admin/login')
-      return
-    }
-
-    fetchBookings()
-  }, [router, currentPage, statusFilter])
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     try {
       const token = localStorage.getItem('adminToken')
       const params = new URLSearchParams({
@@ -94,7 +83,18 @@ export default function AdminBookings() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [currentPage, statusFilter])
+
+  useEffect(() => {
+    // Check if admin is logged in
+    const token = localStorage.getItem('adminToken')
+    if (!token) {
+      router.push('/admin/login')
+      return
+    }
+
+    fetchBookings()
+  }, [router, currentPage, statusFilter, fetchBookings])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-BD', {
