@@ -1,10 +1,15 @@
-// Removed edge runtime for Prisma compatibility
 import { Suspense } from 'react'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/db'
+
+export const runtime = 'edge'
 import VehicleGallery from './VehicleGallery'
 
 async function getVehicles(type?: string) {
   try {
+    // Get D1 database from Cloudflare environment
+    const d1Database = (globalThis as any).DB
+    const prisma = createPrismaClient(d1Database)
+    
     const where = type ? { isAvailable: true, type } : { isAvailable: true }
     const vehicles = await prisma.vehicle.findMany({
       where,

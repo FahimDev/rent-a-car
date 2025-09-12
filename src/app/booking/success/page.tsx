@@ -1,6 +1,7 @@
-// Removed edge runtime for Prisma compatibility
 import { Suspense } from 'react'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/db'
+
+export const runtime = 'edge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -25,6 +26,10 @@ interface SuccessPageProps {
 
 async function getBooking(id: string) {
   try {
+    // Get D1 database from Cloudflare environment
+    const d1Database = (globalThis as any).DB
+    const prisma = createPrismaClient(d1Database)
+    
     const booking = await prisma.booking.findUnique({
       where: { id },
       include: {

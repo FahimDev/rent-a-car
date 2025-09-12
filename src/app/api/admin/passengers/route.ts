@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import jwt from 'jsonwebtoken'
+import { createPrismaClient } from '@/lib/db'
+import { verifyTokenFromRequest } from '@/lib/auth'
+
+export const runtime = 'edge'
 
 interface UpdatePassengerRequest {
   passengerId: string
@@ -12,16 +14,15 @@ interface UpdatePassengerRequest {
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { adminId: string }
+    const { adminId } = await verifyTokenFromRequest(request)
+    
+    // Get D1 database from Cloudflare environment
+    const d1Database = (globalThis as any).DB
+    const prisma = createPrismaClient(d1Database)
     
     // Verify admin exists
     const admin = await prisma.admin.findUnique({
-      where: { id: decoded.adminId }
+      where: { id: adminId }
     })
     
     if (!admin) {
@@ -88,16 +89,15 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     // Verify admin authentication
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { adminId: string }
+    const { adminId } = await verifyTokenFromRequest(request)
+    
+    // Get D1 database from Cloudflare environment
+    const d1Database = (globalThis as any).DB
+    const prisma = createPrismaClient(d1Database)
     
     // Verify admin exists
     const admin = await prisma.admin.findUnique({
-      where: { id: decoded.adminId }
+      where: { id: adminId }
     })
     
     if (!admin) {

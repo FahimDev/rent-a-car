@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/db'
+
+export const runtime = 'edge'
 
 // GET /api/vehicles/[id] - Get a specific vehicle by ID
 export async function GET(
@@ -9,6 +11,10 @@ export async function GET(
   try {
     // Await params for Next.js 15 compatibility
     const { id } = await params
+    
+    // Get D1 database from Cloudflare environment
+    const d1Database = (globalThis as any).DB
+    const prisma = createPrismaClient(d1Database)
     
     const vehicle = await prisma.vehicle.findUnique({
       where: { id },

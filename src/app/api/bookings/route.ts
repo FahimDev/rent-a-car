@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createPrismaClient } from '@/lib/db'
 import { formatPhoneNumber, generateBookingReference } from '@/lib/utils'
+
+export const runtime = 'edge'
 
 interface CreateBookingRequest {
   bookingDate: string
@@ -36,6 +38,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Get D1 database from Cloudflare environment
+    const d1Database = (globalThis as any).DB
+    const prisma = createPrismaClient(d1Database)
 
     // Format phone number
     const formattedPhone = formatPhoneNumber(passengerPhone)
@@ -117,6 +123,10 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
+    // Get D1 database from Cloudflare environment
+    const d1Database = (globalThis as any).DB
+    const prisma = createPrismaClient(d1Database)
+
     const where = status ? { status } : {}
     
     const bookings = await prisma.booking.findMany({
@@ -182,7 +192,7 @@ async function sendWhatsAppNotification(booking: any) {
 🚙 *Vehicle:*
 • ${booking.vehicle.name}
 • Type: ${booking.vehicle.type}
-• Seats: ${booking.vehicle.seats}
+• Capacity: ${booking.vehicle.capacity}
 
 📍 *Locations:*
 • Pickup: ${booking.pickupLocation}
@@ -204,6 +214,10 @@ ${booking.dropoffLocation ? `• Drop-off: ${booking.dropoffLocation}` : ''}
     })
 
     if (response.ok) {
+      // Get D1 database from Cloudflare environment
+      const d1Database = (globalThis as any).DB
+      const prisma = createPrismaClient(d1Database)
+      
       // Create notification record
       await prisma.notification.create({
         data: {

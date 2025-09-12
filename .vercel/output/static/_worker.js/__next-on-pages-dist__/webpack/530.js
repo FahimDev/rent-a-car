@@ -1,0 +1,1 @@
+var t={},_=(o,r,s)=>(t.__chunk_530=(a,c,e)=>{"use strict";e.d(c,{A:()=>l});let l=(0,e(283).A)("clock",[["path",{d:"M12 6v6l4 2",key:"mmk7yg"}],["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}]])},t);export{_ as __getNamedExports};

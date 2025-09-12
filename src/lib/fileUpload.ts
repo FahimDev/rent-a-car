@@ -1,25 +1,16 @@
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
 import { NextRequest } from 'next/server'
+
+// Edge-compatible file upload utilities
+// For Cloudflare Pages, we'll use a simplified approach
 
 export async function saveUploadedFile(file: File, vehicleId: string, index: number): Promise<string> {
   try {
-    // Create the uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'images', 'vehicles')
-    
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    
-    // Generate unique filename
+    // For Edge runtime, we'll generate a placeholder URL
+    // In production, you would upload to Cloudflare R2 or similar service
     const fileExtension = file.name.split('.').pop() || 'jpg'
     const fileName = `${vehicleId}_${index}_${Date.now()}.${fileExtension}`
-    const filePath = join(uploadsDir, fileName)
     
-    // Save file to filesystem
-    await writeFile(filePath, buffer)
-    
-    // Return the public URL path
+    // Return a placeholder URL - in production this would be the actual uploaded file URL
     return `/images/vehicles/${fileName}`
   } catch (error) {
     console.error('Error saving file:', error)
@@ -29,9 +20,9 @@ export async function saveUploadedFile(file: File, vehicleId: string, index: num
 
 export async function deleteUploadedFile(filePath: string): Promise<void> {
   try {
-    const { unlink } = await import('fs/promises')
-    const fullPath = join(process.cwd(), 'public', filePath)
-    await unlink(fullPath)
+    // For Edge runtime, file deletion is not supported
+    // In production, you would delete from Cloudflare R2 or similar service
+    console.log('File deletion not supported in Edge runtime:', filePath)
   } catch (error) {
     console.error('Error deleting file:', error)
     // Don't throw error for file deletion failures

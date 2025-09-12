@@ -1,0 +1,21 @@
+{
+  "runtime": "edge",
+  "name": "vehicles",
+  "deploymentTarget": "v8-worker",
+  "entrypoint": "index.js",
+  "assets": [],
+  "framework": {
+    "slug": "nextjs",
+    "version": "15.4.6"
+  },
+  "environment": {
+    "__NEXT_BUILD_ID": "CErNQhpcoxt5fyuqB2T_X",
+    "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "+liVjSbJeP0ehl71KWdiH0U3eqRpT9htMHaqAjnSq2s=",
+    "__NEXT_PREVIEW_MODE_ID": "667735e44e45ab26e65097307418064f",
+    "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c18a2abaaf86324759df2bc30b52501958a067d1699158f9e8bf48e0b06186c8",
+    "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "d16f9f04a5f566b5ffa63fde1ae5afc5ecfb43aa1019e30282c40f841aabbac1"
+  },
+  "filePathMap": {
+    "wasm/wasm_34d4348ee0edb46db5054170e8b7cdbb9f3584cf.wasm": ".next/server/edge-chunks/wasm_34d4348ee0edb46db5054170e8b7cdbb9f3584cf.wasm"
+  }
+}

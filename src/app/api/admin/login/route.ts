@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import { createPrismaClient } from '@/lib/db'
+import { signJWT, comparePassword } from '@/lib/auth'
+
+export const runtime = 'edge'
 
 interface LoginRequest {
   username: string
@@ -19,6 +20,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Get D1 database from Cloudflare environment
+    const d1Database = (globalThis as any).DB
+    const prisma = createPrismaClient(d1Database)
+
     // Find admin user
     const admin = await prisma.admin.findUnique({
       where: { username }
@@ -32,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, admin.password)
+    const isValidPassword = await comparePassword(password, admin.password)
 
     if (!isValidPassword) {
       return NextResponse.json(
@@ -42,14 +47,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = jwt.sign(
+    const token = await signJWT(
       { 
         adminId: admin.id, 
         username: admin.username,
         role: admin.role 
       },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '24h' }
+      process.env.JWT_SECRET || 'fallback-secret'
     )
 
     // Return admin info (without password) and token
