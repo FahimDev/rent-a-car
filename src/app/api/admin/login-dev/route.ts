@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPrismaClient, prisma } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { signJWT, comparePassword } from '@/lib/auth'
 
-// Use Edge runtime for Cloudflare Pages deployment
-export const runtime = 'edge'
+// Use Node.js runtime for development
+export const runtime = 'nodejs'
 
 interface LoginRequest {
   username: string
@@ -21,19 +21,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get database connection
-    // For Edge runtime, we need to use D1 database
-    const d1Database = (globalThis as any).DB
-    if (!d1Database) {
-      return NextResponse.json(
-        { message: 'Database not available - D1 binding not found' },
-        { status: 500 }
-      )
-    }
-    const prismaClient = createPrismaClient(d1Database)
-
-    // Find admin user
-    const admin = await prismaClient.admin.findUnique({
+    // Find admin user using regular Prisma client
+    const admin = await prisma.admin.findUnique({
       where: { username }
     })
 

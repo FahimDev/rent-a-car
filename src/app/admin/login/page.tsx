@@ -1,5 +1,4 @@
 'use client'
-export const runtime = "edge";
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -32,7 +31,12 @@ export default function AdminLoginPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/admin/login', {
+      // Use development endpoint in development, production endpoint in production
+      const apiEndpoint = process.env.NODE_ENV === 'development' 
+        ? '/api/admin/login-dev' 
+        : '/api/admin/login'
+      
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
