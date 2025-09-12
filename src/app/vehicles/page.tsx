@@ -1,3 +1,4 @@
+// Removed edge runtime for Prisma compatibility
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import VehicleGallery from './VehicleGallery'
@@ -26,11 +27,13 @@ async function getVehicles(type?: string) {
 }
 
 interface VehiclesPageProps {
-  searchParams: { type?: string }
+  searchParams: Promise<{ type?: string }>
 }
 
 export default async function VehiclesPage({ searchParams }: VehiclesPageProps) {
-  const vehicles = await getVehicles(searchParams.type)
+  // Await searchParams for Next.js 15 compatibility
+  const { type } = await searchParams
+  const vehicles = await getVehicles(type)
 
   return <VehicleGallery vehicles={vehicles} />
 }

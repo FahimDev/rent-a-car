@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 
+interface UpdatePassengerRequest {
+  passengerId: string
+  isVerified?: boolean
+  name?: string
+  email?: string
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Verify admin authentication
@@ -97,7 +104,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
     }
 
-    const body = await request.json()
+    const body = await request.json() as UpdatePassengerRequest
     const { passengerId, isVerified, name, email } = body
 
     if (!passengerId) {

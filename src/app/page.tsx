@@ -1,3 +1,4 @@
+// Removed edge runtime for Prisma compatibility
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { Button } from '@/components/ui/button'

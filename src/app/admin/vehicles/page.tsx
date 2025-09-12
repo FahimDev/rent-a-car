@@ -1,5 +1,5 @@
 'use client'
-
+export const runtime = "edge";
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -37,6 +37,14 @@ interface Vehicle {
   }[]
   createdAt: string
   updatedAt: string
+}
+
+interface VehiclesApiResponse {
+  vehicles: Vehicle[]
+}
+
+interface ErrorApiResponse {
+  message: string
 }
 
 interface VehicleFormData {
@@ -94,7 +102,7 @@ export default function VehicleManagement() {
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as VehiclesApiResponse
         // Parse features JSON strings back to arrays
         const vehiclesWithParsedFeatures = (data.vehicles || []).map((vehicle: any) => ({
           ...vehicle,
@@ -170,7 +178,7 @@ export default function VehicleManagement() {
         resetForm()
         fetchVehicles()
       } else {
-        const error = await response.json()
+        const error = await response.json() as ErrorApiResponse
         toast.error(error.message || 'Failed to save vehicle')
       }
     } catch (error) {

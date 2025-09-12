@@ -1,9 +1,16 @@
+// Removed edge runtime for Prisma compatibility
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  fallback: ['system-ui', 'arial'],
+  display: 'swap'
+})
 
 export const metadata: Metadata = {
   title: 'Rent-A-Car Bangladesh | আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন',

@@ -4,11 +4,14 @@ import { prisma } from '@/lib/prisma'
 // GET /api/vehicles/[id] - Get a specific vehicle by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params for Next.js 15 compatibility
+    const { id } = await params
+    
     const vehicle = await prisma.vehicle.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         photos: true
       }

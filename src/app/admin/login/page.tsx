@@ -1,5 +1,5 @@
 'use client'
-
+export const runtime = "edge";
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,14 @@ import { Label } from '@/components/ui/label'
 import { Shield, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+
+interface LoginApiResponse {
+  token: string
+}
+
+interface ErrorApiResponse {
+  message: string
+}
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -31,12 +39,12 @@ export default function AdminLoginPage() {
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as LoginApiResponse
         localStorage.setItem('adminToken', data.token)
         toast.success('Login successful!')
         router.push('/admin/dashboard')
       } else {
-        const error = await response.json()
+        const error = await response.json() as ErrorApiResponse
         toast.error(error.message || 'Login failed')
       }
     } catch (error) {

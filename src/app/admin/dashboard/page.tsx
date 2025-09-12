@@ -1,5 +1,5 @@
 'use client'
-
+export const runtime = "edge";
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -43,6 +43,17 @@ interface RecentBooking {
   }
 }
 
+interface StatsApiResponse {
+  totalBookings: number
+  pendingBookings: number
+  totalVehicles: number
+  totalPassengers: number
+}
+
+interface BookingsApiResponse {
+  bookings: RecentBooking[]
+}
+
 export default function AdminDashboard() {
   const router = useRouter()
   const [stats, setStats] = useState<DashboardStats>({
@@ -79,12 +90,12 @@ export default function AdminDashboard() {
       ])
 
       if (statsResponse.ok) {
-        const statsData = await statsResponse.json()
+        const statsData = await statsResponse.json() as StatsApiResponse
         setStats(statsData)
       }
 
       if (bookingsResponse.ok) {
-        const bookingsData = await bookingsResponse.json()
+        const bookingsData = await bookingsResponse.json() as BookingsApiResponse
         setRecentBookings(bookingsData.bookings || [])
       }
     } catch (error) {

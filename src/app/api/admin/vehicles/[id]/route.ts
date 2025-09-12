@@ -3,11 +3,18 @@ import { prisma } from '@/lib/prisma'
 import { saveUploadedFile, validateImageFile, deleteUploadedFile } from '@/lib/fileUpload'
 import jwt from 'jsonwebtoken'
 
+interface UpdateVehicleAvailabilityRequest {
+  isAvailable: boolean
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params for Next.js 15 compatibility
+    const { id } = await params
+    
     // Verify admin authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     if (!token) {
@@ -27,7 +34,7 @@ export async function GET(
 
     // Get vehicle by ID
     const vehicle = await prisma.vehicle.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         photos: true,
         bookings: {
@@ -51,9 +58,12 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params for Next.js 15 compatibility
+    const { id } = await params
+    
     // Verify admin authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     if (!token) {
@@ -95,7 +105,7 @@ export async function PUT(
 
     // Update vehicle
     const vehicle = await prisma.vehicle.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         type,
@@ -147,7 +157,7 @@ export async function PUT(
 
     // Get updated vehicle with all photos
     const updatedVehicle = await prisma.vehicle.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         photos: true
       }
@@ -165,9 +175,12 @@ export async function PUT(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params for Next.js 15 compatibility
+    const { id } = await params
+    
     // Verify admin authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     if (!token) {
@@ -185,12 +198,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
     }
 
-    const body = await request.json()
+    const body = await request.json() as UpdateVehicleAvailabilityRequest
     const { isAvailable } = body
 
     // Update vehicle availability
     const vehicle = await prisma.vehicle.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         isAvailable: isAvailable
       },
@@ -211,9 +224,12 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params for Next.js 15 compatibility
+    const { id } = await params
+    
     // Verify admin authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     if (!token) {
@@ -233,7 +249,7 @@ export async function DELETE(
 
     // Check if vehicle has any bookings
     const bookingsCount = await prisma.booking.count({
-      where: { vehicleId: params.id }
+      where: { vehicleId: id }
     })
 
     if (bookingsCount > 0) {
@@ -244,7 +260,7 @@ export async function DELETE(
 
     // Get vehicle photos before deletion to clean up files
     const vehicle = await prisma.vehicle.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { photos: true }
     })
 
@@ -257,7 +273,7 @@ export async function DELETE(
 
     // Delete vehicle (photos will be deleted automatically due to cascade)
     await prisma.vehicle.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ 

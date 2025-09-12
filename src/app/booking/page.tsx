@@ -1,6 +1,6 @@
 'use client'
-
-import { useState, useEffect } from 'react'
+export const runtime = "edge";
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -42,6 +42,26 @@ interface BookingFormData {
   vehicleId: string
 }
 
+interface VehicleApiResponse {
+  id: string
+  name: string
+  type: string
+  capacity: number
+  pricePerDay: number
+  description: string
+  features: string[]
+  isAvailable: boolean
+  photos: {
+    id: string
+    url: string
+    alt: string
+  }[]
+}
+
+interface BookingApiResponse {
+  id: string
+}
+
 const initialFormData: BookingFormData = {
   bookingDate: '',
   pickupTime: '',
@@ -54,7 +74,7 @@ const initialFormData: BookingFormData = {
   vehicleId: ''
 }
 
-export default function BookingPage() {
+function BookingPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [currentStep, setCurrentStep] = useState(1)
@@ -77,7 +97,7 @@ export default function BookingPage() {
     try {
       const response = await fetch(`/api/vehicles/${vehicleId}`)
       if (response.ok) {
-        const vehicle = await response.json()
+        const vehicle = await response.json() as VehicleApiResponse
         setSelectedVehicle(vehicle)
       } else {
         console.error('Failed to fetch vehicle details')
@@ -168,7 +188,7 @@ export default function BookingPage() {
       })
 
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json() as BookingApiResponse
         router.push(`/booking/success?id=${result.id}`)
       } else {
         throw new Error('Booking failed')
@@ -529,5 +549,13 @@ export default function BookingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BookingPageContent />
+    </Suspense>
   )
 }

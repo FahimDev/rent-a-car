@@ -1,7 +1,7 @@
 'use client'
-
+export const runtime = "edge";
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -61,8 +61,13 @@ interface Booking {
   }[]
 }
 
-export default function BookingDetail({ params }: { params: { id: string } }) {
+interface BookingApiResponse {
+  booking: Booking
+}
+
+export default function BookingDetail() {
   const router = useRouter()
+  const params = useParams()
   const [booking, setBooking] = useState<Booking | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -77,7 +82,7 @@ export default function BookingDetail({ params }: { params: { id: string } }) {
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as BookingApiResponse
         setBooking(data.booking)
         setStatus(data.booking.status)
         setNotes(data.booking.notes || '')

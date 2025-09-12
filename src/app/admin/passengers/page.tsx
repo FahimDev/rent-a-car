@@ -1,5 +1,5 @@
 'use client'
-
+export const runtime = "edge";
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -39,6 +39,13 @@ interface Passenger {
   }[]
 }
 
+interface PassengersApiResponse {
+  passengers: Passenger[]
+  pagination?: {
+    pages: number
+  }
+}
+
 export default function AdminPassengers() {
   const router = useRouter()
   const [passengers, setPassengers] = useState<Passenger[]>([])
@@ -65,7 +72,7 @@ export default function AdminPassengers() {
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as PassengersApiResponse
         setPassengers(data.passengers || [])
         setTotalPages(data.pagination?.pages || 1)
       } else {

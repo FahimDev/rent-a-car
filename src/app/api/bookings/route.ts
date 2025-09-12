@@ -2,9 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { formatPhoneNumber, generateBookingReference } from '@/lib/utils'
 
+interface CreateBookingRequest {
+  bookingDate: string
+  pickupTime: string
+  tripType: string
+  pickupLocation: string
+  dropoffLocation: string
+  passengerName: string
+  passengerPhone: string
+  passengerEmail?: string
+  vehicleId: string
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json() as CreateBookingRequest
     const {
       bookingDate,
       pickupTime,

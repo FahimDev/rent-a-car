@@ -2,11 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 
+interface UpdateBookingRequest {
+  status?: string
+  notes?: string
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params for Next.js 15 compatibility
+    const { id } = await params
+    
     // Verify admin authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     if (!token) {
@@ -26,7 +34,7 @@ export async function GET(
 
     // Get booking by ID
     const booking = await prisma.booking.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         passenger: true,
         vehicle: {
@@ -51,9 +59,12 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params for Next.js 15 compatibility
+    const { id } = await params
+    
     // Verify admin authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     if (!token) {
@@ -71,12 +82,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
     }
 
-    const body = await request.json()
+    const body = await request.json() as UpdateBookingRequest
     const { status, notes } = body
 
     // Update booking
     const booking = await prisma.booking.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: status || undefined,
         notes: notes || undefined

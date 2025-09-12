@@ -1,5 +1,5 @@
 'use client'
-
+export const runtime = "edge";
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -45,6 +45,13 @@ interface Booking {
   }
 }
 
+interface BookingsApiResponse {
+  bookings: Booking[]
+  pagination?: {
+    pages: number
+  }
+}
+
 export default function AdminBookings() {
   const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -71,7 +78,7 @@ export default function AdminBookings() {
       })
 
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as BookingsApiResponse
         setBookings(data.bookings || [])
         setTotalPages(data.pagination?.pages || 1)
       } else {

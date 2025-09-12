@@ -1,3 +1,4 @@
+// Removed edge runtime for Prisma compatibility
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { Button } from '@/components/ui/button'
@@ -19,7 +20,7 @@ import Image from 'next/image'
 import { formatDate, formatTime, formatPhoneNumber } from '@/lib/utils'
 
 interface SuccessPageProps {
-  searchParams: { id?: string }
+  searchParams: Promise<{ id?: string }>
 }
 
 async function getBooking(id: string) {
@@ -43,7 +44,9 @@ async function getBooking(id: string) {
 }
 
 export default async function BookingSuccessPage({ searchParams }: SuccessPageProps) {
-  const booking = searchParams.id ? await getBooking(searchParams.id) : null
+  // Await searchParams for Next.js 15 compatibility
+  const { id } = await searchParams
+  const booking = id ? await getBooking(id) : null
 
   if (!booking) {
     return (
