@@ -63,6 +63,21 @@ export default async function HomePage() {
     getVehicles()
   ])
 
+
+  // Fallback company info if API doesn't return data
+  const fallbackCompanyInfo = {
+    name: 'Rent-A-Car Bangladesh',
+    tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
+    description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
+    phone: '+8801234567893',
+    email: 'info@rentacar.com',
+    whatsapp: '+8801234567893',
+    latitude: 23.8103,
+    longitude: 90.4125
+  }
+
+  const displayCompanyInfo = companyInfo || fallbackCompanyInfo
+
   const services = [
     {
       icon: <Car className="h-8 w-8 text-primary" />,
@@ -130,7 +145,7 @@ export default async function HomePage() {
               </Button>
             </Link>
             <div className="text-white/60 text-sm">
-              Rent-A-Car Bangladesh
+              {displayCompanyInfo.name}
             </div>
           </div>
         </div>
@@ -141,13 +156,13 @@ export default async function HomePage() {
         <div className="container-mobile py-16 sm:py-24">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="heading-responsive font-bold mb-6 leading-tight">
-              <span className="block">Rent-A-Car Bangladesh</span>
+              <span className="block">{displayCompanyInfo.name}</span>
               <span className="block text-2xl sm:text-3xl lg:text-4xl font-normal mt-2 opacity-90">
-                আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন
+                {displayCompanyInfo.tagline}
               </span>
             </h1>
             <p className="text-responsive mb-8 opacity-90 max-w-2xl mx-auto">
-              Premium car rental services across Bangladesh with professional drivers and well-maintained vehicles. 
+              {displayCompanyInfo.description} 
               Book your ride today for a comfortable and safe journey.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -176,7 +191,7 @@ export default async function HomePage() {
               Why Choose Us?
             </h2>
             <p className="text-responsive text-gray-600 max-w-2xl mx-auto">
-              We provide the best car rental experience in Bangladesh with our commitment to quality and service.
+              We provide the best car rental experience with our commitment to quality and service.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -300,28 +315,28 @@ export default async function HomePage() {
                 <Phone className="h-8 w-8" />
               </div>
               <h3 className="font-semibold mb-2">Phone</h3>
-              <p className="opacity-90">{companyInfo?.phone || '+8801234567890'}</p>
+              <p className="opacity-90">{displayCompanyInfo.phone}</p>
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-4">
                 <Mail className="h-8 w-8" />
               </div>
               <h3 className="font-semibold mb-2">Email</h3>
-              <p className="opacity-90">{companyInfo?.email || 'info@rentacar.com'}</p>
+              <p className="opacity-90">{displayCompanyInfo.email}</p>
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-4">
                 <MessageCircle className="h-8 w-8" />
               </div>
               <h3 className="font-semibold mb-2">WhatsApp</h3>
-              <p className="opacity-90">{companyInfo?.whatsapp || '+8801234567890'}</p>
+              <p className="opacity-90">{displayCompanyInfo.whatsapp}</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Location Section */}
-      {companyInfo?.latitude && companyInfo?.longitude && (
+      {displayCompanyInfo.latitude && displayCompanyInfo.longitude && (
         <section className="py-16 bg-gray-50">
           <div className="container-mobile">
             <div className="text-center mb-12">
@@ -338,7 +353,7 @@ export default async function HomePage() {
                   <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600">Google Maps Integration</p>
                   <p className="text-sm text-gray-500 mt-2">
-                    Latitude: {companyInfo.latitude}, Longitude: {companyInfo.longitude}
+                    Latitude: {displayCompanyInfo.latitude}, Longitude: {displayCompanyInfo.longitude}
                   </p>
                 </div>
               </div>
@@ -354,7 +369,7 @@ export default async function HomePage() {
             Ready to Book Your Ride?
           </h2>
           <p className="text-responsive mb-8 opacity-90 max-w-2xl mx-auto">
-            Experience the best car rental service in Bangladesh. Book now and enjoy a comfortable journey!
+            Experience the best car rental service. Book now and enjoy a comfortable journey!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/booking">
