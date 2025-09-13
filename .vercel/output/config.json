@@ -159,7 +159,7 @@
       "handle": "hit"
     },
     {
-      "src": "/_next/static/(?:[^/]+/pages|pages|chunks|runtime|css|image|media|tNVEsPx_RtZaltuUSNKbG)/.+",
+      "src": "/_next/static/(?:[^/]+/pages|pages|chunks|runtime|css|image|media|BckIQ9hOvRCHEMWxGFCWe)/.+",
       "headers": {
         "cache-control": "public,max-age=31536000,immutable"
       },

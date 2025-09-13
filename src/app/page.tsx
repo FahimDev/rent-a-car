@@ -18,13 +18,85 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { VehicleApiService } from '@/lib/services/api/VehicleApiService'
-import { CompanyApiService } from '@/lib/services/api/CompanyApiService'
+
+// Helper functions to call API endpoints directly
+async function getCompanyInfo() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/company`, {
+      cache: 'no-store'
+    })
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch company info')
+    }
+    
+    const data = await response.json() as any
+    
+    if (data.success && data.data) {
+      return data.data
+    }
+    
+    // Return fallback data if API doesn't return data
+    return {
+      id: 'default',
+      name: 'Rent-A-Car Bangladesh',
+      tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
+      description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
+      phone: '+8801234567893',
+      email: 'info@rentacar.com',
+      whatsapp: '+8801234567893',
+      latitude: 23.8103,
+      longitude: 90.4125,
+      address: 'Dhaka, Bangladesh'
+    }
+  } catch (error) {
+    console.error('Error fetching company info:', error)
+    // Return fallback data
+    return {
+      id: 'default',
+      name: 'Rent-A-Car Bangladesh',
+      tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
+      description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
+      phone: '+8801234567893',
+      email: 'info@rentacar.com',
+      whatsapp: '+8801234567893',
+      latitude: 23.8103,
+      longitude: 90.4125,
+      address: 'Dhaka, Bangladesh'
+    }
+  }
+}
+
+async function getVehicles() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/vehicles`, {
+      cache: 'no-store'
+    })
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch vehicles')
+    }
+    
+    const data = await response.json() as any
+    
+    if (data.success && data.data?.vehicles) {
+      return data.data.vehicles.slice(0, 3) // Limit to 3 for landing page
+    }
+    
+    return []
+  } catch (error) {
+    console.error('Error fetching vehicles:', error)
+    return []
+  }
+}
 
 export default async function HomePage() {
+  // Call API endpoints directly for SSR
   const [companyInfo, vehicles] = await Promise.all([
-    CompanyApiService.getCompanyInfoWithFallback(),
-    VehicleApiService.getVehiclesForLanding()
+    getCompanyInfo(),
+    getVehicles()
   ])
 
   const services = [
