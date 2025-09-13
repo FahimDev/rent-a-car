@@ -1,133 +1,305 @@
-# Rent-A-Car - Simple Car Booking Application
+# Rent-A-Car Bangladesh - Project Context
 
 ## Project Overview
-Rent-A-Car is a simple, professional car booking application designed for a car rental company. The platform provides a seamless booking experience for passengers while giving admins easy vehicle and booking management capabilities.
 
-## Project Structure
+**Rent-A-Car Bangladesh** is a professional car rental booking application designed specifically for the Bangladesh market. The application provides a seamless booking experience for customers and comprehensive management tools for administrators.
+
+## Business Context
+
+### Market Focus
+- **Primary Market**: Bangladesh
+- **Target Audience**: Local and international travelers
+- **Language Support**: Bangla/English fusion for SEO optimization
+- **Mobile-First**: 90% of users access via mobile devices
+
+### Business Model
+- **Revenue**: Daily rental fees (BDT)
+- **Vehicle Types**: 4-seat Sedan, 7-seat Noah, 12-seat Hiace
+- **Service Areas**: Dhaka and surrounding areas
+- **Booking Process**: 4-step guided booking without registration
+
+## Technical Architecture
+
+### Clean Architecture Implementation
+The project follows Clean Architecture principles with clear separation of concerns:
+
 ```
-car-rental-app/
-├── PROJECT_CONTEXT.md          # Root context (this file)
-├── docs/                       # Detailed documentation
-│   ├── product-concept-note.md # Product vision and concept
-│   ├── epic-stories.md         # High-level user stories
-│   ├── functional/             # Functional requirements
-│   │   ├── README.md
-│   │   ├── passenger-booking.md
-│   │   ├── admin-management.md
-│   │   └── vehicle-management.md
-│   ├── module/                 # Module specifications
-│   │   ├── README.md
-│   │   ├── booking-module.md
-│   │   ├── admin-module.md
-│   │   └── vehicle-module.md
-│   └── technical/              # Technical specifications
-│       ├── README.md
-│       ├── architecture.md
-│       ├── database-design.md
-│       └── deployment-guide.md
-└── src/                        # Application source code
+┌─────────────────────────────────────────────────────────────┐
+│                    Presentation Layer                       │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
+│  │   Next.js Pages │  │   API Routes    │  │  Components │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    Business Logic Layer                     │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
+│  │  VehicleService │  │  BookingService │  │  AuthService│ │
+│  └─────────────────┘  └─────────────────┘  └─────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    Data Access Layer                        │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
+│  │ VehicleRepo     │  │  BookingRepo    │  │  AdminRepo  │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                  Infrastructure Layer                       │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
+│  │ Cloudflare D1   │  │   PostgreSQL    │  │    MySQL    │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────┘ │
+└─────────────────────────────────────────────────────────────┘
 ```
+
+### Key Design Patterns
+1. **Repository Pattern**: Data access abstraction
+2. **Service Layer**: Business logic encapsulation
+3. **Factory Pattern**: Provider instantiation
+4. **Dependency Injection**: Loose coupling
+5. **Strategy Pattern**: Database provider switching
 
 ## Technology Stack
-- **Frontend**: React.js with TypeScript (Progressive Web App)
-- **Backend**: Node.js with Express.js
-- **Database**: PostgreSQL
-- **Authentication**: Simple admin login
-- **Notifications**: WhatsApp integration
-- **Maps**: Google Maps API
-- **UI**: Mobile-first responsive design
 
-## Key Features
+### Core Technologies
+- **Framework**: Next.js 15+ with App Router
+- **Runtime**: Edge Runtime for Cloudflare Pages
+- **Language**: TypeScript for type safety
+- **Styling**: Tailwind CSS with mobile-first utilities
+- **Database**: Cloudflare D1 (SQLite-compatible)
 
-### Passenger Features
-1. **Landing Page**: Company details, services, location map
-2. **Vehicle Gallery**: Browse available vehicles with filters
-3. **Booking System**: 4-step booking process
-4. **Mobile-First**: Progressive Web App experience
+### Development Tools
+- **Package Manager**: npm
+- **Linting**: ESLint with TypeScript rules
+- **Build Tool**: Next.js built-in bundler
+- **Deployment**: Cloudflare Pages
+
+### External Services
+- **Database**: Cloudflare D1
+- **Hosting**: Cloudflare Pages
+- **CDN**: Cloudflare global network
+- **Notifications**: WhatsApp Business API (planned)
+
+## Project Structure
+
+```
+car-rental-app/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── page.tsx           # Landing page
+│   │   ├── vehicles/          # Vehicle gallery
+│   │   ├── booking/           # Booking process
+│   │   ├── admin/             # Admin panel
+│   │   └── api/               # API routes
+│   ├── components/            # React components
+│   │   └── ui/               # UI primitives
+│   ├── lib/                  # Core business logic
+│   │   ├── database/         # Database abstraction
+│   │   ├── repositories/     # Data access layer
+│   │   ├── services/         # Business logic layer
+│   │   ├── api/              # API utilities
+│   │   └── utils/            # Utility functions
+│   └── types/                # TypeScript definitions
+├── docs/                     # Documentation
+│   ├── technical/           # Technical documentation
+│   ├── functional/          # Functional requirements
+│   └── business/            # Business requirements
+├── prisma/                  # Database schema
+├── public/                  # Static assets
+└── scripts/                 # Build and deployment scripts
+```
+
+## Core Features
+
+### Customer Features
+1. **Landing Page**: Company information with Bangla/English fusion
+2. **Vehicle Gallery**: Browse and filter vehicles by type
+3. **Booking Process**: 4-step guided booking
+4. **Mobile-First Design**: Optimized for mobile users
+5. **Progressive Web App**: Installable app experience
 
 ### Admin Features
-1. **Vehicle Management**: Upload and manage vehicle data
-2. **Booking Management**: View and manage bookings
-3. **WhatsApp Notifications**: Receive booking alerts
-4. **Simple Login**: Direct access via booking links
+1. **Dashboard**: Business metrics and overview
+2. **Booking Management**: View and manage all bookings
+3. **Vehicle Management**: Add, edit, and manage vehicles
+4. **Passenger Management**: View customer information
+5. **WhatsApp Integration**: Instant notifications
 
-## User Types
-1. **Passenger**: Anyone can book without registration
-2. **Admin**: Company staff managing vehicles and bookings
+## Database Design
 
-## Booking Flow
-1. **Step 1**: Date/time selection + Trip type (Single/Round)
-2. **Step 2**: Pickup and drop-off locations
-3. **Step 3**: Contact person details (name, phone)
-4. **Step 4**: Preview and confirmation
+### Core Entities
+- **Vehicles**: Vehicle information and availability
+- **Passengers**: Customer information (phone-based)
+- **Bookings**: Booking details and status
+- **Admins**: Admin user management
+- **Company Info**: Company details for landing page
 
-## Vehicle Types
-- 4-seat Sedan
-- 7-seat Noah
-- 12-seat Hiace
+### Key Relationships
+- One-to-Many: Vehicle → Bookings
+- One-to-Many: Passenger → Bookings
+- One-to-Many: Vehicle → Photos
+- One-to-Many: Admin → Vehicles
 
-## Documentation Navigation
-- **Start Here**: [Product Concept Note](docs/product-concept-note.md)
-- **User Stories**: [Epic Stories](docs/epic-stories.md)
-- **Functional Requirements**: [Functional README](docs/functional/README.md)
-- **Module Specifications**: [Module README](docs/module/README.md)
-- **Technical Specifications**: [Technical README](docs/technical/README.md)
+## API Design
 
-## Development Phases
-1. **Phase 1**: Landing page and vehicle gallery
-2. **Phase 2**: Booking system with stepper
-3. **Phase 3**: Admin panel and vehicle management
-4. **Phase 4**: WhatsApp integration and notifications
+### RESTful Endpoints
+- **Public APIs**: `/api/vehicles`, `/api/company`
+- **Admin APIs**: `/api/admin/*` (protected with JWT)
+- **CORS**: Centralized CORS management
+- **Error Handling**: Consistent error response format
 
-## Cursor AI Integration
-This project is designed to leverage Cursor AI's capabilities:
-- Clear, focused requirements for accurate implementation
-- Mobile-first PWA approach
-- Simple, professional UI design
-- Streamlined booking flow
+### Response Format
+```json
+{
+  "success": true,
+  "data": { ... },
+  "count": 10
+}
+```
 
-## Project Clarifications (Updated)
+## Development Workflow
 
-### Core Business Model
-- **Simple Form Submission System**: No complex inventory or real-time availability
-- **Mobile-First Design**: 90% mobile users, 10% desktop
-- **Manual Admin Process**: Trust-based system with manual verification
-- **Offline Payments**: No online payment integration required
+### 1. Feature Development
+1. **Plan**: Identify affected layers
+2. **Types**: Define data structures
+3. **Repository**: Implement data access
+4. **Service**: Add business logic
+5. **API**: Create endpoints
+6. **Frontend**: Update UI components
 
-### Authentication Strategy
-- **Admin**: Username/password with NextAuth.js (Super Admin + Regular Admin roles)
-- **Passengers**: No authentication portal - simple form submission only
-- **Verification**: Manual phone verification by admin (no OTP system)
+### 2. Database Changes
+1. **Schema**: Update `schema.sql`
+2. **Migration**: Create migration script
+3. **Repository**: Update data access layer
+4. **Test**: Verify changes work
 
-### Key Features (Simplified)
-1. **Vehicle Gallery**: Browse and select vehicles
-2. **Booking Form**: Mobile number + details submission
-3. **Admin Dashboard**: Manage bookings, verify passengers, track payments
-4. **WhatsApp Integration**: Notifications for verified WhatsApp users
-5. **Manual Payment Tracking**: Offline payment with Excel export
-6. **Basic Analytics**: Simple business metrics dashboard
+### 3. Deployment
+1. **Build**: `npm run pages:build`
+2. **Deploy**: `npm run deploy`
+3. **Environment**: Set variables in Cloudflare Pages
+4. **Test**: Verify production functionality
 
-### Mobile Number as Primary Key
-- **Unique Identifier**: One mobile number = One passenger record
-- **Multiple Bookings**: Same number can book multiple times
-- **Manual Verification**: Admin calls to verify legitimacy
-- **Country Code Validation**: Required for all mobile numbers
-- **Immutable**: Cannot change mobile number in existing bookings
+## Quality Assurance
 
-### Admin Capabilities
-- **Passenger Verification**: Mark mobile numbers as verified after call
-- **WhatsApp Status**: Track which passengers use WhatsApp
-- **Payment Management**: Manual payment entry and tracking
-- **Booking Modification**: Super Admin can modify (except mobile number)
-- **Analytics Dashboard**: View booking stats and revenue metrics
+### Code Quality
+- **TypeScript**: Strict type checking
+- **ESLint**: Code linting and formatting
+- **Architecture**: Clean architecture principles
+- **Documentation**: Comprehensive documentation
 
-### Technical Priorities
-- **Mobile Responsiveness**: Primary focus on mobile experience
-- **Simple Architecture**: No complex inventory or availability systems
-- **Manual Workflow**: Admin-centered process management
-- **Data Export**: Excel reports for business tracking
-- **Change Tracking**: Audit trail for booking modifications
+### Testing Strategy
+- **Unit Tests**: Individual component testing
+- **Integration Tests**: API endpoint testing
+- **E2E Tests**: Full user journey testing
+- **Performance Tests**: Load and stress testing
 
----
-*Last Updated: [Current Date]*
-*Project Status: Planning Phase*
+## Security Considerations
+
+### Data Protection
+- **JWT Authentication**: Secure admin access
+- **Password Hashing**: bcrypt for password security
+- **Input Validation**: All inputs validated and sanitized
+- **CORS**: Proper cross-origin resource sharing
+
+### Infrastructure Security
+- **HTTPS**: All communications encrypted
+- **Environment Variables**: Sensitive data in environment
+- **Database Security**: Cloudflare D1 security features
+- **Edge Runtime**: Secure execution environment
+
+## Performance Optimization
+
+### Frontend Performance
+- **Edge Runtime**: Fast global execution
+- **Image Optimization**: Next.js image optimization
+- **Code Splitting**: Automatic code splitting
+- **Caching**: Strategic caching strategies
+
+### Backend Performance
+- **Database Indexing**: Optimized database queries
+- **Connection Pooling**: Efficient database connections
+- **Query Optimization**: Optimized SQL queries
+- **CDN**: Global content delivery
+
+## Scalability Considerations
+
+### Horizontal Scaling
+- **Stateless Design**: No server-side state
+- **Database Scaling**: Cloudflare D1 scaling
+- **CDN**: Global content distribution
+- **Edge Computing**: Distributed processing
+
+### Vertical Scaling
+- **Resource Optimization**: Efficient resource usage
+- **Caching**: Multiple caching layers
+- **Database Optimization**: Query and index optimization
+- **Code Optimization**: Efficient algorithms
+
+## Maintenance and Support
+
+### Monitoring
+- **Application Metrics**: Performance monitoring
+- **Error Tracking**: Error logging and tracking
+- **Database Monitoring**: Query performance
+- **User Analytics**: Usage patterns and behavior
+
+### Backup and Recovery
+- **Database Backups**: Regular automated backups
+- **Code Versioning**: Git version control
+- **Deployment Rollback**: Quick rollback capability
+- **Disaster Recovery**: Comprehensive recovery plan
+
+## Future Enhancements
+
+### Planned Features
+1. **Payment Integration**: Online payment processing
+2. **Real-time Tracking**: Vehicle location tracking
+3. **Mobile App**: Native mobile applications
+4. **Advanced Analytics**: Business intelligence dashboard
+5. **Multi-language Support**: Additional language support
+
+### Technical Improvements
+1. **Microservices**: Service-oriented architecture
+2. **Event Sourcing**: Event-driven architecture
+3. **GraphQL**: Advanced API querying
+4. **Machine Learning**: Predictive analytics
+5. **IoT Integration**: Vehicle monitoring and control
+
+## Success Metrics
+
+### Business Metrics
+- **Booking Conversion Rate**: Percentage of visitors who book
+- **Customer Satisfaction**: User feedback and ratings
+- **Revenue Growth**: Monthly and yearly revenue
+- **Market Share**: Competitive positioning
+
+### Technical Metrics
+- **Page Load Time**: Frontend performance
+- **API Response Time**: Backend performance
+- **Uptime**: System availability
+- **Error Rate**: System reliability
+
+## Risk Management
+
+### Technical Risks
+- **Database Downtime**: Cloudflare D1 reliability
+- **Performance Issues**: Scalability challenges
+- **Security Vulnerabilities**: Security threats
+- **Data Loss**: Backup and recovery procedures
+
+### Business Risks
+- **Market Competition**: Competitive landscape
+- **Regulatory Changes**: Legal compliance
+- **Economic Factors**: Market conditions
+- **Technology Changes**: Technology evolution
+
+## Conclusion
+
+The Rent-A-Car Bangladesh project represents a modern, scalable, and maintainable solution for the car rental industry. By following clean architecture principles and leveraging modern technologies, the application provides a solid foundation for future growth and enhancement.
+
+The project's success depends on:
+1. **Technical Excellence**: Clean, maintainable code
+2. **User Experience**: Intuitive and responsive design
+3. **Business Value**: Meeting customer and business needs
+4. **Scalability**: Ability to grow with the business
+5. **Maintainability**: Easy to update and enhance
+
+This project serves as a template for future development projects, demonstrating best practices in modern web application development.

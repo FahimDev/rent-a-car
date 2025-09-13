@@ -1,6 +1,6 @@
 # Rent-A-Car Bangladesh | আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন
 
-A professional car rental booking application built with Next.js, designed for the Bangladesh market with Bangla/English localization and mobile-first Progressive Web App experience.
+A professional car rental booking application built with Next.js and Cloudflare D1, designed for the Bangladesh market with Bangla/English localization and mobile-first Progressive Web App experience.
 
 ## 🚀 Features
 
@@ -23,16 +23,17 @@ A professional car rental booking application built with Next.js, designed for t
 
 ## 🛠️ Technology Stack
 
-- **Framework**: Next.js 14+ with App Router
+- **Framework**: Next.js 15+ with App Router & Edge Runtime
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS with custom mobile-first utilities
-- **Database**: SQLite (development) / MySQL (production)
-- **ORM**: Prisma
+- **Database**: Cloudflare D1 (SQLite-compatible)
+- **Architecture**: Clean Architecture with Repository Pattern
 - **Authentication**: JWT with bcrypt
 - **UI Components**: Radix UI primitives
 - **Notifications**: React Hot Toast
 - **External APIs**: WhatsApp Business API, Google Maps API
-- **Hosting**: cPanel compatible
+- **Hosting**: Cloudflare Pages
+- **CORS**: Centralized CORS management
 
 ## 📋 Vehicle Types
 
@@ -40,45 +41,50 @@ A professional car rental booking application built with Next.js, designed for t
 - **7-seat Noah** 🚐: Family and group travel
 - **12-seat Hiace** 🚌: Large group transportation
 
-## 🏗️ Project Structure
+## 🏗️ Clean Architecture
 
+This project follows Clean Architecture principles with clear separation of concerns:
+
+### Core Architecture
 ```
-rent-a-car/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── page.tsx           # Landing page with Bangla/English fusion
-│   │   ├── vehicles/          # Vehicle gallery with filtering
-│   │   ├── booking/           # 4-step booking process
-│   │   │   ├── page.tsx       # Booking form
-│   │   │   └── success/       # Booking confirmation
-│   │   ├── admin/             # Admin panel
-│   │   │   ├── login/         # Admin authentication
-│   │   │   └── dashboard/     # Admin dashboard
-│   │   └── api/               # API routes
-│   │       ├── bookings/      # Booking CRUD operations
-│   │       ├── admin/         # Admin authentication & management
-│   │       └── whatsapp/      # WhatsApp notifications
-│   ├── components/            # Reusable React components
-│   │   └── ui/               # Basic UI components (Button, Card, Input, etc.)
-│   ├── lib/                  # Utilities and helpers
-│   │   ├── prisma.ts         # Prisma client
-│   │   └── utils.ts          # Common utilities
-│   └── types/                # TypeScript type definitions
-├── prisma/                   # Database schema and migrations
-│   ├── schema.prisma         # Database schema
-│   └── seed.ts              # Database seeding
-├── public/                   # Static assets
-│   ├── images/              # Vehicle images
-│   └── manifest.json        # PWA manifest
-├── docs/                    # Comprehensive documentation
-└── package.json
+src/
+├── lib/
+│   ├── database/           # Database abstraction layer
+│   │   ├── types.ts        # Database interfaces
+│   │   ├── DatabaseFactory.ts  # Database provider factory
+│   │   └── providers/      # Database implementations
+│   │       ├── CloudflareD1Provider.ts
+│   │       ├── PostgreSQLProvider.ts
+│   │       └── MySQLProvider.ts
+│   ├── repositories/       # Data access layer
+│   │   ├── BaseRepository.ts
+│   │   └── VehicleRepository.ts
+│   ├── services/          # Business logic layer
+│   │   ├── VehicleService.ts
+│   │   ├── ServiceFactory.ts
+│   │   └── api/           # API service layer
+│   │       ├── VehicleApiService.ts
+│   │       └── CompanyApiService.ts
+│   ├── api/               # API utilities
+│   │   └── cors.ts        # Centralized CORS management
+│   └── utils/             # Utility functions
+│       └── api.ts         # API request utilities
 ```
+
+### Key Design Patterns
+
+1. **Repository Pattern**: Data access abstraction
+2. **Service Layer**: Business logic encapsulation
+3. **Factory Pattern**: Provider instantiation
+4. **Dependency Injection**: Loose coupling
+5. **Strategy Pattern**: Database provider switching
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js (v18 or higher)
 - npm or yarn package manager
+- Cloudflare account (for D1 database)
 
 ### Installation
 
@@ -100,39 +106,40 @@ rent-a-car/
    
    Edit `.env.local` with your configuration:
    ```env
-   # Database
-   DATABASE_URL="file:./dev.db"
+   # Cloudflare D1 Database
+   CLOUDFLARE_ACCOUNT_ID="your_account_id"
+   CLOUDFLARE_API_TOKEN="your_api_token"
+   CLOUDFLARE_D1_DATABASE_ID="your_database_id"
+   
+   # App Configuration
+   NEXT_PUBLIC_BASE_URL="http://localhost:3000"
    
    # Admin Credentials
    ADMIN_USERNAME="admin"
    ADMIN_PASSWORD="admin123"
    
-   # WhatsApp Business API (for production)
-   WHATSAPP_API_KEY=""
-   WHATSAPP_PHONE_NUMBER=""
-   
-   # Google Maps API
-   GOOGLE_MAPS_API_KEY=""
-   
    # JWT Secret
    JWT_SECRET="your-super-secret-jwt-key-change-in-production"
-   
-   # App Configuration
-   NEXT_PUBLIC_APP_URL="http://localhost:3000"
-   NEXT_PUBLIC_COMPANY_NAME="Rent-A-Car"
-   NEXT_PUBLIC_COMPANY_PHONE="+8801234567890"
-   NEXT_PUBLIC_COMPANY_EMAIL="info@rentacar.com"
-   NEXT_PUBLIC_COMPANY_WHATSAPP="+8801234567890"
    ```
 
-4. **Set up database**
+4. **Set up Cloudflare D1 database**
    ```bash
-   npx prisma db push
-   npx prisma db seed
+   # Create D1 database
+   npx wrangler d1 create rent-a-car-db
+   
+   # Run migrations
+   npx wrangler d1 execute rent-a-car-db --file=./schema.sql
+   
+   # Seed database
+   npx wrangler d1 execute rent-a-car-db --file=./seed-d1.sql
    ```
 
 5. **Start development server**
    ```bash
+   # For local development with D1
+   npm run dev:d1
+   
+   # Or regular development
    npm run dev
    ```
 
@@ -144,29 +151,29 @@ rent-a-car/
 Comprehensive documentation is available in the `docs/` directory:
 
 - **Project Context**: `PROJECT_CONTEXT.md` - High-level project overview
-- **Product Concept**: `docs/product-concept-note.md` - Product vision and requirements
-- **Functional Requirements**: `docs/functional/` - Detailed feature specifications
-- **Technical Architecture**: `docs/technical/` - System design and implementation
+- **Clean Architecture**: `docs/technical/clean-architecture.md` - Architecture patterns
+- **API Documentation**: `docs/technical/api-documentation.md` - API endpoints
+- **Database Schema**: `docs/technical/database-schema.md` - Database design
+- **Development Guide**: `docs/technical/development-guide.md` - Development workflow
 
 ## 🔧 Development
 
 ### Available Scripts
 
 - `npm run dev` - Start development server
+- `npm run dev:d1` - Start development with D1 bindings
 - `npm run build` - Build for production
+- `npm run pages:build` - Build for Cloudflare Pages
+- `npm run deploy` - Deploy to Cloudflare Pages
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run db:generate` - Generate Prisma client
-- `npm run db:push` - Push schema changes to database
-- `npm run db:seed` - Seed database with sample data
 
-### Code Structure
+### Development Workflow
 
-- **Components**: Reusable React components in `src/components/`
-- **API Routes**: Next.js API routes in `src/app/api/`
-- **Pages**: Next.js pages in `src/app/`
-- **Types**: TypeScript definitions in `src/types/`
-- **Utilities**: Helper functions in `src/lib/`
+1. **Database Changes**: Update `schema.sql` and run migrations
+2. **API Changes**: Update service layer, then API routes
+3. **UI Changes**: Update components and pages
+4. **Testing**: Use `npm run dev:d1` for local testing with D1
 
 ## 🎨 Design Features
 
@@ -188,61 +195,44 @@ Comprehensive documentation is available in the `docs/` directory:
 
 ## 🚀 Deployment
 
-### cPanel Deployment
+### Cloudflare Pages Deployment
 
 1. **Build the application**
    ```bash
-   npm run build
+   npm run pages:build
    ```
 
-2. **Upload files** to your cPanel hosting via FTP or Git
-
-3. **Set up MySQL database** in cPanel and update `DATABASE_URL`
-
-4. **Configure environment variables** in cPanel
-
-5. **Start the application**
+2. **Deploy to Cloudflare Pages**
    ```bash
-   npm start
+   npm run deploy
+   ```
+
+3. **Set environment variables** in Cloudflare Pages dashboard:
+   ```
+   CLOUDFLARE_ACCOUNT_ID=your_account_id
+   CLOUDFLARE_API_TOKEN=your_api_token
+   CLOUDFLARE_D1_DATABASE_ID=your_database_id
+   NEXT_PUBLIC_BASE_URL=https://your-domain.pages.dev
    ```
 
 ### Environment Configuration for Production
 
 ```env
-# Database (MySQL for production)
-DATABASE_URL="mysql://username:password@localhost:3306/rentacar"
+# Cloudflare D1 Database
+CLOUDFLARE_ACCOUNT_ID="your_account_id"
+CLOUDFLARE_API_TOKEN="your_api_token"
+CLOUDFLARE_D1_DATABASE_ID="your_database_id"
 
-# WhatsApp Business API
-WHATSAPP_API_KEY="your_whatsapp_api_key"
-WHATSAPP_PHONE_NUMBER="your_whatsapp_number"
+# App Configuration
+NEXT_PUBLIC_BASE_URL="https://your-domain.pages.dev"
 
-# Google Maps API
-GOOGLE_MAPS_API_KEY="your_google_maps_key"
+# Admin Credentials
+ADMIN_USERNAME="admin"
+ADMIN_PASSWORD="secure_password"
 
 # JWT Secret (use a strong secret in production)
 JWT_SECRET="your-super-secure-jwt-secret"
-
-# App Configuration
-NEXT_PUBLIC_APP_URL="https://yourdomain.com"
-NEXT_PUBLIC_COMPANY_NAME="Your Company Name"
-NEXT_PUBLIC_COMPANY_PHONE="+8801234567890"
-NEXT_PUBLIC_COMPANY_EMAIL="info@yourcompany.com"
-NEXT_PUBLIC_COMPANY_WHATSAPP="+8801234567890"
 ```
-
-## 📱 User Experience
-
-### Passenger Journey
-1. **Landing Page**: View company info, services, and location
-2. **Vehicle Gallery**: Browse and filter available vehicles
-3. **Booking Process**: 4-step guided booking
-4. **Confirmation**: Receive booking confirmation with reference number
-
-### Admin Workflow
-1. **Login**: Secure admin authentication
-2. **Dashboard**: Overview of business metrics
-3. **Booking Management**: View and manage all bookings
-4. **Notifications**: Receive WhatsApp alerts for new bookings
 
 ## 🔐 Security Features
 
@@ -250,11 +240,12 @@ NEXT_PUBLIC_COMPANY_WHATSAPP="+8801234567890"
 - Password hashing with bcrypt
 - Input validation and sanitization
 - Secure environment variable handling
-- CORS configuration
+- Centralized CORS management
+- Edge runtime security
 
 ## 📊 Database Schema
 
-The application uses a simple, efficient database schema:
+The application uses Cloudflare D1 (SQLite-compatible) with the following schema:
 
 - **Admins**: Admin user management
 - **Vehicles**: Vehicle information and photos
@@ -265,13 +256,20 @@ The application uses a simple, efficient database schema:
 
 ## 🤝 Contributing
 
-This is an experimental project for learning purposes. Feel free to:
+This project follows clean architecture principles. When contributing:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. **Follow the architecture**: Use repositories for data access, services for business logic
+2. **Maintain patterns**: Keep the established patterns for consistency
+3. **Update documentation**: Update relevant docs when adding features
+4. **Test thoroughly**: Test with both local and D1 environments
+
+### Development Guidelines
+
+1. **Database Changes**: Always update `schema.sql` and create migrations
+2. **API Changes**: Update service layer first, then API routes
+3. **CORS**: Use the centralized CORS utility for all API routes
+4. **Error Handling**: Implement proper error handling in all layers
+5. **Type Safety**: Maintain TypeScript types throughout
 
 ## 📄 License
 
@@ -281,7 +279,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Built with [Next.js](https://nextjs.org/)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Database management with [Prisma](https://www.prisma.io/)
+- Database powered by [Cloudflare D1](https://developers.cloudflare.com/d1/)
 - UI components from [Radix UI](https://www.radix-ui.com/)
 - Icons from [Lucide React](https://lucide.dev/)
 - Toast notifications with [React Hot Toast](https://react-hot-toast.com/)
@@ -294,4 +292,4 @@ For support and questions:
 
 ---
 
-**Built with ❤️ for the Bangladesh car rental market**
+**Built with ❤️ for the Bangladesh car rental market using Clean Architecture principles**
