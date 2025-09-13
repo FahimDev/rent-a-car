@@ -110,7 +110,7 @@ export class BookingRepository extends BaseRepository {
 ```bash
 DATABASE_TYPE=cloudflare-d1
 CLOUDFLARE_ACCOUNT_ID=your_account_id
-CLOUDFLARE_API_TOKEN=your_api_token
+CLOUDFLARE_API_TOKEN_D1=your_api_token
 CLOUDFLARE_D1_DATABASE_ID=your_database_id
 ```
 

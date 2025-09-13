@@ -32,17 +32,49 @@ export class DatabaseFactory {
   /**
    * Get the default database provider based on environment
    */
-  static getDefaultProvider(): DatabaseProvider {
-    const dbType = (process.env.DATABASE_TYPE || 'cloudflare-d1') as DatabaseType
+  static getDefaultProvider(env?: any): DatabaseProvider {
+    // Better environment detection
+    const isProduction = typeof process !== 'undefined' && 
+                        process.env.APP_ENV === 'PRODUCTION' || 
+                        typeof window === 'undefined'; // SSR context
     
+    const dbType = (process.env.DATABASE_TYPE || 'cloudflare-d1') as DatabaseType
+  
+    if (isProduction) {
+      // ✅ Production: use D1 binding directly
+      if (!env?.DB) {
+        // Fallback to API connection if binding is missing
+        console.warn('D1 binding "env.DB" is missing, falling back to API connection')
+        
+        const config: DatabaseConfig = {
+          accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+          apiToken: process.env.CLOUDFLARE_API_TOKEN_D1,
+          databaseId: process.env.CLOUDFLARE_D1_DATABASE_ID,
+          region: process.env.DATABASE_REGION,
+        }
+        
+        return this.createProvider(dbType, config)
+      }
+  
+      const config: DatabaseConfig = {
+        binding: env.DB,
+        accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+        databaseId: process.env.CLOUDFLARE_D1_DATABASE_ID,
+        region: process.env.DATABASE_REGION,
+      }
+  
+      return this.createProvider(dbType, config)
+    }
+  
+    // 🛠 Development: use token-based API connection
     const config: DatabaseConfig = {
       accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
-      apiToken: process.env.CLOUDFLARE_API_TOKEN,
+      apiToken: process.env.CLOUDFLARE_API_TOKEN_D1,
       databaseId: process.env.CLOUDFLARE_D1_DATABASE_ID,
       connectionString: process.env.DATABASE_URL,
-      region: process.env.DATABASE_REGION
+      region: process.env.DATABASE_REGION,
     }
-
+  
     return this.createProvider(dbType, config)
   }
 }

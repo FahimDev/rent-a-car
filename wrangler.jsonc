@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "my-next-app",
+	"name": "chittagong-rent-a-car",
 	"compatibility_date": "2025-09-11",
 	"compatibility_flags": [
 		"nodejs_compat"
