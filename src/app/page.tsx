@@ -1,6 +1,6 @@
-// Removed edge runtime for Prisma compatibility
 import { Suspense } from 'react'
-import { prisma } from '@/lib/prisma'
+
+export const runtime = 'edge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -21,8 +21,16 @@ import Image from 'next/image'
 
 async function getCompanyInfo() {
   try {
-    const companyInfo = await prisma.companyInfo.findFirst()
-    return companyInfo
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/company`, {
+      cache: 'no-store'
+    })
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch company info')
+    }
+    
+    const data = await response.json() as any
+    return data.data || null
   } catch (error) {
     console.error('Error fetching company info:', error)
     return null
@@ -39,11 +47,9 @@ async function getVehicles() {
       throw new Error('Failed to fetch vehicles')
     }
     
-    const data = await response.json()
-    console.log('API Response:', data) // Debug log
+    const data = await response.json() as any
     // Handle new API response format: { success: true, data: { vehicles }, count: number }
     const vehicles = data.data?.vehicles || data.vehicles || []
-    console.log('Vehicles data:', vehicles) // Debug log
     return vehicles.slice(0, 3)
   } catch (error) {
     console.error('Error fetching vehicles:', error)
@@ -235,7 +241,7 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {vehicles.map((vehicle) => (
+              {vehicles.map((vehicle: any) => (
                 <Card key={vehicle.id} className="card-mobile overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   <div className="aspect-video bg-gray-200 flex items-center justify-center">
                     {vehicle.photos.length > 0 ? (

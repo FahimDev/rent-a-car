@@ -49,9 +49,6 @@ export class CloudflareD1Provider implements DatabaseProvider {
 
       const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`
       
-      console.log('D1 Query SQL:', processedSql) // Debug log
-      console.log('D1 Query Params:', params) // Debug log
-      
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -70,9 +67,7 @@ export class CloudflareD1Provider implements DatabaseProvider {
       }
 
       const data = await response.json() as any
-      console.log('D1 Response:', data) // Debug log
       const rows = data.result?.[0]?.results || []
-      console.log('D1 Rows:', rows) // Debug log
 
       return {
         success: true,

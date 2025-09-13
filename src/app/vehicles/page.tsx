@@ -18,7 +18,7 @@ async function getVehicles(type?: string) {
       throw new Error('Failed to fetch vehicles')
     }
     
-    const data = await response.json()
+    const data = await response.json() as any
     // Handle new API response format: { success: true, data: { vehicles }, count: number }
     return data.data?.vehicles || data.vehicles || []
   } catch (error) {
