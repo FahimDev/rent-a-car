@@ -25,7 +25,7 @@ interface Vehicle {
   capacity: number
   pricePerDay: number
   description: string | null
-  features: string | null
+  features: string[] | null
   isAvailable: boolean
   photos: {
     id: string
@@ -189,10 +189,10 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
                   </p>
 
                   {/* Features */}
-                  {vehicle.features && (
+                  {vehicle.features && Array.isArray(vehicle.features) && vehicle.features.length > 0 && (
                     <div className="mb-4">
                       <div className="flex flex-wrap gap-2">
-                        {JSON.parse(vehicle.features).slice(0, 3).map((feature: string, index: number) => (
+                        {vehicle.features.slice(0, 3).map((feature: string, index: number) => (
                           <span
                             key={index}
                             className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
@@ -200,9 +200,9 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
                             {feature}
                           </span>
                         ))}
-                        {JSON.parse(vehicle.features).length > 3 && (
+                        {vehicle.features.length > 3 && (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                            +{JSON.parse(vehicle.features).length - 3} more
+                            +{vehicle.features.length - 3} more
                           </span>
                         )}
                       </div>

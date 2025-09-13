@@ -31,12 +31,16 @@ async function getCompanyInfo() {
 
 async function getVehicles() {
   try {
-    const vehicles = await prisma.vehicle.findMany({
-      where: { isAvailable: true },
-      include: { photos: true },
-      take: 3
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/vehicles`, {
+      cache: 'no-store'
     })
-    return vehicles
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch vehicles')
+    }
+    
+    const data = await response.json()
+    return data.vehicles?.slice(0, 3) || []
   } catch (error) {
     console.error('Error fetching vehicles:', error)
     return []

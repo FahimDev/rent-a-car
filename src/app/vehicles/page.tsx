@@ -1,30 +1,25 @@
 import { Suspense } from 'react'
-import { createPrismaClient } from '@/lib/db'
 
 export const runtime = 'edge'
 import VehicleGallery from './VehicleGallery'
 
 async function getVehicles(type?: string) {
   try {
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    const url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/vehicles`)
+    if (type) {
+      url.searchParams.set('type', type)
+    }
     
-    const where = type ? { isAvailable: true, type } : { isAvailable: true }
-    const vehicles = await prisma.vehicle.findMany({
-      where,
-      include: { 
-        photos: true,
-        bookings: {
-          where: {
-            status: { in: ['confirmed', 'pending'] }
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
+    const response = await fetch(url.toString(), {
+      cache: 'no-store'
     })
-
-    return vehicles
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch vehicles')
+    }
+    
+    const data = await response.json()
+    return data.vehicles || []
   } catch (error) {
     console.error('Error fetching vehicles:', error)
     return []
