@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ServiceFactory } from '@/lib/services/ServiceFactory'
+import { withCORS, handleCORSPreflight } from '@/lib/api/cors'
 
 export const runtime = 'edge'
+
+/**
+ * OPTIONS /api/vehicles - Handle CORS preflight requests
+ */
+export async function OPTIONS() {
+  return handleCORSPreflight()
+}
 
 /**
  * GET /api/vehicles - Get all available vehicles for public
@@ -26,34 +34,39 @@ export async function GET(request: NextRequest) {
     // Fetch vehicles using service layer
     const vehicles = await vehicleService.getAvailableVehicles(type || undefined)
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       success: true,
       data: { vehicles },
       count: vehicles.length 
     })
+    
+    return withCORS(response)
   } catch (error) {
     console.error('Error fetching vehicles:', error)
     
     // Handle specific error types
     if (error instanceof Error) {
       if (error.message.includes('Invalid vehicle type')) {
-        return NextResponse.json(
+        const response = NextResponse.json(
           { error: error.message }, 
           { status: 400 }
         )
+        return withCORS(response)
       }
       
       if (error.message.includes('Missing Cloudflare')) {
-        return NextResponse.json(
+        const response = NextResponse.json(
           { error: 'Database configuration error' }, 
           { status: 500 }
         )
+        return withCORS(response)
       }
     }
     
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }
     )
+    return withCORS(response)
   }
 }

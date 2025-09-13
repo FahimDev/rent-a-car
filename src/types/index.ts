@@ -5,7 +5,7 @@ export interface Vehicle {
   capacity: number
   pricePerDay: number
   description?: string
-  features?: string
+  features?: string[]
   isAvailable: boolean
   adminId?: string
   createdAt: Date

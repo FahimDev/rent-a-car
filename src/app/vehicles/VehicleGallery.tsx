@@ -16,25 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { VEHICLE_TYPES } from '@/types'
-
-interface Vehicle {
-  id: string
-  name: string
-  type: string
-  capacity: number
-  pricePerDay: number
-  description: string | null
-  features: string[] | null
-  isAvailable: boolean
-  photos: {
-    id: string
-    url: string
-    alt: string | null
-    isPrimary: boolean
-    order: number
-  }[]
-}
+import { VEHICLE_TYPES, Vehicle } from '@/types'
 
 interface VehicleGalleryProps {
   vehicles: Vehicle[]
@@ -137,7 +119,7 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
             {filteredVehicles.map((vehicle) => (
               <Card key={vehicle.id} className="card-mobile overflow-hidden hover:shadow-xl transition-all duration-300 group">
                 <div className="aspect-video bg-gray-200 relative overflow-hidden">
-                  {vehicle.photos.length > 0 ? (
+                  {vehicle.photos && vehicle.photos.length > 0 ? (
                     <Image 
                       src={vehicle.photos[0].url} 
                       alt={vehicle.photos[0].alt || vehicle.name}
@@ -148,7 +130,7 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
                   ) : null}
                   <div 
                     className="w-full h-full flex items-center justify-center"
-                    style={{ display: vehicle.photos.length > 0 ? 'none' : 'flex' }}
+                    style={{ display: (vehicle.photos && vehicle.photos.length > 0) ? 'none' : 'flex' }}
                   >
                     <span className="text-6xl">{getVehicleIcon(vehicle.type)}</span>
                   </div>
@@ -189,7 +171,7 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
                   </p>
 
                   {/* Features */}
-                  {vehicle.features && Array.isArray(vehicle.features) && vehicle.features.length > 0 && (
+                  {vehicle.features && vehicle.features.length > 0 && (
                     <div className="mb-4">
                       <div className="flex flex-wrap gap-2">
                         {vehicle.features.slice(0, 3).map((feature: string, index: number) => (

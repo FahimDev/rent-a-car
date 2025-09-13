@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server'
 import { DatabaseFactory } from '@/lib/database/DatabaseFactory'
+import { withCORS, handleCORSPreflight } from '@/lib/api/cors'
 
 export const runtime = 'edge'
+
+/**
+ * OPTIONS /api/company - Handle CORS preflight requests
+ */
+export async function OPTIONS() {
+  return handleCORSPreflight()
+}
 
 export async function GET() {
   try {
@@ -11,17 +19,21 @@ export async function GET() {
     const result = await database.query(sql)
     
     if (!result.success) {
-      return NextResponse.json({ error: 'Failed to fetch company info' }, { status: 500 })
+      const response = NextResponse.json({ error: 'Failed to fetch company info' }, { status: 500 })
+      return withCORS(response)
     }
     
     const companyInfo = result.data?.[0] || null
     
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       success: true,
       data: companyInfo
     })
+    
+    return withCORS(response)
   } catch (error) {
     console.error('Error fetching company info:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }

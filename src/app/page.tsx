@@ -18,65 +18,14 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-
-async function getCompanyInfo() {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/company`, {
-      cache: 'no-store'
-    })
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch company info')
-    }
-    
-    const data = await response.json() as any
-    return data.data || null
-  } catch (error) {
-    console.error('Error fetching company info:', error)
-    return null
-  }
-}
-
-async function getVehicles() {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/vehicles`, {
-      cache: 'no-store'
-    })
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch vehicles')
-    }
-    
-    const data = await response.json() as any
-    // Handle new API response format: { success: true, data: { vehicles }, count: number }
-    const vehicles = data.data?.vehicles || data.vehicles || []
-    return vehicles.slice(0, 3)
-  } catch (error) {
-    console.error('Error fetching vehicles:', error)
-    return []
-  }
-}
+import { VehicleApiService } from '@/lib/services/api/VehicleApiService'
+import { CompanyApiService } from '@/lib/services/api/CompanyApiService'
 
 export default async function HomePage() {
   const [companyInfo, vehicles] = await Promise.all([
-    getCompanyInfo(),
-    getVehicles()
+    CompanyApiService.getCompanyInfoWithFallback(),
+    VehicleApiService.getVehiclesForLanding()
   ])
-
-
-  // Fallback company info if API doesn't return data
-  const fallbackCompanyInfo = {
-    name: 'Rent-A-Car Bangladesh',
-    tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
-    description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
-    phone: '+8801234567893',
-    email: 'info@rentacar.com',
-    whatsapp: '+8801234567893',
-    latitude: 23.8103,
-    longitude: 90.4125
-  }
-
-  const displayCompanyInfo = companyInfo || fallbackCompanyInfo
 
   const services = [
     {
@@ -145,7 +94,7 @@ export default async function HomePage() {
               </Button>
             </Link>
             <div className="text-white/60 text-sm">
-              {displayCompanyInfo.name}
+              {companyInfo.name}
             </div>
           </div>
         </div>
@@ -156,13 +105,13 @@ export default async function HomePage() {
         <div className="container-mobile py-16 sm:py-24">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="heading-responsive font-bold mb-6 leading-tight">
-              <span className="block">{displayCompanyInfo.name}</span>
+              <span className="block">{companyInfo.name}</span>
               <span className="block text-2xl sm:text-3xl lg:text-4xl font-normal mt-2 opacity-90">
-                {displayCompanyInfo.tagline}
+                {companyInfo.tagline}
               </span>
             </h1>
             <p className="text-responsive mb-8 opacity-90 max-w-2xl mx-auto">
-              {displayCompanyInfo.description} 
+              {companyInfo.description} 
               Book your ride today for a comfortable and safe journey.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -315,28 +264,28 @@ export default async function HomePage() {
                 <Phone className="h-8 w-8" />
               </div>
               <h3 className="font-semibold mb-2">Phone</h3>
-              <p className="opacity-90">{displayCompanyInfo.phone}</p>
+              <p className="opacity-90">{companyInfo.phone}</p>
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-4">
                 <Mail className="h-8 w-8" />
               </div>
               <h3 className="font-semibold mb-2">Email</h3>
-              <p className="opacity-90">{displayCompanyInfo.email}</p>
+              <p className="opacity-90">{companyInfo.email}</p>
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-4">
                 <MessageCircle className="h-8 w-8" />
               </div>
               <h3 className="font-semibold mb-2">WhatsApp</h3>
-              <p className="opacity-90">{displayCompanyInfo.whatsapp}</p>
+              <p className="opacity-90">{companyInfo.whatsapp}</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Location Section */}
-      {displayCompanyInfo.latitude && displayCompanyInfo.longitude && (
+      {companyInfo.latitude && companyInfo.longitude && (
         <section className="py-16 bg-gray-50">
           <div className="container-mobile">
             <div className="text-center mb-12">
@@ -353,7 +302,7 @@ export default async function HomePage() {
                   <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600">Google Maps Integration</p>
                   <p className="text-sm text-gray-500 mt-2">
-                    Latitude: {displayCompanyInfo.latitude}, Longitude: {displayCompanyInfo.longitude}
+                    Latitude: {companyInfo.latitude}, Longitude: {companyInfo.longitude}
                   </p>
                 </div>
               </div>
