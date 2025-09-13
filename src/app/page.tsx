@@ -40,7 +40,11 @@ async function getVehicles() {
     }
     
     const data = await response.json()
-    return data.vehicles?.slice(0, 3) || []
+    console.log('API Response:', data) // Debug log
+    // Handle new API response format: { success: true, data: { vehicles }, count: number }
+    const vehicles = data.data?.vehicles || data.vehicles || []
+    console.log('Vehicles data:', vehicles) // Debug log
+    return vehicles.slice(0, 3)
   } catch (error) {
     console.error('Error fetching vehicles:', error)
     return []
