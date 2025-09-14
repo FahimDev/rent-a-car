@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { api } from '@/lib/api/utils'
 
 export const runtime = 'edge'
 import VehicleGallery from './VehicleGallery'
@@ -7,24 +8,13 @@ interface VehiclesPageProps {
   searchParams: Promise<{ type?: string }>
 }
 
-// Helper function to call API endpoint directly
+// Helper function to call API endpoint
 async function getVehicles(type?: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-    const url = type ? `${baseUrl}/api/vehicles?type=${encodeURIComponent(type)}` : `${baseUrl}/api/vehicles`
+    const response = await api.vehicles.getAll(type)
     
-    const response = await fetch(url, {
-      cache: 'no-store'
-    })
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch vehicles')
-    }
-    
-    const data = await response.json() as any
-    
-    if (data.success && data.data?.vehicles) {
-      return data.data.vehicles
+    if (response.success && response.data?.vehicles) {
+      return response.data.vehicles
     }
     
     return []

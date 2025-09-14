@@ -69,9 +69,12 @@ export async function POST(request: NextRequest) {
     }
 
     const response = NextResponse.json({
-      id: booking.id,
-      message: 'Booking created successfully',
-      booking
+      success: true,
+      data: {
+        id: booking.id,
+        message: 'Booking created successfully',
+        booking
+      }
     })
     return withCORS(response)
 
@@ -105,12 +108,15 @@ export async function GET(request: NextRequest) {
     })
 
     const response = NextResponse.json({
-      bookings: result.bookings,
-      pagination: {
-        page,
-        limit,
-        total: result.total,
-        pages: Math.ceil(result.total / limit)
+      success: true,
+      data: {
+        bookings: result.bookings,
+        pagination: {
+          page,
+          limit,
+          total: result.total,
+          pages: Math.ceil(result.total / limit)
+        }
       }
     })
     return withCORS(response)

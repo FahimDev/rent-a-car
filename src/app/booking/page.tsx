@@ -22,6 +22,7 @@ import {
 import Link from 'next/link'
 import { VEHICLE_TYPES } from '@/types'
 import { formatDate, formatTime, validatePhoneNumber, formatPhoneNumber } from '@/lib/utils'
+import { api } from '@/lib/api/utils'
 
 interface BookingFormData {
   // Step 1: Date, Time, Trip Type
@@ -94,40 +95,24 @@ function BookingPageContent() {
   }, [searchParams])
 
   const fetchVehicleDetails = async (vehicleId: string) => {
+    const fallbackVehicle = { 
+      id: vehicleId, 
+      name: 'Selected Vehicle', 
+      type: 'sedan', 
+      capacity: 4,
+      pricePerDay: 0,
+      description: '',
+      features: [],
+      isAvailable: true,
+      photos: []
+    }
+
     try {
-      const response = await fetch(`/api/vehicles/${vehicleId}`)
-      if (response.ok) {
-        const vehicle = await response.json() as VehicleApiResponse
-        setSelectedVehicle(vehicle)
-      } else {
-        console.error('Failed to fetch vehicle details')
-        // Fallback to a basic vehicle object
-        setSelectedVehicle({ 
-          id: vehicleId, 
-          name: 'Selected Vehicle', 
-          type: 'sedan', 
-          capacity: 4,
-          pricePerDay: 0,
-          description: '',
-          features: [],
-          isAvailable: true,
-          photos: []
-        })
-      }
+      const vehicle = await api.vehicles.getById(vehicleId)
+      setSelectedVehicle(vehicle)
     } catch (error) {
       console.error('Error fetching vehicle details:', error)
-      // Fallback to a basic vehicle object
-      setSelectedVehicle({ 
-        id: vehicleId, 
-        name: 'Selected Vehicle', 
-        type: 'sedan', 
-        capacity: 4,
-        pricePerDay: 0,
-        description: '',
-        features: [],
-        isAvailable: true,
-        photos: []
-      })
+      setSelectedVehicle(fallbackVehicle)
     }
   }
 
@@ -201,17 +186,12 @@ function BookingPageContent() {
         bookingDate: new Date(formData.bookingDate).toISOString()
       }
 
-      const response = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData)
-      })
-
-      if (response.ok) {
-        const result = await response.json() as BookingApiResponse
-        router.push(`/booking/success?id=${result.id}`)
+      const result = await api.bookings.create(bookingData)
+      
+      if (result.success && result.data) {
+        router.push(`/booking/success?id=${result.data.id}`)
       } else {
-        throw new Error('Booking failed')
+        throw new Error(result.error || 'Booking failed')
       }
     } catch (error) {
       console.error('Booking error:', error)

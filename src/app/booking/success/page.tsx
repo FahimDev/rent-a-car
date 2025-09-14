@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { ServiceFactory } from '@/lib/services/ServiceFactory'
+import { api } from '@/lib/api/utils'
 
 export const runtime = 'edge'
 import { Button } from '@/components/ui/button'
@@ -26,9 +26,13 @@ interface SuccessPageProps {
 
 async function getBooking(id: string) {
   try {
-    const bookingService = ServiceFactory.getBookingService()
-    const booking = await bookingService.getBookingById(id)
-    return booking
+    const response = await api.bookings.getById(id)
+    
+    if (response.success && response.data) {
+      return response.data
+    }
+    
+    return null
   } catch (error) {
     console.error('Error fetching booking:', error)
     return null
@@ -127,7 +131,7 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
                     <Calendar className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-sm text-gray-600">Date</p>
-                      <p className="font-medium">{formatDate(booking.bookingDate)}</p>
+                      <p className="font-medium">{formatDate(new Date(booking.bookingDate))}</p>
                     </div>
                   </div>
                   <div className="flex items-center">
