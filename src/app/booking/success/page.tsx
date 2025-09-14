@@ -1,4 +1,7 @@
-import { Suspense } from 'react'
+'use client'
+
+import { Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { api } from '@/lib/api/utils'
 
 export const runtime = 'edge'
@@ -25,24 +28,79 @@ interface SuccessPageProps {
 }
 
 async function getBooking(id: string) {
+  console.log('🚀 [BOOKING SUCCESS] Starting booking fetch...', { id })
+  
   try {
+    console.log('🚀 [BOOKING SUCCESS] Calling api.bookings.getById()...')
     const response = await api.bookings.getById(id)
+    console.log('🚀 [BOOKING SUCCESS] Booking API response:', {
+      success: response.success,
+      hasData: !!response.data,
+      bookingId: response.data?.id,
+      fullResponse: response
+    })
     
     if (response.success && response.data) {
+      console.log('🚀 [BOOKING SUCCESS] Using API data for booking')
       return response.data
     }
     
+    console.log('🚀 [BOOKING SUCCESS] No booking data from API, returning null')
     return null
   } catch (error) {
-    console.error('Error fetching booking:', error)
+    console.error('🚀 [BOOKING SUCCESS] Error fetching booking:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : 'Unknown'
+    })
+    console.log('🚀 [BOOKING SUCCESS] Returning null due to error')
     return null
   }
 }
 
-export default async function BookingSuccessPage({ searchParams }: SuccessPageProps) {
-  // Await searchParams for Next.js 15 compatibility
-  const { id } = await searchParams
-  const booking = id ? await getBooking(id) : null
+function BookingSuccessPageContent() {
+  const searchParams = useSearchParams()
+  const [booking, setBooking] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadBooking = async () => {
+      console.log('🚀 [BOOKING SUCCESS] useEffect - Loading booking...')
+      const id = searchParams?.get('id')
+      
+      if (!id) {
+        console.log('🚀 [BOOKING SUCCESS] No booking ID provided')
+        setLoading(false)
+        return
+      }
+      
+      try {
+        const bookingData = await getBooking(id)
+        console.log('🚀 [BOOKING SUCCESS] Booking loaded:', {
+          hasBooking: !!bookingData,
+          bookingId: bookingData?.id
+        })
+        setBooking(bookingData)
+      } catch (error) {
+        console.error('🚀 [BOOKING SUCCESS] Error loading booking:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadBooking()
+  }, [searchParams])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading booking details...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!booking) {
     return (
@@ -170,7 +228,7 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
                   Vehicle Details
                 </h3>
                 <div className="flex items-center space-x-4">
-                  {booking.vehicle.photos.length > 0 ? (
+                  {booking.vehicle?.photos?.length > 0 ? (
                     <Image 
                       src={booking.vehicle.photos[0].url} 
                       alt={booking.vehicle.photos[0].alt || booking.vehicle.name}
@@ -184,9 +242,9 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
                     </div>
                   )}
                   <div>
-                    <h4 className="font-semibold">{booking.vehicle.name}</h4>
-                    <p className="text-sm text-gray-600 capitalize">{booking.vehicle.type}</p>
-                    <p className="text-sm text-gray-600">{booking.vehicle.capacity} seats</p>
+                    <h4 className="font-semibold">{booking.vehicle?.name || 'Vehicle'}</h4>
+                    <p className="text-sm text-gray-600 capitalize">{booking.vehicle?.type || 'N/A'}</p>
+                    <p className="text-sm text-gray-600">{booking.vehicle?.capacity || 0} seats</p>
                   </div>
                 </div>
               </div>
@@ -202,14 +260,14 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
                     <User className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-sm text-gray-600">Name</p>
-                      <p className="font-medium">{booking.passenger.name}</p>
+                      <p className="font-medium">{booking.passenger?.name || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center">
                     <Phone className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-sm text-gray-600">Phone</p>
-                      <p className="font-medium">{formatPhoneNumber(booking.passenger.phone)}</p>
+                      <p className="font-medium">{formatPhoneNumber(booking.passenger?.phone || '')}</p>
                     </div>
                   </div>
                 </div>
@@ -310,5 +368,20 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
         </div>
       </div>
     </div>
+  )
+}
+
+export default function BookingSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading booking details...</p>
+        </div>
+      </div>
+    }>
+      <BookingSuccessPageContent />
+    </Suspense>
   )
 }

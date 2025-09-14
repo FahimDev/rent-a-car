@@ -1,4 +1,6 @@
-import { Suspense } from 'react'
+'use client'
+
+import { Suspense, useEffect, useState } from 'react'
 
 export const runtime = 'edge'
 import { Button } from '@/components/ui/button'
@@ -23,6 +25,8 @@ import { api } from '@/lib/api/utils'
 
 // Helper functions to call API endpoints
 async function getCompanyInfo() {
+  console.log('🚀 [FRONTEND] Starting company info fetch...')
+  
   const fallbackData = {
     id: 'default',
     name: 'Rent-A-Car Bangladesh',
@@ -37,15 +41,29 @@ async function getCompanyInfo() {
   }
 
   try {
+    console.log('🚀 [FRONTEND] Calling api.company.getInfo()...')
     const response = await api.company.getInfo()
+    console.log('🚀 [FRONTEND] Company API response:', {
+      success: response.success,
+      hasData: !!response.data,
+      dataKeys: response.data ? Object.keys(response.data) : [],
+      fullResponse: response
+    })
     
     if (response.success && response.data) {
+      console.log('🚀 [FRONTEND] Using API data for company info')
       return response.data
     }
     
+    console.log('🚀 [FRONTEND] Using fallback data for company info')
     return fallbackData
   } catch (error) {
-    console.error('Error fetching company info:', error)
+    console.error('🚀 [FRONTEND] Error fetching company info:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : 'Unknown'
+    })
+    console.log('🚀 [FRONTEND] Using fallback data due to error')
     return fallbackData
   }
 }
@@ -65,12 +83,48 @@ async function getVehicles() {
   }
 }
 
-export default async function HomePage() {
-  // Call API endpoints directly for SSR
-  const [companyInfo, vehicles] = await Promise.all([
-    getCompanyInfo(),
-    getVehicles()
-  ])
+export default function HomePage() {
+  const [companyInfo, setCompanyInfo] = useState({
+    id: 'default',
+    name: 'Rent-A-Car Bangladesh',
+    tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
+    description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
+    phone: '+8801234567893',
+    email: 'info@rentacar.com',
+    whatsapp: '+8801234567893',
+    latitude: 23.8103,
+    longitude: 90.4125,
+    address: 'Dhaka, Bangladesh'
+  })
+  
+  const [vehicles, setVehicles] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadData = async () => {
+      console.log('🚀 [FRONTEND] HomePage useEffect - Loading data...')
+      try {
+        const [companyData, vehiclesData] = await Promise.all([
+          getCompanyInfo(),
+          getVehicles()
+        ])
+        
+        console.log('🚀 [FRONTEND] Data loaded:', {
+          companyInfo: companyData,
+          vehiclesCount: vehiclesData.length
+        })
+        
+        setCompanyInfo(companyData)
+        setVehicles(vehiclesData)
+      } catch (error) {
+        console.error('🚀 [FRONTEND] Error loading data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+  }, [])
 
   const services = [
     {
@@ -125,6 +179,17 @@ export default async function HomePage() {
       textBn: "প্রতিযোগিতামূলক মূল্য"
     }
   ]
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">

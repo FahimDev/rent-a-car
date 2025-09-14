@@ -95,6 +95,8 @@ function BookingPageContent() {
   }, [searchParams])
 
   const fetchVehicleDetails = async (vehicleId: string) => {
+    console.log('🚀 [BOOKING PAGE] Starting vehicle details fetch...', { vehicleId })
+    
     const fallbackVehicle = { 
       id: vehicleId, 
       name: 'Selected Vehicle', 
@@ -108,10 +110,30 @@ function BookingPageContent() {
     }
 
     try {
-      const vehicle = await api.vehicles.getById(vehicleId)
-      setSelectedVehicle(vehicle)
+      console.log('🚀 [BOOKING PAGE] Calling api.vehicles.getById()...')
+      const response = await api.vehicles.getById(vehicleId)
+      console.log('🚀 [BOOKING PAGE] Vehicle details API response:', {
+        success: response.success,
+        hasData: !!response.data,
+        vehicleId: response.data?.id,
+        vehicleName: response.data?.name,
+        fullResponse: response
+      })
+      
+      if (response.success && response.data) {
+        console.log('🚀 [BOOKING PAGE] Using API data for vehicle details')
+        setSelectedVehicle(response.data)
+      } else {
+        console.log('🚀 [BOOKING PAGE] No vehicle data from API, using fallback')
+        setSelectedVehicle(fallbackVehicle)
+      }
     } catch (error) {
-      console.error('Error fetching vehicle details:', error)
+      console.error('🚀 [BOOKING PAGE] Error fetching vehicle details:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown'
+      })
+      console.log('🚀 [BOOKING PAGE] Using fallback vehicle due to error')
       setSelectedVehicle(fallbackVehicle)
     }
   }
@@ -175,7 +197,9 @@ function BookingPageContent() {
   const handleSubmit = async () => {
     if (!validateStep(3)) return
 
+    console.log('🚀 [BOOKING PAGE] Starting booking submission...', { formData })
     setIsSubmitting(true)
+    
     try {
       // Format phone number
       const formattedPhone = formatPhoneNumber(formData.passengerPhone)
@@ -186,15 +210,28 @@ function BookingPageContent() {
         bookingDate: new Date(formData.bookingDate).toISOString()
       }
 
+      console.log('🚀 [BOOKING PAGE] Calling api.bookings.create()...', { bookingData })
       const result = await api.bookings.create(bookingData)
+      console.log('🚀 [BOOKING PAGE] Booking API response:', {
+        success: result.success,
+        hasData: !!result.data,
+        bookingId: result.data?.id,
+        fullResponse: result
+      })
       
       if (result.success && result.data) {
+        console.log('🚀 [BOOKING PAGE] Booking created successfully, redirecting to success page')
         router.push(`/booking/success?id=${result.data.id}`)
       } else {
+        console.error('🚀 [BOOKING PAGE] Booking failed:', result.error)
         throw new Error(result.error || 'Booking failed')
       }
     } catch (error) {
-      console.error('Booking error:', error)
+      console.error('🚀 [BOOKING PAGE] Booking error:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown'
+      })
       setErrors({ submit: 'Failed to create booking. Please try again.' })
     } finally {
       setIsSubmitting(false)
