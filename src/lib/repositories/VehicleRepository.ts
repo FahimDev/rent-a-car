@@ -236,8 +236,8 @@ export class VehicleRepository extends BaseRepository {
     isPrimary: boolean
   }): Promise<any> {
     const sql = `
-      INSERT INTO vehicle_photos (id, vehicleId, url, alt, isPrimary, "order", createdAt, updatedAt)
-      VALUES ($1, $2, $3, $4, $5, $6, datetime("now"), datetime("now"))
+      INSERT INTO vehicle_photos (id, vehicleId, url, alt, isPrimary, "order", createdAt)
+      VALUES ($1, $2, $3, $4, $5, $6, datetime("now"))
     `
     
     const photoId = `photo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`

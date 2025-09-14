@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
           url: fileUrl,
           alt: `${vehicle.name} - Photo ${index + 1}`,
           order: index,
-          isPrimary: index === primaryImageIndex
+          isPrimary: uploadedFiles.length > 0 && index === primaryImageIndex
         })
         photos.push(photo)
       } catch (error) {

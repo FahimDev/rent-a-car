@@ -388,8 +388,12 @@ export default function VehicleManagement() {
                     <Input
                       id="capacity"
                       type="number"
-                      value={formData.capacity}
-                      onChange={(e) => handleInputChange('capacity', parseInt(e.target.value))}
+                      value={formData.capacity || ''}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        const numValue = value === '' ? 4 : parseInt(value)
+                        handleInputChange('capacity', isNaN(numValue) ? 4 : numValue)
+                      }}
                       min="1"
                       max="20"
                       required
@@ -400,8 +404,12 @@ export default function VehicleManagement() {
                     <Input
                       id="pricePerDay"
                       type="number"
-                      value={formData.pricePerDay}
-                      onChange={(e) => handleInputChange('pricePerDay', parseFloat(e.target.value))}
+                      value={formData.pricePerDay || ''}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        const numValue = value === '' ? 0 : parseFloat(value)
+                        handleInputChange('pricePerDay', isNaN(numValue) ? 0 : numValue)
+                      }}
                       min="0"
                       step="0.01"
                       required
