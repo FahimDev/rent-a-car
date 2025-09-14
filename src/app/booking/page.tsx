@@ -102,12 +102,32 @@ function BookingPageContent() {
       } else {
         console.error('Failed to fetch vehicle details')
         // Fallback to a basic vehicle object
-        setSelectedVehicle({ id: vehicleId, name: 'Selected Vehicle', type: 'sedan', capacity: 4 })
+        setSelectedVehicle({ 
+          id: vehicleId, 
+          name: 'Selected Vehicle', 
+          type: 'sedan', 
+          capacity: 4,
+          pricePerDay: 0,
+          description: '',
+          features: [],
+          isAvailable: true,
+          photos: []
+        })
       }
     } catch (error) {
       console.error('Error fetching vehicle details:', error)
       // Fallback to a basic vehicle object
-      setSelectedVehicle({ id: vehicleId, name: 'Selected Vehicle', type: 'sedan', capacity: 4 })
+      setSelectedVehicle({ 
+        id: vehicleId, 
+        name: 'Selected Vehicle', 
+        type: 'sedan', 
+        capacity: 4,
+        pricePerDay: 0,
+        description: '',
+        features: [],
+        isAvailable: true,
+        photos: []
+      })
     }
   }
 

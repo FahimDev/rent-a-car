@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPrismaClient } from '@/lib/db'
+import { ServiceFactory } from '@/lib/services/ServiceFactory'
+import { withCORS } from '@/lib/api/cors'
 
 export const runtime = 'edge'
 
@@ -12,24 +13,23 @@ export async function GET(
     // Await params for Next.js 15 compatibility
     const { id } = await params
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get vehicle service
+    const vehicleService = ServiceFactory.getVehicleService()
     
-    const vehicle = await prisma.vehicle.findUnique({
-      where: { id },
-      include: {
-        photos: true
-      }
-    })
+    const vehicle = await vehicleService.getVehicleById(id)
 
     if (!vehicle) {
-      return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 })
+      const response = NextResponse.json({ error: 'Vehicle not found' }, { status: 404 })
+      return withCORS(response)
     }
 
-    return NextResponse.json(vehicle)
+    const response = NextResponse.json(vehicle)
+    return withCORS(response)
   } catch (error) {
     console.error('Error fetching vehicle:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error'
+    const response = NextResponse.json({ error: errorMessage }, { status: 500 })
+    return withCORS(response)
   }
 }

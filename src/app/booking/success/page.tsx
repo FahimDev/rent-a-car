@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { createPrismaClient } from '@/lib/db'
+import { ServiceFactory } from '@/lib/services/ServiceFactory'
 
 export const runtime = 'edge'
 import { Button } from '@/components/ui/button'
@@ -26,21 +26,8 @@ interface SuccessPageProps {
 
 async function getBooking(id: string) {
   try {
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
-    
-    const booking = await prisma.booking.findUnique({
-      where: { id },
-      include: {
-        passenger: true,
-        vehicle: {
-          include: {
-            photos: true
-          }
-        }
-      }
-    })
+    const bookingService = ServiceFactory.getBookingService()
+    const booking = await bookingService.getBookingById(id)
     return booking
   } catch (error) {
     console.error('Error fetching booking:', error)

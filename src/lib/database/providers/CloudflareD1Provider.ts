@@ -22,30 +22,12 @@ export class CloudflareD1Provider implements DatabaseProvider {
         }
       }
 
-      // Replace parameter placeholders with actual values
+      // Convert $1, $2, $3 placeholders to ? placeholders for D1 API
       let processedSql = sql
-      if (params.length > 0) {
-        // Simple parameter replacement for SQL injection safety
-        params.forEach((param, index) => {
-          const placeholder = `$${index + 1}`
-          let value: string
-          
-          if (param === null || param === undefined) {
-            value = 'NULL'
-          } else if (typeof param === 'string') {
-            // Escape single quotes and wrap in quotes
-            value = `'${param.replace(/'/g, "''")}'`
-          } else if (typeof param === 'number') {
-            value = param.toString()
-          } else if (typeof param === 'boolean') {
-            value = param ? '1' : '0'
-          } else {
-            value = `'${String(param).replace(/'/g, "''")}'`
-          }
-          
-          processedSql = processedSql.replace(new RegExp(placeholder, 'g'), value)
-        })
-      }
+      params.forEach((_, index) => {
+        const placeholder = `$${index + 1}`
+        processedSql = processedSql.replace(new RegExp(placeholder, 'g'), '?')
+      })
 
       const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`
       
@@ -55,7 +37,10 @@ export class CloudflareD1Provider implements DatabaseProvider {
           'Authorization': `Bearer ${apiToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ sql: processedSql }),
+        body: JSON.stringify({ 
+          sql: processedSql,
+          params: params
+        }),
       })
 
       if (!response.ok) {

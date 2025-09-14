@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPrismaClient } from '@/lib/db'
-import { formatPhoneNumber, generateBookingReference } from '@/lib/utils'
+import { ServiceFactory } from '@/lib/services/ServiceFactory'
+import { withCORS } from '@/lib/api/cors'
+import { BookingFormData } from '@/types'
 
 export const runtime = 'edge'
 
@@ -33,65 +34,31 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!bookingDate || !pickupTime || !tripType || !pickupLocation || !passengerName || !passengerPhone || !vehicleId) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
+      return withCORS(response)
     }
 
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get booking service
+    const bookingService = ServiceFactory.getBookingService()
 
-    // Format phone number
-    const formattedPhone = formatPhoneNumber(passengerPhone)
-
-    // Check if passenger exists, if not create one
-    let passenger = await prisma.passenger.findUnique({
-      where: { phone: formattedPhone }
-    })
-
-    if (!passenger) {
-      passenger = await prisma.passenger.create({
-        data: {
-          phone: formattedPhone,
-          name: passengerName,
-          email: passengerEmail || null,
-          isVerified: false
-        }
-      })
-    } else {
-      // Update passenger info if provided
-      await prisma.passenger.update({
-        where: { id: passenger.id },
-        data: {
-          name: passengerName,
-          email: passengerEmail || passenger.email
-        }
-      })
+    // Prepare booking data
+    const bookingData: BookingFormData = {
+      bookingDate: new Date(bookingDate),
+      pickupTime,
+      tripType: tripType as 'single' | 'round',
+      pickupLocation,
+      dropoffLocation: tripType === 'round' ? dropoffLocation : undefined,
+      passengerName,
+      passengerPhone,
+      passengerEmail,
+      vehicleId
     }
 
-    // Create booking
-    const booking = await prisma.booking.create({
-      data: {
-        passengerId: passenger.id,
-        vehicleId,
-        bookingDate: new Date(bookingDate),
-        pickupTime,
-        tripType,
-        pickupLocation,
-        dropoffLocation: tripType === 'round' ? dropoffLocation : null,
-        status: 'pending'
-      },
-      include: {
-        passenger: true,
-        vehicle: {
-          include: {
-            photos: true
-          }
-        }
-      }
-    })
+    // Create booking using service layer
+    const booking = await bookingService.createBooking(bookingData)
 
     // Send WhatsApp notification (if configured)
     try {
@@ -101,18 +68,22 @@ export async function POST(request: NextRequest) {
       // Don't fail the booking if notification fails
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       id: booking.id,
       message: 'Booking created successfully',
       booking
     })
+    return withCORS(response)
 
   } catch (error) {
     console.error('Booking creation error:', error)
-    return NextResponse.json(
-      { error: 'Failed to create booking' },
+    
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create booking'
+    const response = NextResponse.json(
+      { error: errorMessage },
       { status: 500 }
     )
+    return withCORS(response)
   }
 }
 
@@ -123,45 +94,36 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get booking service
+    const bookingService = ServiceFactory.getBookingService()
 
-    const where = status ? { status } : {}
-    
-    const bookings = await prisma.booking.findMany({
-      where,
-      include: {
-        passenger: true,
-        vehicle: {
-          include: {
-            photos: true
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * limit,
-      take: limit
+    // Get bookings using service layer
+    const result = await bookingService.getBookings({
+      status: status || undefined,
+      page,
+      limit
     })
 
-    const total = await prisma.booking.count({ where })
-
-    return NextResponse.json({
-      bookings,
+    const response = NextResponse.json({
+      bookings: result.bookings,
       pagination: {
         page,
         limit,
-        total,
-        pages: Math.ceil(total / limit)
+        total: result.total,
+        pages: Math.ceil(result.total / limit)
       }
     })
+    return withCORS(response)
 
   } catch (error) {
     console.error('Error fetching bookings:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch bookings' },
+    
+    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch bookings'
+    const response = NextResponse.json(
+      { error: errorMessage },
       { status: 500 }
     )
+    return withCORS(response)
   }
 }
 
@@ -214,20 +176,9 @@ ${booking.dropoffLocation ? `• Drop-off: ${booking.dropoffLocation}` : ''}
     })
 
     if (response.ok) {
-      // Get D1 database from Cloudflare environment
-      const d1Database = (globalThis as any).DB
-      const prisma = createPrismaClient(d1Database)
-      
-      // Create notification record
-      await prisma.notification.create({
-        data: {
-          bookingId: booking.id,
-          type: 'whatsapp',
-          status: 'sent',
-          message: message,
-          sentAt: new Date()
-        }
-      })
+      console.log('WhatsApp notification sent successfully')
+      // Note: In a production system, you might want to log this to a database
+      // For now, we'll just log it to the console
     }
   } catch (error) {
     console.error('WhatsApp API error:', error)

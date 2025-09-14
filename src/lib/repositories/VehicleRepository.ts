@@ -177,9 +177,9 @@ export class VehicleRepository extends BaseRepository {
       
       if (photosJson.includes('},{')) {
         // Multiple photos
-        const photoStrings = photosJson.split('},{').map((str: string, index: number) => {
+        const photoStrings = photosJson.split('},{').map((str: string, index: number, array: string[]) => {
           if (index === 0) return str + '}'
-          if (index === photoStrings.length - 1) return '{' + str
+          if (index === array.length - 1) return '{' + str
           return '{' + str + '}'
         })
         
