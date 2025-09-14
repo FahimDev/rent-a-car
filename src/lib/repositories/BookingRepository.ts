@@ -190,44 +190,54 @@ export class BookingRepository extends BaseRepository {
     const fields = []
     const values = []
 
+    let paramIndex = 1
+
     if (updateData.bookingDate) {
-      fields.push('bookingDate = ?')
+      fields.push(`bookingDate = $${paramIndex}`)
       values.push(updateData.bookingDate.toISOString())
+      paramIndex++
     }
     if (updateData.pickupTime) {
-      fields.push('pickupTime = ?')
+      fields.push(`pickupTime = $${paramIndex}`)
       values.push(updateData.pickupTime)
+      paramIndex++
     }
     if (updateData.tripType) {
-      fields.push('tripType = ?')
+      fields.push(`tripType = $${paramIndex}`)
       values.push(updateData.tripType)
+      paramIndex++
     }
     if (updateData.pickupLocation) {
-      fields.push('pickupLocation = ?')
+      fields.push(`pickupLocation = $${paramIndex}`)
       values.push(updateData.pickupLocation)
+      paramIndex++
     }
     if (updateData.dropoffLocation !== undefined) {
-      fields.push('dropoffLocation = ?')
+      fields.push(`dropoffLocation = $${paramIndex}`)
       values.push(updateData.dropoffLocation)
+      paramIndex++
     }
     if (updateData.status) {
-      fields.push('status = ?')
+      fields.push(`status = $${paramIndex}`)
       values.push(updateData.status)
+      paramIndex++
     }
     if (updateData.notes !== undefined) {
-      fields.push('notes = ?')
+      fields.push(`notes = $${paramIndex}`)
       values.push(updateData.notes)
+      paramIndex++
     }
 
     if (fields.length === 0) {
       return false
     }
 
-    fields.push('updatedAt = ?')
+    fields.push(`updatedAt = $${paramIndex}`)
     values.push(new Date().toISOString())
+    paramIndex++
     values.push(id)
 
-    const sql = `UPDATE bookings SET ${fields.join(', ')} WHERE id = ?`
+    const sql = `UPDATE bookings SET ${fields.join(', ')} WHERE id = $${paramIndex}`
     const affectedRows = await this.update(sql, values)
     return affectedRows > 0
   }

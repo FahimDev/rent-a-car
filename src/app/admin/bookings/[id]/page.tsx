@@ -46,13 +46,13 @@ interface Booking {
     name: string
     type: string
     capacity: number
-    photos: {
+    photos?: {
       id: string
       url: string
       alt: string
     }[]
   }
-  notifications: {
+  notifications?: {
     id: string
     type: string
     status: string
@@ -349,7 +349,7 @@ export default function BookingDetail() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-4">
-                  {booking.vehicle.photos.length > 0 ? (
+                  {booking.vehicle.photos && booking.vehicle.photos.length > 0 ? (
                     <Image 
                       src={booking.vehicle.photos[0].url} 
                       alt={booking.vehicle.photos[0].alt}
@@ -433,22 +433,28 @@ export default function BookingDetail() {
                     </div>
                   </div>
                   
-                  {booking.notifications.map((notification) => (
-                    <div key={notification.id} className="flex items-center space-x-3">
-                      <div className={`w-2 h-2 rounded-full ${
-                        notification.status === 'sent' ? 'bg-green-500' : 'bg-yellow-500'
-                      }`}></div>
-                      <div>
-                        <p className="text-sm font-medium">
-                          {notification.type === 'whatsapp' ? 'WhatsApp Notification' : 'Notification'} 
-                          {notification.status === 'sent' ? ' Sent' : ' Pending'}
-                        </p>
-                        {notification.sentAt && (
-                          <p className="text-xs text-gray-600">{formatDate(notification.sentAt)}</p>
-                        )}
+                  {booking.notifications && booking.notifications.length > 0 ? (
+                    booking.notifications.map((notification) => (
+                      <div key={notification.id} className="flex items-center space-x-3">
+                        <div className={`w-2 h-2 rounded-full ${
+                          notification.status === 'sent' ? 'bg-green-500' : 'bg-yellow-500'
+                        }`}></div>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {notification.type === 'whatsapp' ? 'WhatsApp Notification' : 'Notification'} 
+                            {notification.status === 'sent' ? ' Sent' : ' Pending'}
+                          </p>
+                          {notification.sentAt && (
+                            <p className="text-xs text-gray-600">{formatDate(notification.sentAt)}</p>
+                          )}
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-gray-500">No notifications sent</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>

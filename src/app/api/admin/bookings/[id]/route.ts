@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPrismaClient } from '@/lib/db'
+import { ServiceFactory } from '@/lib/services/ServiceFactory'
 import { verifyTokenFromRequest } from '@/lib/auth'
+import { withCORS } from '@/lib/api/cors'
 
 export const runtime = 'edge'
 
@@ -20,41 +21,23 @@ export async function GET(
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get booking service
+    const bookingService = ServiceFactory.getBookingService()
     
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
-    }
-
     // Get booking by ID
-    const booking = await prisma.booking.findUnique({
-      where: { id },
-      include: {
-        passenger: true,
-        vehicle: {
-          include: {
-            photos: true
-          }
-        },
-        notifications: true
-      }
-    })
+    const booking = await bookingService.getBookingById(id)
 
     if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
+      const response = NextResponse.json({ error: 'Booking not found' }, { status: 404 })
+      return withCORS(response)
     }
 
-    return NextResponse.json({ booking })
+    const response = NextResponse.json({ booking })
+    return withCORS(response)
   } catch (error) {
     console.error('Error fetching booking:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }
 
@@ -69,45 +52,26 @@ export async function PATCH(
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
-    
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
-    }
-
     const body = await request.json() as UpdateBookingRequest
     const { status, notes } = body
 
+    // Get booking service
+    const bookingService = ServiceFactory.getBookingService()
+    
     // Update booking
-    const booking = await prisma.booking.update({
-      where: { id },
-      data: {
-        status: status || undefined,
-        notes: notes || undefined
-      },
-      include: {
-        passenger: true,
-        vehicle: {
-          include: {
-            photos: true
-          }
-        }
-      }
+    const booking = await bookingService.updateBooking(id, {
+      status,
+      notes
     })
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       booking,
       message: 'Booking updated successfully' 
     })
+    return withCORS(response)
   } catch (error) {
     console.error('Error updating booking:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }

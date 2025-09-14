@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { api } from '@/lib/api/utils'
 
 interface Booking {
   id: string
@@ -63,27 +64,14 @@ export default function AdminBookings() {
 
   const fetchBookings = useCallback(async () => {
     try {
-      const token = localStorage.getItem('adminToken')
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: '10'
-      })
-      
-      if (statusFilter !== 'all') {
-        params.append('status', statusFilter)
-      }
-
-      const response = await fetch(`/api/admin/bookings?${params}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const data = await api.admin.getBookings({
+        page: currentPage,
+        limit: 10,
+        status: statusFilter !== 'all' ? statusFilter : undefined
       })
 
-      if (response.ok) {
-        const data = await response.json() as BookingsApiResponse
-        setBookings(data.bookings || [])
-        setTotalPages(data.pagination?.pages || 1)
-      } else {
-        toast.error('Failed to fetch bookings')
-      }
+      setBookings(data.bookings || [])
+      setTotalPages(data.pagination?.pages || 1)
     } catch (error) {
       console.error('Error fetching bookings:', error)
       toast.error('Failed to load bookings')

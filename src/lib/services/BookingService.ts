@@ -134,13 +134,16 @@ export class BookingService {
     dropoffLocation?: string
     status?: 'pending' | 'confirmed' | 'completed' | 'cancelled'
     notes?: string
-  }): Promise<boolean> {
+  }): Promise<Booking> {
     const booking = await this.bookingRepository.findById(id)
     if (!booking) {
       throw new Error('Booking not found')
     }
 
-    return this.bookingRepository.updateBooking(id, updateData)
+    const updated = await this.bookingRepository.updateBooking(id, updateData)
+    
+    // Return the updated booking (even if no changes were made, the booking still exists)
+    return this.bookingRepository.findById(id) as Promise<Booking>
   }
 
   /**

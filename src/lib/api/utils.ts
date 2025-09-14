@@ -169,6 +169,22 @@ export const api = {
       return apiCall<{ passengers: any[]; pagination: any }>(endpoint, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
+    },
+
+    async getBookingById(id: string): Promise<{ booking: any }> {
+      const token = localStorage.getItem('adminToken')
+      return apiCall<{ booking: any }>(`/api/admin/bookings/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+    },
+
+    async updateBooking(id: string, updateData: { status?: string; notes?: string }): Promise<{ booking: any; message: string }> {
+      const token = localStorage.getItem('adminToken')
+      return apiCall<{ booking: any; message: string }>(`/api/admin/bookings/${id}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(updateData)
+      })
     }
   }
 }
