@@ -1,9 +1,11 @@
 import { VehicleService } from './VehicleService'
 import { BookingService } from './BookingService'
 import { PassengerService } from './PassengerService'
+import { AdminService } from './AdminService'
 import { VehicleRepository } from '../repositories/VehicleRepository'
 import { BookingRepository } from '../repositories/BookingRepository'
 import { PassengerRepository } from '../repositories/PassengerRepository'
+import { AdminRepository } from '../repositories/AdminRepository'
 import { DatabaseFactory } from '../database/DatabaseFactory'
 
 /**
@@ -14,6 +16,7 @@ export class ServiceFactory {
   private static vehicleService: VehicleService | null = null
   private static bookingService: BookingService | null = null
   private static passengerService: PassengerService | null = null
+  private static adminService: AdminService | null = null
 
   /**
    * Get vehicle service instance (singleton)
@@ -54,11 +57,24 @@ export class ServiceFactory {
   }
 
   /**
+   * Get admin service instance (singleton)
+   */
+  static getAdminService(): AdminService {
+    if (!this.adminService) {
+      const database = DatabaseFactory.getDefaultProvider()
+      const adminRepository = new AdminRepository(database)
+      this.adminService = new AdminService(adminRepository)
+    }
+    return this.adminService
+  }
+
+  /**
    * Reset services (useful for testing)
    */
   static reset(): void {
     this.vehicleService = null
     this.bookingService = null
     this.passengerService = null
+    this.adminService = null
   }
 }

@@ -120,5 +120,17 @@ export const api = {
       const endpoint = queryString ? `/api/bookings?${queryString}` : '/api/bookings'
       return apiCall<ApiResponse<any>>(endpoint)
     }
+  },
+
+  /**
+   * Admin API
+   */
+  admin: {
+    async login(credentials: { username: string; password: string }): Promise<{ message: string; token: string; admin: any }> {
+      return apiCall<{ message: string; token: string; admin: any }>('/api/admin/login', {
+        method: 'POST',
+        body: JSON.stringify(credentials)
+      })
+    }
   }
 }

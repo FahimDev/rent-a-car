@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPrismaClient, prisma } from '@/lib/db'
-import { signJWT, comparePassword } from '@/lib/auth'
+import { ServiceFactory } from '@/lib/services/ServiceFactory'
+import { withCORS, handleCORSPreflight } from '@/lib/api/cors'
 
 // Use Edge runtime for Cloudflare Pages deployment
 export const runtime = 'edge'
@@ -10,74 +10,50 @@ interface LoginRequest {
   password: string
 }
 
+export async function OPTIONS() {
+  return handleCORSPreflight()
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json() as LoginRequest
 
     if (!username || !password) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { message: 'Username and password are required' },
         { status: 400 }
       )
+      return withCORS(response)
     }
 
-    // Get database connection
-    // For Edge runtime, we need to use D1 database
-    const d1Database = (globalThis as any).DB
-    if (!d1Database) {
-      return NextResponse.json(
-        { message: 'Database not available - D1 binding not found' },
-        { status: 500 }
-      )
-    }
-    const prismaClient = createPrismaClient(d1Database)
+    // Get admin service
+    const adminService = ServiceFactory.getAdminService()
 
-    // Find admin user
-    const admin = await prismaClient.admin.findUnique({
-      where: { username }
-    })
+    // Authenticate admin
+    const authResult = await adminService.authenticate(username, password)
 
-    if (!admin) {
-      return NextResponse.json(
+    if (!authResult) {
+      const response = NextResponse.json(
         { message: 'Invalid credentials' },
         { status: 401 }
       )
+      return withCORS(response)
     }
 
-    // Verify password
-    const isValidPassword = await comparePassword(password, admin.password)
-
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { message: 'Invalid credentials' },
-        { status: 401 }
-      )
-    }
-
-    // Generate JWT token
-    const token = await signJWT(
-      { 
-        adminId: admin.id, 
-        username: admin.username,
-        role: admin.role 
-      },
-      process.env.JWT_SECRET || 'fallback-secret'
-    )
-
-    // Return admin info (without password) and token
-    const { password: _, ...adminWithoutPassword } = admin
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       message: 'Login successful',
-      token,
-      admin: adminWithoutPassword
+      token: authResult.token,
+      admin: authResult.admin
     })
+    
+    return withCORS(response)
 
   } catch (error) {
     console.error('Admin login error:', error)
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
     )
+    return withCORS(response)
   }
 }

@@ -8,14 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Shield, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-
-interface LoginApiResponse {
-  token: string
-}
-
-interface ErrorApiResponse {
-  message: string
-}
+import { api } from '@/lib/api/utils'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -31,28 +24,12 @@ export default function AdminLoginPage() {
     setIsLoading(true)
 
     try {
-      // Use development endpoint in development, production endpoint in production
-      const apiEndpoint = process.env.NODE_ENV === 'development' 
-        ? '/api/admin/login-dev' 
-        : '/api/admin/login'
-      
-      const response = await fetch(apiEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-
-      if (response.ok) {
-        const data = await response.json() as LoginApiResponse
-        localStorage.setItem('adminToken', data.token)
-        toast.success('Login successful!')
-        router.push('/admin/dashboard')
-      } else {
-        const error = await response.json() as ErrorApiResponse
-        toast.error(error.message || 'Login failed')
-      }
-    } catch (error) {
-      toast.error('An error occurred. Please try again.')
+      const data = await api.admin.login(formData)
+      localStorage.setItem('adminToken', data.token)
+      toast.success('Login successful!')
+      router.push('/admin/dashboard')
+    } catch (error: any) {
+      toast.error(error.message || 'Login failed')
     } finally {
       setIsLoading(false)
     }
