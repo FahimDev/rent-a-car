@@ -311,7 +311,7 @@ export class BookingRepository extends BaseRepository {
                  'url', vp.url,
                  'alt', vp.alt,
                  'isPrimary', vp.isPrimary,
-                 'order', vp.order
+                 'order', vp."order"
                )
              ) as vehiclePhotos_json
       FROM bookings b

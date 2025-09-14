@@ -62,16 +62,31 @@ export async function PUT(
       return withCORS(response)
     }
 
-    // Parse form data
-    const formData = await request.formData()
+    // Parse request data (JSON or FormData)
+    const contentType = request.headers.get('content-type') || ''
+    let name: string, type: string, capacity: number, pricePerDay: number, description: string, features: string, isAvailable: boolean
     
-    const name = formData.get('name') as string
-    const type = formData.get('type') as string
-    const capacity = parseInt(formData.get('capacity') as string)
-    const pricePerDay = parseFloat(formData.get('pricePerDay') as string)
-    const description = formData.get('description') as string
-    const features = formData.get('features') as string
-    const isAvailable = formData.get('isAvailable') === 'true'
+    if (contentType.includes('application/json')) {
+      // Handle JSON request
+      const body = await request.json()
+      name = body.name
+      type = body.type
+      capacity = body.capacity
+      pricePerDay = body.pricePerDay
+      description = body.description
+      features = body.features
+      isAvailable = body.isAvailable
+    } else {
+      // Handle FormData request
+      const formData = await request.formData()
+      name = formData.get('name') as string
+      type = formData.get('type') as string
+      capacity = parseInt(formData.get('capacity') as string)
+      pricePerDay = parseFloat(formData.get('pricePerDay') as string)
+      description = formData.get('description') as string
+      features = formData.get('features') as string
+      isAvailable = formData.get('isAvailable') === 'true'
+    }
 
     // Validate required fields
     if (!name || !type || !capacity || !pricePerDay || !description) {
@@ -82,7 +97,8 @@ export async function PUT(
     }
 
     // Parse features array
-    const featuresArray = features ? features.split(',').map(f => f.trim()).filter(f => f) : []
+    const featuresArray = Array.isArray(features) ? features : 
+                         (features ? features.split(',').map(f => f.trim()).filter(f => f) : [])
 
     // Update vehicle using service
     const updatedVehicle = await vehicleService.updateVehicle(id, {
@@ -95,11 +111,13 @@ export async function PUT(
       isAvailable
     })
 
-    // Handle new photo uploads
+    // Handle new photo uploads (only for FormData requests)
     const newPhotos = []
-    for (let i = 0; i < 10; i++) { // Allow up to 10 photos
-      const photoFile = formData.get(`photo_${i}`) as File
-      if (photoFile && photoFile.size > 0) {
+    if (!contentType.includes('application/json')) {
+      const formData = await request.formData()
+      for (let i = 0; i < 10; i++) { // Allow up to 10 photos
+        const photoFile = formData.get(`photo_${i}`) as File
+        if (photoFile && photoFile.size > 0) {
         // Validate the image file
         if (!validateImageFile(photoFile)) {
           const response = NextResponse.json({ 
@@ -128,6 +146,7 @@ export async function PUT(
           return withCORS(response)
         }
       }
+    }
     }
 
     // Get updated vehicle with all photos

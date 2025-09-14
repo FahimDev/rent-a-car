@@ -88,7 +88,11 @@ export class VehicleService {
       throw new Error('Vehicle ID is required')
     }
 
-    return this.vehicleRepository.updateVehicleAvailability(id, isAvailable)
+    await this.vehicleRepository.updateVehicleAvailability(id, isAvailable)
+    
+    // Verify the update by fetching the vehicle
+    const vehicle = await this.vehicleRepository.getVehicleById(id)
+    return vehicle ? vehicle.isAvailable === isAvailable : false
   }
 
   /**
@@ -186,12 +190,9 @@ export class VehicleService {
     this.validateVehicleData(updateData)
 
     // Update vehicle in repository
-    const updated = await this.vehicleRepository.updateVehicle(id, updateData)
-    if (!updated) {
-      throw new Error('Failed to update vehicle')
-    }
+    await this.vehicleRepository.updateVehicle(id, updateData)
 
-    // Return the updated vehicle
+    // Return the updated vehicle to verify the update
     const vehicle = await this.vehicleRepository.getVehicleById(id)
     if (!vehicle) {
       throw new Error('Failed to fetch updated vehicle')
@@ -211,6 +212,10 @@ export class VehicleService {
     }
 
     // Delete vehicle from repository
-    return this.vehicleRepository.deleteVehicle(id)
+    await this.vehicleRepository.deleteVehicle(id)
+    
+    // Verify deletion by trying to fetch the vehicle
+    const deletedVehicle = await this.vehicleRepository.getVehicleById(id)
+    return !deletedVehicle
   }
 }
