@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPrismaClient } from '@/lib/db'
+import { ServiceFactory } from '@/lib/services/ServiceFactory'
 import { verifyTokenFromRequest } from '@/lib/auth'
+import { withCORS } from '@/lib/api/cors'
 
 export const runtime = 'edge'
 
@@ -16,19 +17,6 @@ export async function GET(request: NextRequest) {
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
-    
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
-    }
-
     // Get query parameters
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
@@ -36,53 +24,26 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    // Build where clause
-    const where: any = {}
+    // Get passenger service
+    const passengerService = ServiceFactory.getPassengerService()
     
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { phone: { contains: search } },
-        { email: { contains: search, mode: 'insensitive' } }
-      ]
-    }
-    
-    if (verified !== null && verified !== undefined) {
-      where.isVerified = verified === 'true'
-    }
-
     // Get passengers with pagination
-    const [passengers, total] = await Promise.all([
-      prisma.passenger.findMany({
-        where,
-        include: {
-          bookings: {
-            include: {
-              vehicle: true
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 5 // Show only recent bookings
-          }
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit
-      }),
-      prisma.passenger.count({ where })
-    ])
-
-    return NextResponse.json({
-      passengers,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
+    const result = await passengerService.getPassengers({ 
+      search: search || undefined,
+      verified: verified ? verified === 'true' : undefined,
+      page, 
+      limit 
     })
+
+    const response = NextResponse.json({
+      passengers: result.passengers,
+      pagination: result.pagination
+    })
+    return withCORS(response)
   } catch (error) {
     console.error('Error fetching passengers:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }
 
@@ -91,51 +52,32 @@ export async function PATCH(request: NextRequest) {
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
-    
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
-    }
-
     const body = await request.json() as UpdatePassengerRequest
     const { passengerId, isVerified, name, email } = body
 
     if (!passengerId) {
-      return NextResponse.json({ error: 'Passenger ID is required' }, { status: 400 })
+      const response = NextResponse.json({ error: 'Passenger ID is required' }, { status: 400 })
+      return withCORS(response)
     }
 
+    // Get passenger service
+    const passengerService = ServiceFactory.getPassengerService()
+    
     // Update passenger
-    const passenger = await prisma.passenger.update({
-      where: { id: passengerId },
-      data: {
-        isVerified: isVerified !== undefined ? isVerified : undefined,
-        name: name || undefined,
-        email: email || undefined
-      },
-      include: {
-        bookings: {
-          include: {
-            vehicle: true
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 5
-        }
-      }
+    const passenger = await passengerService.updatePassenger(passengerId, {
+      isVerified,
+      name,
+      email
     })
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       passenger,
       message: 'Passenger updated successfully' 
     })
+    return withCORS(response)
   } catch (error) {
     console.error('Error updating passenger:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }

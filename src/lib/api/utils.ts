@@ -131,6 +131,44 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(credentials)
       })
+    },
+
+    async getStats(): Promise<{ totalBookings: number; pendingBookings: number; totalVehicles: number; totalPassengers: number }> {
+      const token = localStorage.getItem('adminToken')
+      return apiCall<{ totalBookings: number; pendingBookings: number; totalVehicles: number; totalPassengers: number }>('/api/admin/stats', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+    },
+
+    async getBookings(filters?: { status?: string; page?: number; limit?: number }): Promise<{ bookings: any[]; pagination: any }> {
+      const token = localStorage.getItem('adminToken')
+      const params = new URLSearchParams()
+      if (filters?.status) params.append('status', filters.status)
+      if (filters?.page) params.append('page', filters.page.toString())
+      if (filters?.limit) params.append('limit', filters.limit.toString())
+      
+      const queryString = params.toString()
+      const endpoint = queryString ? `/api/admin/bookings?${queryString}` : '/api/admin/bookings'
+      
+      return apiCall<{ bookings: any[]; pagination: any }>(endpoint, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+    },
+
+    async getPassengers(filters?: { search?: string; verified?: boolean; page?: number; limit?: number }): Promise<{ passengers: any[]; pagination: any }> {
+      const token = localStorage.getItem('adminToken')
+      const params = new URLSearchParams()
+      if (filters?.search) params.append('search', filters.search)
+      if (filters?.verified !== undefined) params.append('verified', filters.verified.toString())
+      if (filters?.page) params.append('page', filters.page.toString())
+      if (filters?.limit) params.append('limit', filters.limit.toString())
+      
+      const queryString = params.toString()
+      const endpoint = queryString ? `/api/admin/passengers?${queryString}` : '/api/admin/passengers'
+      
+      return apiCall<{ passengers: any[]; pagination: any }>(endpoint, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
     }
   }
 }

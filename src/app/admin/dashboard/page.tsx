@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { api } from '@/lib/api/utils'
 
 interface DashboardStats {
   totalBookings: number
@@ -78,26 +79,13 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('adminToken')
-      
-      const [statsResponse, bookingsResponse] = await Promise.all([
-        fetch('/api/admin/stats', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch('/api/admin/bookings?limit=5', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+      const [statsData, bookingsData] = await Promise.all([
+        api.admin.getStats(),
+        api.admin.getBookings({ limit: 5 })
       ])
 
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json() as StatsApiResponse
-        setStats(statsData)
-      }
-
-      if (bookingsResponse.ok) {
-        const bookingsData = await bookingsResponse.json() as BookingsApiResponse
-        setRecentBookings(bookingsData.bookings || [])
-      }
+      setStats(statsData)
+      setRecentBookings(bookingsData.bookings || [])
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
       toast.error('Failed to load dashboard data')

@@ -37,9 +37,12 @@ export async function verifyTokenFromRequest(request: Request): Promise<{ adminI
   const token = authHeader.replace('Bearer ', '')
   const decoded = await verifyJWT(token, process.env.JWT_SECRET || 'fallback-secret')
   
-  if (!decoded.adminId || !decoded.username || !decoded.role) {
+  // Extract payload from the decoded token structure
+  const payload = decoded.payload || decoded
+  
+  if (!payload.adminId || !payload.username || !payload.role) {
     throw new Error('Invalid token payload')
   }
   
-  return decoded as { adminId: string; username: string; role: string }
+  return payload as { adminId: string; username: string; role: string }
 }

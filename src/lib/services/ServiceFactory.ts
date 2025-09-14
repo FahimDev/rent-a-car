@@ -2,6 +2,7 @@ import { VehicleService } from './VehicleService'
 import { BookingService } from './BookingService'
 import { PassengerService } from './PassengerService'
 import { AdminService } from './AdminService'
+import { AdminStatsService } from './AdminStatsService'
 import { VehicleRepository } from '../repositories/VehicleRepository'
 import { BookingRepository } from '../repositories/BookingRepository'
 import { PassengerRepository } from '../repositories/PassengerRepository'
@@ -17,6 +18,7 @@ export class ServiceFactory {
   private static bookingService: BookingService | null = null
   private static passengerService: PassengerService | null = null
   private static adminService: AdminService | null = null
+  private static adminStatsService: AdminStatsService | null = null
 
   /**
    * Get vehicle service instance (singleton)
@@ -69,6 +71,16 @@ export class ServiceFactory {
   }
 
   /**
+   * Get admin stats service instance (singleton)
+   */
+  static getAdminStatsService(): AdminStatsService {
+    if (!this.adminStatsService) {
+      this.adminStatsService = new AdminStatsService()
+    }
+    return this.adminStatsService
+  }
+
+  /**
    * Reset services (useful for testing)
    */
   static reset(): void {
@@ -76,5 +88,6 @@ export class ServiceFactory {
     this.bookingService = null
     this.passengerService = null
     this.adminService = null
+    this.adminStatsService = null
   }
 }
