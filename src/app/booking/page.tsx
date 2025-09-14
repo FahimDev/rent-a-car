@@ -155,8 +155,8 @@ function BookingPageContent() {
         break
       case 2:
         if (!formData.pickupLocation) newErrors.pickupLocation = 'Pickup location is required'
-        if (formData.tripType === 'round' && !formData.dropoffLocation) {
-          newErrors.dropoffLocation = 'Drop-off location is required for round trip'
+        if (!formData.dropoffLocation) {
+          newErrors.dropoffLocation = 'Drop-off location is required'
         }
         break
       case 3:
@@ -195,7 +195,8 @@ function BookingPageContent() {
   }
 
   const handleSubmit = async () => {
-    if (!validateStep(3)) return
+    // Validate all steps except vehicle selection (optional)
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) return
 
     console.log('🚀 [BOOKING PAGE] Starting booking submission...', { formData })
     setIsSubmitting(true)
@@ -207,7 +208,9 @@ function BookingPageContent() {
       const bookingData = {
         ...formData,
         passengerPhone: formattedPhone,
-        bookingDate: new Date(formData.bookingDate).toISOString()
+        bookingDate: new Date(formData.bookingDate).toISOString(),
+        // If no vehicle is selected, use a placeholder for admin assignment
+        vehicleId: formData.vehicleId || 'pending-assignment'
       }
 
       console.log('🚀 [BOOKING PAGE] Calling api.bookings.create()...', { bookingData })
@@ -407,22 +410,20 @@ function BookingPageContent() {
                         <p className="text-sm text-red-600 mt-1">{errors.pickupLocation}</p>
                       )}
                     </div>
-                    {formData.tripType === 'round' && (
-                      <div>
-                        <Label htmlFor="dropoffLocation">Drop-off Location *</Label>
-                        <Input
-                          id="dropoffLocation"
-                          type="text"
-                          placeholder="Enter drop-off address"
-                          value={formData.dropoffLocation}
-                          onChange={(e) => handleInputChange('dropoffLocation', e.target.value)}
-                          className="input-mobile"
-                        />
-                        {errors.dropoffLocation && (
-                          <p className="text-sm text-red-600 mt-1">{errors.dropoffLocation}</p>
-                        )}
-                      </div>
-                    )}
+                    <div>
+                      <Label htmlFor="dropoffLocation">Drop-off Location *</Label>
+                      <Input
+                        id="dropoffLocation"
+                        type="text"
+                        placeholder="Enter drop-off address"
+                        value={formData.dropoffLocation}
+                        onChange={(e) => handleInputChange('dropoffLocation', e.target.value)}
+                        className="input-mobile"
+                      />
+                      {errors.dropoffLocation && (
+                        <p className="text-sm text-red-600 mt-1">{errors.dropoffLocation}</p>
+                      )}
+                    </div>
                   </>
                 )}
 
@@ -496,12 +497,10 @@ function BookingPageContent() {
                           <span className="text-gray-600">Pickup:</span>
                           <span className="font-medium">{formData.pickupLocation}</span>
                         </div>
-                        {formData.tripType === 'round' && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Drop-off:</span>
-                            <span className="font-medium">{formData.dropoffLocation}</span>
-                          </div>
-                        )}
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Drop-off:</span>
+                          <span className="font-medium">{formData.dropoffLocation}</span>
+                        </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Passenger:</span>
                           <span className="font-medium">{formData.passengerName}</span>
@@ -509,6 +508,12 @@ function BookingPageContent() {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Phone:</span>
                           <span className="font-medium">{formatPhoneNumber(formData.passengerPhone)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Vehicle:</span>
+                          <span className="font-medium">
+                            {selectedVehicle ? selectedVehicle.name : 'No vehicle selected (optional)'}
+                          </span>
                         </div>
                       </div>
                     </div>

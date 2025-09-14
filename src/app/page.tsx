@@ -24,49 +24,32 @@ import Image from 'next/image'
 import { api } from '@/lib/api/utils'
 
 // Helper functions to call API endpoints
-async function getCompanyInfo() {
-  console.log('🚀 [FRONTEND] Starting company info fetch...')
-  
-  const fallbackData = {
-    id: 'default',
-    name: 'Rent-A-Car Bangladesh',
-    tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
-    description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
-    phone: '+8801234567893',
-    email: 'info@rentacar.com',
-    whatsapp: '+8801234567893',
-    latitude: 23.8103,
-    longitude: 90.4125,
-    address: 'Dhaka, Bangladesh'
-  }
-
-  try {
-    console.log('🚀 [FRONTEND] Calling api.company.getInfo()...')
-    const response = await api.company.getInfo()
-    console.log('🚀 [FRONTEND] Company API response:', {
-      success: response.success,
-      hasData: !!response.data,
-      dataKeys: response.data ? Object.keys(response.data) : [],
-      fullResponse: response
-    })
-    
-    if (response.success && response.data) {
-      console.log('🚀 [FRONTEND] Using API data for company info')
-      return response.data
+  async function getCompanyInfo() {
+    const fallbackData = {
+      id: 'default',
+      name: 'Rent-A-Car Bangladesh',
+      tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
+      description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
+      phone: '+8801234567893',
+      email: 'info@rentacar.com',
+      whatsapp: '+8801234567893',
+      latitude: 23.8103,
+      longitude: 90.4125,
+      address: 'Dhaka, Bangladesh'
     }
-    
-    console.log('🚀 [FRONTEND] Using fallback data for company info')
-    return fallbackData
-  } catch (error) {
-    console.error('🚀 [FRONTEND] Error fetching company info:', {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : 'Unknown'
-    })
-    console.log('🚀 [FRONTEND] Using fallback data due to error')
-    return fallbackData
+
+    try {
+      const response = await api.company.getInfo()
+      
+      if (response.success && response.data) {
+        return response.data
+      }
+      
+      return fallbackData
+    } catch (error) {
+      return fallbackData
+    }
   }
-}
 
 async function getVehicles() {
   try {
@@ -78,7 +61,6 @@ async function getVehicles() {
     
     return []
   } catch (error) {
-    console.error('Error fetching vehicles:', error)
     return []
   }
 }
@@ -102,22 +84,16 @@ export default function HomePage() {
 
   useEffect(() => {
     const loadData = async () => {
-      console.log('🚀 [FRONTEND] HomePage useEffect - Loading data...')
       try {
         const [companyData, vehiclesData] = await Promise.all([
           getCompanyInfo(),
           getVehicles()
         ])
         
-        console.log('🚀 [FRONTEND] Data loaded:', {
-          companyInfo: companyData,
-          vehiclesCount: vehiclesData.length
-        })
-        
         setCompanyInfo(companyData)
         setVehicles(vehiclesData)
       } catch (error) {
-        console.error('🚀 [FRONTEND] Error loading data:', error)
+        // Handle error silently
       } finally {
         setLoading(false)
       }
@@ -232,7 +208,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/booking">
-                <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-black">
+                <Button size="lg" variant="outline" className="btn-mobile border-[#ae3338] text-[#ae3338] bg-[#ae3338] text-white">
                   <Clock className="mr-2 h-5 w-5" />
                   Book Now
                 </Button>
@@ -438,7 +414,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/vehicles">
-              <Button size="lg" variant="outline" className="btn-mobile border-white text-white hover:bg-white hover:text-black">
+              <Button size="lg" variant="outline" className="btn-mobile border-[#ae3338] text-[#ae3338] bg-[#ae3338] text-white">
                 <Car className="mr-2 h-5 w-5" />
                 View Vehicles
               </Button>

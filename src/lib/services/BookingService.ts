@@ -30,14 +30,17 @@ export class BookingService {
     // Validate booking data
     this.validateBookingData(bookingData)
 
-    // Check if vehicle exists and is available
-    const vehicle = await this.vehicleRepository.getVehicleById(bookingData.vehicleId)
-    if (!vehicle) {
-      throw new Error('Vehicle not found')
-    }
+    // Check if vehicle exists and is available (skip validation for placeholder)
+    let vehicle = null
+    if (bookingData.vehicleId && bookingData.vehicleId !== 'pending-assignment') {
+      vehicle = await this.vehicleRepository.getVehicleById(bookingData.vehicleId)
+      if (!vehicle) {
+        throw new Error('Vehicle not found')
+      }
 
-    if (!vehicle.isAvailable) {
-      throw new Error('Vehicle is not available for booking')
+      if (!vehicle.isAvailable) {
+        throw new Error('Vehicle is not available for booking')
+      }
     }
 
     // Format phone number
@@ -64,7 +67,7 @@ export class BookingService {
     // Create booking
     const booking = await this.bookingRepository.create({
       passengerId: passenger.id,
-      vehicleId: bookingData.vehicleId,
+      vehicleId: bookingData.vehicleId || 'pending-assignment',
       bookingDate: bookingData.bookingDate,
       pickupTime: bookingData.pickupTime,
       tripType: bookingData.tripType,

@@ -104,3 +104,26 @@ CREATE INDEX IF NOT EXISTS "idx_vehicles_available" ON "vehicles"("isAvailable")
 CREATE INDEX IF NOT EXISTS "idx_bookings_status" ON "bookings"("status");
 CREATE INDEX IF NOT EXISTS "idx_bookings_date" ON "bookings"("bookingDate");
 CREATE INDEX IF NOT EXISTS "idx_passengers_phone" ON "passengers"("phone");
+
+-- Insert default placeholder vehicle for bookings without vehicle selection
+INSERT INTO "vehicles" (
+    "id", 
+    "name", 
+    "type", 
+    "capacity", 
+    "pricePerDay", 
+    "description", 
+    "isAvailable", 
+    "createdAt", 
+    "updatedAt"
+) VALUES (
+    'pending-assignment',
+    'Vehicle Assignment Pending',
+    'transport',
+    0,
+    0,
+    'Placeholder for bookings without vehicle selection',
+    0,
+    datetime('now'),
+    datetime('now')
+);

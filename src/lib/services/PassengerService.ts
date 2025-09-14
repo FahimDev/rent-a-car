@@ -1,4 +1,5 @@
 import { PassengerRepository } from '../repositories/PassengerRepository'
+import { BookingRepository } from '../repositories/BookingRepository'
 import { Passenger } from '@/types'
 import { formatPhoneNumber, validatePhoneNumber } from '@/lib/utils'
 
@@ -8,9 +9,11 @@ import { formatPhoneNumber, validatePhoneNumber } from '@/lib/utils'
  */
 export class PassengerService {
   private passengerRepository: PassengerRepository
+  private bookingRepository: BookingRepository
 
-  constructor(passengerRepository: PassengerRepository) {
+  constructor(passengerRepository: PassengerRepository, bookingRepository: BookingRepository) {
     this.passengerRepository = passengerRepository
+    this.bookingRepository = bookingRepository
   }
 
   /**
@@ -75,12 +78,48 @@ export class PassengerService {
   }
 
   /**
+   * Get all passengers with their bookings for admin panel
+   */
+  async getPassengersWithBookings(options: {
+    page?: number
+    limit?: number
+    isVerified?: boolean
+  } = {}): Promise<{ passengers: any[], total: number }> {
+    const { passengers, total } = await this.passengerRepository.findAll(options)
+    
+    // Get bookings for each passenger
+    const passengersWithBookings = await Promise.all(
+      passengers.map(async (passenger) => {
+        const bookings = await this.bookingRepository.findByPassengerId(passenger.id)
+        return {
+          ...passenger,
+          bookings: bookings.map(booking => ({
+            id: booking.id,
+            bookingDate: booking.bookingDate,
+            status: booking.status,
+            vehicle: {
+              name: booking.vehicle.name,
+              type: booking.vehicle.type
+            }
+          }))
+        }
+      })
+    )
+
+    return {
+      passengers: passengersWithBookings,
+      total
+    }
+  }
+
+  /**
    * Update passenger information
    */
   async updatePassenger(id: string, updateData: {
     name?: string
     email?: string
-  }): Promise<boolean> {
+    isVerified?: boolean
+  }): Promise<Passenger> {
     const passenger = await this.passengerRepository.findById(id)
     if (!passenger) {
       throw new Error('Passenger not found')
@@ -91,7 +130,13 @@ export class PassengerService {
       throw new Error('Invalid email format')
     }
 
-    return this.passengerRepository.updatePassenger(id, updateData)
+    const success = await this.passengerRepository.updatePassenger(id, updateData)
+    if (!success) {
+      throw new Error('Failed to update passenger')
+    }
+
+    // Return updated passenger
+    return this.passengerRepository.findById(id) as Promise<Passenger>
   }
 
   /**

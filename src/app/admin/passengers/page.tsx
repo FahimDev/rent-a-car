@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { api } from '@/lib/api/utils'
 
 interface Passenger {
   id: string
@@ -57,29 +58,15 @@ export default function AdminPassengers() {
 
   const fetchPassengers = useCallback(async () => {
     try {
-      const token = localStorage.getItem('adminToken')
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: '10'
-      })
-      
-      if (verificationFilter !== 'all') {
-        params.append('verified', verificationFilter)
-      }
-
-      const response = await fetch(`/api/admin/passengers?${params}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const data = await api.admin.getPassengers({
+        page: currentPage,
+        limit: 10,
+        verified: verificationFilter !== 'all' ? verificationFilter === 'true' : undefined
       })
 
-      if (response.ok) {
-        const data = await response.json() as PassengersApiResponse
-        setPassengers(data.passengers || [])
-        setTotalPages(data.pagination?.pages || 1)
-      } else {
-        toast.error('Failed to fetch passengers')
-      }
+      setPassengers(data.passengers || [])
+      setTotalPages(data.pagination?.pages || 1)
     } catch (error) {
-      console.error('Error fetching passengers:', error)
       toast.error('Failed to load passengers')
     } finally {
       setIsLoading(false)
@@ -119,7 +106,6 @@ export default function AdminPassengers() {
         toast.error('Failed to update verification status')
       }
     } catch (error) {
-      console.error('Error updating verification status:', error)
       toast.error('Failed to update verification status')
     }
   }

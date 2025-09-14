@@ -87,7 +87,7 @@ export class PassengerRepository extends BaseRepository {
       SELECT * FROM passengers
       ${whereClause}
       ORDER BY createdAt DESC
-      LIMIT ? OFFSET ?
+      LIMIT $${params.length + 1} OFFSET $${params.length + 2}
     `
 
     const countSql = `
@@ -119,29 +119,35 @@ export class PassengerRepository extends BaseRepository {
   }): Promise<boolean> {
     const fields = []
     const values = []
+    let paramIndex = 1
 
     if (updateData.name !== undefined) {
-      fields.push('name = ?')
+      fields.push(`name = $${paramIndex}`)
       values.push(updateData.name)
+      paramIndex++
     }
     if (updateData.email !== undefined) {
-      fields.push('email = ?')
+      fields.push(`email = $${paramIndex}`)
       values.push(updateData.email)
+      paramIndex++
     }
     if (updateData.isVerified !== undefined) {
-      fields.push('isVerified = ?')
+      fields.push(`isVerified = $${paramIndex}`)
       values.push(updateData.isVerified)
+      paramIndex++
     }
 
     if (fields.length === 0) {
       return false
     }
 
-    fields.push('updatedAt = ?')
+    fields.push(`updatedAt = $${paramIndex}`)
     values.push(new Date().toISOString())
+    paramIndex++
+    
     values.push(id)
 
-    const sql = `UPDATE passengers SET ${fields.join(', ')} WHERE id = ?`
+    const sql = `UPDATE passengers SET ${fields.join(', ')} WHERE id = $${paramIndex}`
     const affectedRows = await this.update(sql, values)
     return affectedRows > 0
   }

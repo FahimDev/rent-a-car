@@ -53,7 +53,8 @@ export class ServiceFactory {
     if (!this.passengerService) {
       const database = DatabaseFactory.getDefaultProvider()
       const passengerRepository = new PassengerRepository(database)
-      this.passengerService = new PassengerService(passengerRepository)
+      const bookingRepository = new BookingRepository(database)
+      this.passengerService = new PassengerService(passengerRepository, bookingRepository)
     }
     return this.passengerService
   }

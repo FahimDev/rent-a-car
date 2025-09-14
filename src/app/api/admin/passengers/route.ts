@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
     // Get passenger service
     const passengerService = ServiceFactory.getPassengerService()
     
-    // Get passengers with pagination
-    const result = await passengerService.getPassengers({ 
+    // Get passengers with their bookings for admin panel
+    const result = await passengerService.getPassengersWithBookings({ 
       isVerified: verified ? verified === 'true' : undefined,
       page, 
       limit 
@@ -38,11 +38,13 @@ export async function GET(request: NextRequest) {
       passengers: result.passengers,
       total: result.total,
       page: page || 1,
-      limit: limit || 10
+      limit: limit || 10,
+      pagination: {
+        pages: Math.ceil((result.total || 0) / (limit || 10))
+      }
     })
     return withCORS(response)
   } catch (error) {
-    console.error('Error fetching passengers:', error)
     const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     return withCORS(response)
   }
@@ -64,11 +66,13 @@ export async function PATCH(request: NextRequest) {
     // Get passenger service
     const passengerService = ServiceFactory.getPassengerService()
     
-    // Update passenger
-    const passenger = await passengerService.updatePassenger(passengerId, {
-      name,
-      email
-    })
+    // Update passenger with verification status if provided
+    const updateData: any = {}
+    if (name !== undefined) updateData.name = name
+    if (email !== undefined) updateData.email = email
+    if (isVerified !== undefined) updateData.isVerified = isVerified
+    
+    const passenger = await passengerService.updatePassenger(passengerId, updateData)
 
     const response = NextResponse.json({ 
       passenger,
@@ -76,7 +80,6 @@ export async function PATCH(request: NextRequest) {
     })
     return withCORS(response)
   } catch (error) {
-    console.error('Error updating passenger:', error)
     const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     return withCORS(response)
   }

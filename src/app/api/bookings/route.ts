@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       passengerName,
       passengerPhone,
       passengerEmail,
-      vehicleId
+      vehicleId: vehicleId || 'pending-assignment'
     }
 
     // Create booking using service layer

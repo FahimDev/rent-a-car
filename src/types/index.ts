@@ -91,7 +91,7 @@ export interface BookingFormData {
   passengerPhone: string
   passengerEmail?: string
   
-  // Step 4: Vehicle Selection
+  // Step 4: Vehicle Selection (optional - uses placeholder if not selected)
   vehicleId: string
 }
 

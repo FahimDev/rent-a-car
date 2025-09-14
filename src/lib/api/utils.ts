@@ -35,13 +35,6 @@ export async function apiCall<T = any>(
   const baseUrl = getApiBaseUrl()
   const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
   
-  console.log('🚀 [API UTILS] Making API call:', {
-    endpoint,
-    baseUrl,
-    fullUrl: url,
-    method: options.method || 'GET'
-  })
-  
   const defaultOptions: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
@@ -50,40 +43,16 @@ export async function apiCall<T = any>(
   }
 
   try {
-    console.log('🚀 [API UTILS] Fetching URL:', url)
     const response = await fetch(url, defaultOptions)
-    
-    console.log('🚀 [API UTILS] Response received:', {
-      status: response.status,
-      statusText: response.statusText,
-      ok: response.ok,
-      headers: Object.fromEntries(response.headers.entries())
-    })
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({})) as any
-      console.error('🚀 [API UTILS] Response not OK:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorData
-      })
       throw new Error(errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`)
     }
 
     const data = await response.json() as any
-    console.log('🚀 [API UTILS] Response data:', {
-      success: data.success,
-      hasData: !!data.data,
-      dataKeys: data.data ? Object.keys(data.data) : [],
-      fullData: data
-    })
     return data as T
   } catch (error) {
-    console.error('🚀 [API UTILS] API call failed for', endpoint, ':', {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : 'Unknown'
-    })
     throw error
   }
 }
@@ -99,7 +68,6 @@ export async function apiCallWithFallback<T = any>(
   try {
     return await apiCall<T>(endpoint, options)
   } catch (error) {
-    console.error(`API call failed for ${endpoint}, using fallback:`, error)
     return fallback
   }
 }
