@@ -20,6 +20,7 @@ import {
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import Image from 'next/image'
+import { api } from '@/lib/api/utils'
 
 interface Vehicle {
   id: string
@@ -56,6 +57,7 @@ interface VehicleFormData {
   features: string
   isAvailable: boolean
   photos: File[]
+  primaryImageIndex: number
 }
 
 export default function VehicleManagement() {
@@ -74,7 +76,8 @@ export default function VehicleManagement() {
     description: '',
     features: '',
     isAvailable: true,
-    photos: []
+    photos: [],
+    primaryImageIndex: 0
   })
 
   const vehicleTypes = [
@@ -96,22 +99,13 @@ export default function VehicleManagement() {
 
   const fetchVehicles = async () => {
     try {
-      const token = localStorage.getItem('adminToken')
-      const response = await fetch('/api/admin/vehicles', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-
-      if (response.ok) {
-        const data = await response.json() as VehiclesApiResponse
-        // Parse features JSON strings back to arrays
-        const vehiclesWithParsedFeatures = (data.vehicles || []).map((vehicle: any) => ({
-          ...vehicle,
-          features: vehicle.features ? JSON.parse(vehicle.features) : []
-        }))
-        setVehicles(vehiclesWithParsedFeatures)
-      } else {
-        toast.error('Failed to fetch vehicles')
-      }
+      const data = await api.admin.getVehicles()
+      // Features are already parsed by the repository, so use them directly
+      const vehiclesWithParsedFeatures = (data.vehicles || []).map((vehicle: any) => ({
+        ...vehicle,
+        features: vehicle.features || []
+      }))
+      setVehicles(vehiclesWithParsedFeatures)
     } catch (error) {
       console.error('Error fetching vehicles:', error)
       toast.error('Failed to load vehicles')
@@ -135,7 +129,11 @@ export default function VehicleManagement() {
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    setFormData(prev => ({ ...prev, photos: files }))
+    setFormData(prev => ({ ...prev, photos: files, primaryImageIndex: 0 }))
+  }
+
+  const handlePrimaryImageChange = (index: number) => {
+    setFormData(prev => ({ ...prev, primaryImageIndex: index }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -158,6 +156,9 @@ export default function VehicleManagement() {
       formData.photos.forEach((photo, index) => {
         formDataToSend.append(`photo_${index}`, photo)
       })
+      
+      // Add primary image index
+      formDataToSend.append('primaryImageIndex', formData.primaryImageIndex.toString())
 
       const url = editingVehicle 
         ? `/api/admin/vehicles/${editingVehicle.id}`
@@ -197,7 +198,8 @@ export default function VehicleManagement() {
       description: vehicle.description,
       features: vehicle.features.join(', '),
       isAvailable: vehicle.isAvailable,
-      photos: []
+      photos: [],
+      primaryImageIndex: 0
     })
     setShowAddForm(true)
   }
@@ -257,7 +259,8 @@ export default function VehicleManagement() {
       description: '',
       features: '',
       isAvailable: true,
-      photos: []
+      photos: [],
+      primaryImageIndex: 0
     })
   }
 
@@ -440,8 +443,54 @@ export default function VehicleManagement() {
                     className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    Upload multiple photos to showcase the vehicle
+                    Upload multiple photos to showcase the vehicle (up to 10 images)
                   </p>
+                  
+                  {/* Photo Preview with Primary Selection */}
+                  {formData.photos.length > 0 && (
+                    <div className="mt-4">
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        Select Primary Image:
+                      </Label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {formData.photos.map((photo, index) => (
+                          <div key={index} className="relative">
+                            <div className={`relative border-2 rounded-lg overflow-hidden cursor-pointer transition-all ${
+                              formData.primaryImageIndex === index 
+                                ? 'border-blue-500 ring-2 ring-blue-200' 
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}>
+                              <Image
+                                src={URL.createObjectURL(photo)}
+                                alt={`Preview ${index + 1}`}
+                                width={150}
+                                height={150}
+                                className="w-full h-32 object-cover"
+                                onClick={() => handlePrimaryImageChange(index)}
+                              />
+                              {formData.primaryImageIndex === index && (
+                                <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                  Primary
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all flex items-center justify-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handlePrimaryImageChange(index)}
+                                  className="opacity-0 hover:opacity-100 bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-medium transition-all"
+                                >
+                                  {formData.primaryImageIndex === index ? 'Primary' : 'Set Primary'}
+                                </button>
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1 text-center truncate">
+                              {photo.name}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center space-x-2">

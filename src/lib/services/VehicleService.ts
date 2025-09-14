@@ -62,12 +62,22 @@ export class VehicleService {
     pricePerDay: number
     description?: string
     features?: string[]
+    isAvailable?: boolean
     adminId?: string
-  }): Promise<string> {
+  }): Promise<Vehicle> {
     // Validate vehicle data
     this.validateVehicleData(vehicleData)
 
-    return this.vehicleRepository.createVehicle(vehicleData)
+    // Create vehicle in repository
+    const vehicleId = await this.vehicleRepository.createVehicle(vehicleData)
+    
+    // Return the complete vehicle object
+    const vehicle = await this.vehicleRepository.getVehicleById(vehicleId)
+    if (!vehicle) {
+      throw new Error('Failed to create vehicle')
+    }
+    
+    return vehicle
   }
 
   /**
@@ -125,5 +135,82 @@ export class VehicleService {
       // Then by creation date (newest first)
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
+  }
+
+  /**
+   * Get all vehicles (for admin)
+   */
+  async getAllVehicles(): Promise<Vehicle[]> {
+    return this.vehicleRepository.getAllVehicles()
+  }
+
+  /**
+   * Add photo to vehicle
+   */
+  async addVehiclePhoto(vehicleId: string, photoData: {
+    url: string
+    alt: string
+    order: number
+    isPrimary: boolean
+  }): Promise<any> {
+    return this.vehicleRepository.addVehiclePhoto(vehicleId, photoData)
+  }
+
+  /**
+   * Set primary photo for vehicle
+   */
+  async setPrimaryPhoto(vehicleId: string, photoId: string): Promise<boolean> {
+    return this.vehicleRepository.setPrimaryPhoto(vehicleId, photoId)
+  }
+
+  /**
+   * Delete vehicle photo
+   */
+  async deleteVehiclePhoto(photoId: string): Promise<boolean> {
+    return this.vehicleRepository.deleteVehiclePhoto(photoId)
+  }
+
+  /**
+   * Update vehicle
+   */
+  async updateVehicle(id: string, updateData: {
+    name: string
+    type: string
+    capacity: number
+    pricePerDay: number
+    description: string
+    features: string[]
+    isAvailable: boolean
+  }): Promise<Vehicle> {
+    // Validate vehicle data
+    this.validateVehicleData(updateData)
+
+    // Update vehicle in repository
+    const updated = await this.vehicleRepository.updateVehicle(id, updateData)
+    if (!updated) {
+      throw new Error('Failed to update vehicle')
+    }
+
+    // Return the updated vehicle
+    const vehicle = await this.vehicleRepository.getVehicleById(id)
+    if (!vehicle) {
+      throw new Error('Failed to fetch updated vehicle')
+    }
+    
+    return vehicle
+  }
+
+  /**
+   * Delete vehicle
+   */
+  async deleteVehicle(id: string): Promise<boolean> {
+    // Check if vehicle exists
+    const vehicle = await this.vehicleRepository.getVehicleById(id)
+    if (!vehicle) {
+      throw new Error('Vehicle not found')
+    }
+
+    // Delete vehicle from repository
+    return this.vehicleRepository.deleteVehicle(id)
   }
 }

@@ -216,4 +216,115 @@ export class VehicleRepository extends BaseRepository {
       return []
     }
   }
+
+  /**
+   * Get all vehicles (for admin)
+   */
+  async getAllVehicles(): Promise<Vehicle[]> {
+    const sql = 'SELECT * FROM vehicles ORDER BY createdAt DESC'
+    const result = await this.select(sql, [])
+    return this.mapRowsToVehicles(result)
+  }
+
+  /**
+   * Add photo to vehicle
+   */
+  async addVehiclePhoto(vehicleId: string, photoData: {
+    url: string
+    alt: string
+    order: number
+    isPrimary: boolean
+  }): Promise<any> {
+    const sql = `
+      INSERT INTO vehicle_photos (id, vehicleId, url, alt, isPrimary, "order", createdAt, updatedAt)
+      VALUES ($1, $2, $3, $4, $5, $6, datetime("now"), datetime("now"))
+    `
+    
+    const photoId = `photo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const result = await this.insert(sql, [
+      photoId,
+      vehicleId,
+      photoData.url,
+      photoData.alt,
+      photoData.isPrimary ? 1 : 0,
+      photoData.order
+    ])
+    
+    return {
+      id: photoId,
+      vehicleId,
+      url: photoData.url,
+      alt: photoData.alt,
+      isPrimary: photoData.isPrimary,
+      order: photoData.order,
+      createdAt: new Date()
+    }
+  }
+
+  /**
+   * Set primary photo for vehicle
+   */
+  async setPrimaryPhoto(vehicleId: string, photoId: string): Promise<boolean> {
+    // First, unset all primary photos for this vehicle
+    const unsetSql = 'UPDATE vehicle_photos SET isPrimary = 0 WHERE vehicleId = $1'
+    await this.update(unsetSql, [vehicleId])
+    
+    // Then set the specified photo as primary
+    const setSql = 'UPDATE vehicle_photos SET isPrimary = 1 WHERE id = $1 AND vehicleId = $2'
+    const changes = await this.update(setSql, [photoId, vehicleId])
+    return changes > 0
+  }
+
+  /**
+   * Delete vehicle photo
+   */
+  async deleteVehiclePhoto(photoId: string): Promise<boolean> {
+    const sql = 'DELETE FROM vehicle_photos WHERE id = $1'
+    const changes = await this.delete(sql, [photoId])
+    return changes > 0
+  }
+
+  /**
+   * Update vehicle
+   */
+  async updateVehicle(id: string, updateData: {
+    name: string
+    type: string
+    capacity: number
+    pricePerDay: number
+    description: string
+    features: string[]
+    isAvailable: boolean
+  }): Promise<boolean> {
+    const sql = `
+      UPDATE vehicles 
+      SET name = $1, type = $2, capacity = $3, pricePerDay = $4, 
+          description = $5, features = $6, isAvailable = $7, 
+          updatedAt = datetime("now")
+      WHERE id = $8
+    `
+    
+    const featuresJson = JSON.stringify(updateData.features)
+    const changes = await this.update(sql, [
+      updateData.name,
+      updateData.type,
+      updateData.capacity,
+      updateData.pricePerDay,
+      updateData.description,
+      featuresJson,
+      updateData.isAvailable ? 1 : 0,
+      id
+    ])
+    
+    return changes > 0
+  }
+
+  /**
+   * Delete vehicle
+   */
+  async deleteVehicle(id: string): Promise<boolean> {
+    const sql = 'DELETE FROM vehicles WHERE id = $1'
+    const changes = await this.delete(sql, [id])
+    return changes > 0
+  }
 }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPrismaClient } from '@/lib/db'
+import { ServiceFactory } from '@/lib/services/ServiceFactory'
 import { saveUploadedFile, validateImageFile } from '@/lib/fileUpload'
 import { verifyTokenFromRequest } from '@/lib/auth'
+import { withCORS } from '@/lib/api/cors'
 
 export const runtime = 'edge'
 
@@ -11,33 +12,18 @@ export async function GET(request: NextRequest) {
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get vehicle service
+    const vehicleService = ServiceFactory.getVehicleService()
     
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
-    }
+    // Get all vehicles
+    const vehicles = await vehicleService.getAllVehicles()
 
-    // Get all vehicles with photos
-    const vehicles = await prisma.vehicle.findMany({
-      include: {
-        photos: true
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-
-    return NextResponse.json({ vehicles })
+    const response = NextResponse.json({ vehicles })
+    return withCORS(response)
   } catch (error) {
     console.error('Error fetching vehicles:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }
 
@@ -47,19 +33,6 @@ export async function POST(request: NextRequest) {
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
-    
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
-    }
-
     // Parse form data
     const formData = await request.formData()
     
@@ -70,81 +43,88 @@ export async function POST(request: NextRequest) {
     const description = formData.get('description') as string
     const features = formData.get('features') as string
     const isAvailable = formData.get('isAvailable') === 'true'
+    const primaryImageIndex = parseInt(formData.get('primaryImageIndex') as string) || 0
 
     // Validate required fields
     if (!name || !type || !capacity || !pricePerDay || !description) {
-      return NextResponse.json({ 
+      const response = NextResponse.json({ 
         error: 'Missing required fields: name, type, capacity, pricePerDay, description' 
       }, { status: 400 })
+      return withCORS(response)
     }
 
     // Parse features array and convert to JSON string
     const featuresArray = features ? features.split(',').map(f => f.trim()).filter(f => f) : []
     const featuresJson = JSON.stringify(featuresArray)
 
+    // Get vehicle service
+    const vehicleService = ServiceFactory.getVehicleService()
+    
     // Create vehicle
-    const vehicle = await prisma.vehicle.create({
-      data: {
-        name,
-        type,
-        capacity,
-        pricePerDay,
-        description,
-        features: featuresJson,
-        isAvailable,
-        adminId: admin.id
-      }
+    const vehicle = await vehicleService.createVehicle({
+      name,
+      type,
+      capacity,
+      pricePerDay,
+      description,
+      features: featuresArray,
+      isAvailable,
+      adminId
     })
 
     // Handle photo uploads
     const photos = []
+    const uploadedFiles = []
+    
+    // Collect all photo files first
     for (let i = 0; i < 10; i++) { // Allow up to 10 photos
       const photoFile = formData.get(`photo_${i}`) as File
       if (photoFile && photoFile.size > 0) {
         // Validate the image file
         if (!validateImageFile(photoFile)) {
-          return NextResponse.json({ 
+          const response = NextResponse.json({ 
             error: `Invalid image file: ${photoFile.name}. Please upload a valid image (JPEG, PNG, WebP) under 5MB.` 
           }, { status: 400 })
+          return withCORS(response)
         }
-        
-        try {
-          // Save the uploaded file to filesystem
-          const fileUrl = await saveUploadedFile(photoFile, vehicle.id, i)
-          
-          // Create photo record in database
-          const photo = await prisma.vehiclePhoto.create({
-            data: {
-              vehicleId: vehicle.id,
-              url: fileUrl,
-              alt: `${vehicle.name} - Photo ${i + 1}`,
-              order: i
-            }
-          })
-          photos.push(photo)
-        } catch (error) {
-          console.error('Error saving photo:', error)
-          return NextResponse.json({ 
-            error: `Failed to save image: ${photoFile.name}` 
-          }, { status: 500 })
-        }
+        uploadedFiles.push({ file: photoFile, index: i })
       }
     }
 
-    // Return vehicle with photos
-    const vehicleWithPhotos = await prisma.vehicle.findUnique({
-      where: { id: vehicle.id },
-      include: {
-        photos: true
+    // Upload photos and create database records
+    for (const { file, index } of uploadedFiles) {
+      try {
+        // Save the uploaded file to filesystem
+        const fileUrl = await saveUploadedFile(file, vehicle.id, index)
+        
+        // Create photo record in database
+        const photo = await vehicleService.addVehiclePhoto(vehicle.id, {
+          url: fileUrl,
+          alt: `${vehicle.name} - Photo ${index + 1}`,
+          order: index,
+          isPrimary: index === primaryImageIndex
+        })
+        photos.push(photo)
+      } catch (error) {
+        console.error('Error saving photo:', error)
+        const response = NextResponse.json({ 
+          error: `Failed to save image: ${file.name}` 
+        }, { status: 500 })
+        return withCORS(response)
       }
-    })
+    }
 
-    return NextResponse.json({ 
+    // Get the complete vehicle with photos
+    const vehicleWithPhotos = await vehicleService.getVehicleById(vehicle.id)
+
+    const response = NextResponse.json({ 
       vehicle: vehicleWithPhotos,
       message: 'Vehicle created successfully' 
     }, { status: 201 })
+    return withCORS(response)
   } catch (error) {
     console.error('Error creating vehicle:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }

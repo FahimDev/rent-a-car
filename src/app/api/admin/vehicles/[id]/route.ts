@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createPrismaClient } from '@/lib/db'
+import { ServiceFactory } from '@/lib/services/ServiceFactory'
 import { saveUploadedFile, validateImageFile, deleteUploadedFile } from '@/lib/fileUpload'
 import { verifyTokenFromRequest } from '@/lib/auth'
+import { withCORS } from '@/lib/api/cors'
 
 export const runtime = 'edge'
 
@@ -20,40 +21,23 @@ export async function GET(
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get vehicle service
+    const vehicleService = ServiceFactory.getVehicleService()
     
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
-    }
-
     // Get vehicle by ID
-    const vehicle = await prisma.vehicle.findUnique({
-      where: { id },
-      include: {
-        photos: true,
-        bookings: {
-          include: {
-            passenger: true
-          }
-        }
-      }
-    })
+    const vehicle = await vehicleService.getVehicleById(id)
 
     if (!vehicle) {
-      return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 })
+      const response = NextResponse.json({ error: 'Vehicle not found' }, { status: 404 })
+      return withCORS(response)
     }
 
-    return NextResponse.json({ vehicle })
+    const response = NextResponse.json({ vehicle })
+    return withCORS(response)
   } catch (error) {
     console.error('Error fetching vehicle:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }
 
@@ -68,17 +52,14 @@ export async function PUT(
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get vehicle service
+    const vehicleService = ServiceFactory.getVehicleService()
     
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
+    // Check if vehicle exists
+    const existingVehicle = await vehicleService.getVehicleById(id)
+    if (!existingVehicle) {
+      const response = NextResponse.json({ error: 'Vehicle not found' }, { status: 404 })
+      return withCORS(response)
     }
 
     // Parse form data
@@ -94,30 +75,24 @@ export async function PUT(
 
     // Validate required fields
     if (!name || !type || !capacity || !pricePerDay || !description) {
-      return NextResponse.json({ 
+      const response = NextResponse.json({ 
         error: 'Missing required fields: name, type, capacity, pricePerDay, description' 
       }, { status: 400 })
+      return withCORS(response)
     }
 
-    // Parse features array and convert to JSON string
+    // Parse features array
     const featuresArray = features ? features.split(',').map(f => f.trim()).filter(f => f) : []
-    const featuresJson = JSON.stringify(featuresArray)
 
-    // Update vehicle
-    const vehicle = await prisma.vehicle.update({
-      where: { id },
-      data: {
-        name,
-        type,
-        capacity,
-        pricePerDay,
-        description,
-        features: featuresJson,
-        isAvailable
-      },
-      include: {
-        photos: true
-      }
+    // Update vehicle using service
+    const updatedVehicle = await vehicleService.updateVehicle(id, {
+      name,
+      type,
+      capacity,
+      pricePerDay,
+      description,
+      features: featuresArray,
+      isAvailable
     })
 
     // Handle new photo uploads
@@ -127,49 +102,46 @@ export async function PUT(
       if (photoFile && photoFile.size > 0) {
         // Validate the image file
         if (!validateImageFile(photoFile)) {
-          return NextResponse.json({ 
+          const response = NextResponse.json({ 
             error: `Invalid image file: ${photoFile.name}. Please upload a valid image (JPEG, PNG, WebP) under 5MB.` 
           }, { status: 400 })
+          return withCORS(response)
         }
         
         try {
           // Save the uploaded file to filesystem
-          const fileUrl = await saveUploadedFile(photoFile, vehicle.id, i)
+          const fileUrl = await saveUploadedFile(photoFile, id, i)
           
           // Create photo record in database
-          const photo = await prisma.vehiclePhoto.create({
-            data: {
-              vehicleId: vehicle.id,
-              url: fileUrl,
-              alt: `${vehicle.name} - Photo ${i + 1}`,
-              order: i
-            }
+          const photo = await vehicleService.addVehiclePhoto(id, {
+            url: fileUrl,
+            alt: `${updatedVehicle.name} - Photo ${i + 1}`,
+            order: i,
+            isPrimary: false
           })
           newPhotos.push(photo)
         } catch (error) {
           console.error('Error saving photo:', error)
-          return NextResponse.json({ 
+          const response = NextResponse.json({ 
             error: `Failed to save image: ${photoFile.name}` 
           }, { status: 500 })
+          return withCORS(response)
         }
       }
     }
 
     // Get updated vehicle with all photos
-    const updatedVehicle = await prisma.vehicle.findUnique({
-      where: { id },
-      include: {
-        photos: true
-      }
-    })
+    const finalVehicle = await vehicleService.getVehicleById(id)
 
-    return NextResponse.json({ 
-      vehicle: updatedVehicle,
+    const response = NextResponse.json({ 
+      vehicle: finalVehicle,
       message: 'Vehicle updated successfully' 
     })
+    return withCORS(response)
   } catch (error) {
     console.error('Error updating vehicle:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }
 
@@ -184,40 +156,32 @@ export async function PATCH(
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get vehicle service
+    const vehicleService = ServiceFactory.getVehicleService()
     
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
-    }
-
     const body = await request.json() as UpdateVehicleAvailabilityRequest
     const { isAvailable } = body
 
     // Update vehicle availability
-    const vehicle = await prisma.vehicle.update({
-      where: { id },
-      data: {
-        isAvailable: isAvailable
-      },
-      include: {
-        photos: true
-      }
-    })
+    const updated = await vehicleService.updateVehicleAvailability(id, isAvailable)
+    
+    if (!updated) {
+      const response = NextResponse.json({ error: 'Failed to update vehicle availability' }, { status: 400 })
+      return withCORS(response)
+    }
 
-    return NextResponse.json({ 
+    // Get updated vehicle
+    const vehicle = await vehicleService.getVehicleById(id)
+
+    const response = NextResponse.json({ 
       vehicle,
       message: 'Vehicle status updated successfully' 
     })
+    return withCORS(response)
   } catch (error) {
     console.error('Error updating vehicle status:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }
 
@@ -232,53 +196,48 @@ export async function DELETE(
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    // Get D1 database from Cloudflare environment
-    const d1Database = (globalThis as any).DB
-    const prisma = createPrismaClient(d1Database)
+    // Get vehicle service
+    const vehicleService = ServiceFactory.getVehicleService()
+    const bookingService = ServiceFactory.getBookingService()
     
-    // Verify admin exists
-    const admin = await prisma.admin.findUnique({
-      where: { id: adminId }
-    })
-    
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin not found' }, { status: 404 })
+    // Check if vehicle exists
+    const vehicle = await vehicleService.getVehicleById(id)
+    if (!vehicle) {
+      const response = NextResponse.json({ error: 'Vehicle not found' }, { status: 404 })
+      return withCORS(response)
     }
 
     // Check if vehicle has any bookings
-    const bookingsCount = await prisma.booking.count({
-      where: { vehicleId: id }
-    })
-
-    if (bookingsCount > 0) {
-      return NextResponse.json({ 
+    const bookings = await bookingService.getBookingsByVehicleId(id)
+    if (bookings.length > 0) {
+      const response = NextResponse.json({ 
         error: 'Cannot delete vehicle with existing bookings' 
       }, { status: 400 })
+      return withCORS(response)
     }
 
-    // Get vehicle photos before deletion to clean up files
-    const vehicle = await prisma.vehicle.findUnique({
-      where: { id },
-      include: { photos: true }
-    })
-
-    if (vehicle) {
-      // Delete uploaded files
+    // Delete vehicle photos and files
+    if (vehicle.photos && vehicle.photos.length > 0) {
       for (const photo of vehicle.photos) {
         await deleteUploadedFile(photo.url)
+        await vehicleService.deleteVehiclePhoto(photo.id)
       }
     }
 
-    // Delete vehicle (photos will be deleted automatically due to cascade)
-    await prisma.vehicle.delete({
-      where: { id }
-    })
+    // Delete vehicle
+    const deleted = await vehicleService.deleteVehicle(id)
+    if (!deleted) {
+      const response = NextResponse.json({ error: 'Failed to delete vehicle' }, { status: 500 })
+      return withCORS(response)
+    }
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       message: 'Vehicle deleted successfully' 
     })
+    return withCORS(response)
   } catch (error) {
     console.error('Error deleting vehicle:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return withCORS(response)
   }
 }

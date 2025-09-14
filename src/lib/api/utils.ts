@@ -178,13 +178,56 @@ export const api = {
       })
     },
 
-    async updateBooking(id: string, updateData: { status?: string; notes?: string }): Promise<{ booking: any; message: string }> {
-      const token = localStorage.getItem('adminToken')
-      return apiCall<{ booking: any; message: string }>(`/api/admin/bookings/${id}`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(updateData)
-      })
-    }
-  }
-}
+                async updateBooking(id: string, updateData: { status?: string; notes?: string }): Promise<{ booking: any; message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ booking: any; message: string }>(`/api/admin/bookings/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(updateData)
+                  })
+                },
+                async getVehicles(): Promise<{ vehicles: any[] }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ vehicles: any[] }>('/api/admin/vehicles', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
+                },
+                async createVehicle(formData: FormData): Promise<{ vehicle: any; message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ vehicle: any; message: string }>('/api/admin/vehicles', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                  })
+                },
+                async updateVehicle(id: string, formData: FormData): Promise<{ vehicle: any; message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ vehicle: any; message: string }>(`/api/admin/vehicles/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                  })
+                },
+                async deleteVehicle(id: string): Promise<{ message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ message: string }>(`/api/admin/vehicles/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
+                },
+                async setPrimaryPhoto(vehicleId: string, photoId: string): Promise<{ message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ message: string }>(`/api/admin/vehicles/${vehicleId}/photos/${photoId}/primary`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
+                },
+                async deletePhoto(photoId: string): Promise<{ message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ message: string }>(`/api/admin/photos/${photoId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
+                }
+              }
+            }

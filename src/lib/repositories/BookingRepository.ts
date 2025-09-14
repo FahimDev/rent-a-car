@@ -293,4 +293,37 @@ export class BookingRepository extends BaseRepository {
       }
     }
   }
+
+  /**
+   * Find bookings by vehicle ID
+   */
+  async findByVehicleId(vehicleId: string): Promise<Booking[]> {
+    const sql = `
+      SELECT b.*, 
+             p.name as passengerName, p.phone as passengerPhone, p.email as passengerEmail, p.isVerified as passengerIsVerified,
+             v.name as vehicleName, v.type as vehicleType, v.capacity as vehicleCapacity, v.pricePerDay as vehiclePricePerDay,
+             v.description as vehicleDescription, v.features as vehicleFeatures, v.isAvailable as vehicleIsAvailable,
+             v.adminId as vehicleAdminId, v.createdAt as vehicleCreatedAt, v.updatedAt as vehicleUpdatedAt,
+             GROUP_CONCAT(
+               json_object(
+                 'id', vp.id,
+                 'vehicleId', vp.vehicleId,
+                 'url', vp.url,
+                 'alt', vp.alt,
+                 'isPrimary', vp.isPrimary,
+                 'order', vp.order
+               )
+             ) as vehiclePhotos_json
+      FROM bookings b
+      LEFT JOIN passengers p ON b.passengerId = p.id
+      LEFT JOIN vehicles v ON b.vehicleId = v.id
+      LEFT JOIN vehicle_photos vp ON v.id = vp.vehicleId
+      WHERE b.vehicleId = $1
+      GROUP BY b.id
+      ORDER BY b.createdAt DESC
+    `
+    
+    const result = await this.select(sql, [vehicleId])
+    return this.mapRowsToBookings(result)
+  }
 }

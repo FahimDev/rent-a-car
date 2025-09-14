@@ -281,4 +281,11 @@ export class BookingService {
     // In a more complex system, you'd check for existing bookings on the same date
     return true
   }
+
+  /**
+   * Get bookings by vehicle ID
+   */
+  async getBookingsByVehicleId(vehicleId: string): Promise<Booking[]> {
+    return this.bookingRepository.findByVehicleId(vehicleId)
+  }
 }
