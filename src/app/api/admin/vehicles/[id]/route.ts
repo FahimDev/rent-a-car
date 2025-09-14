@@ -65,6 +65,7 @@ export async function PUT(
     // Parse request data (JSON or FormData)
     const contentType = request.headers.get('content-type') || ''
     let name: string, type: string, capacity: number, pricePerDay: number, description: string, features: string | string[], isAvailable: boolean
+    let formData: FormData | null = null
     
     if (contentType.includes('application/json')) {
       // Handle JSON request
@@ -86,7 +87,7 @@ export async function PUT(
       isAvailable = body.isAvailable
     } else {
       // Handle FormData request
-      const formData = await request.formData()
+      formData = await request.formData()
       name = formData.get('name') as string
       type = formData.get('type') as string
       capacity = parseInt(formData.get('capacity') as string)
@@ -121,8 +122,7 @@ export async function PUT(
 
     // Handle new photo uploads (only for FormData requests)
     const newPhotos = []
-    if (!contentType.includes('application/json')) {
-      const formData = await request.formData()
+    if (formData) {
       for (let i = 0; i < 10; i++) { // Allow up to 10 photos
         const photoFile = formData.get(`photo_${i}`) as File
         if (photoFile && photoFile.size > 0) {

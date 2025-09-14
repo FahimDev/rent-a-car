@@ -35,6 +35,9 @@ interface Vehicle {
     id: string
     url: string
     alt: string
+    isPrimary: boolean
+    order: number
+    createdAt: string
   }[]
   createdAt: string
   updatedAt: string
@@ -58,6 +61,12 @@ interface VehicleFormData {
   isAvailable: boolean
   photos: File[]
   primaryImageIndex: number
+  existingPhotos?: {
+    id: string
+    url: string
+    alt: string
+    isPrimary: boolean
+  }[]
 }
 
 export default function VehicleManagement() {
@@ -171,8 +180,18 @@ export default function VehicleManagement() {
         formDataToSend.append(`photo_${index}`, photo)
       })
       
-      // Add primary image index
-      formDataToSend.append('primaryImageIndex', formData.primaryImageIndex.toString())
+      // For editing, calculate the correct primary image index
+      // If we have new photos, the primary index refers to new photos
+      // If no new photos, we need to handle existing photos differently
+      let primaryImageIndex = formData.primaryImageIndex
+      
+      if (editingVehicle && formData.photos.length === 0 && formData.existingPhotos) {
+        // If no new photos, we're working with existing photos
+        // The primaryImageIndex should refer to existing photos
+        primaryImageIndex = formData.primaryImageIndex
+      }
+      
+      formDataToSend.append('primaryImageIndex', primaryImageIndex.toString())
 
       const url = editingVehicle 
         ? `/api/admin/vehicles/${editingVehicle.id}`
@@ -204,6 +223,11 @@ export default function VehicleManagement() {
 
   const handleEdit = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle)
+    
+    // Find the primary photo index
+    const primaryPhotoIndex = vehicle.photos.findIndex(photo => photo.isPrimary)
+    const validPrimaryIndex = primaryPhotoIndex >= 0 ? primaryPhotoIndex : 0
+    
     setFormData({
       name: vehicle.name,
       type: vehicle.type,
@@ -212,8 +236,9 @@ export default function VehicleManagement() {
       description: vehicle.description,
       features: vehicle.features.join(', '),
       isAvailable: vehicle.isAvailable,
-      photos: [],
-      primaryImageIndex: 0
+      photos: [], // New photos will be added here
+      primaryImageIndex: validPrimaryIndex,
+      existingPhotos: vehicle.photos // Store existing photos for display
     })
     setShowAddForm(true)
   }
@@ -274,7 +299,8 @@ export default function VehicleManagement() {
       features: '',
       isAvailable: true,
       photos: [],
-      primaryImageIndex: 0
+      primaryImageIndex: 0,
+      existingPhotos: undefined
     })
   }
 
@@ -498,6 +524,88 @@ export default function VehicleManagement() {
                     </p>
                   )}
                   
+                  {/* Existing Photos (when editing) */}
+                  {editingVehicle && formData.existingPhotos && formData.existingPhotos.length > 0 && (
+                    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-4">
+                        <Label className="text-base font-semibold text-gray-900">
+                          Existing Photos
+                        </Label>
+                        <span className="text-sm text-gray-500">
+                          {formData.existingPhotos.length} existing photo(s)
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        {formData.existingPhotos.map((photo, index) => (
+                          <div key={photo.id} className="relative group">
+                            <div className={`relative border-2 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
+                              formData.primaryImageIndex === index && formData.photos.length === 0
+                                ? 'border-blue-500 ring-4 ring-blue-100 shadow-lg' 
+                                : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
+                            }`}>
+                              <Image
+                                src={photo.url}
+                                alt={photo.alt}
+                                width={150}
+                                height={150}
+                                className="w-full h-32 object-cover"
+                                onClick={() => {
+                                  // When clicking existing photos, set as primary if no new photos
+                                  if (formData.photos.length === 0) {
+                                    handlePrimaryImageChange(index)
+                                  }
+                                }}
+                              />
+                              
+                              {/* Primary Badge */}
+                              {formData.primaryImageIndex === index && formData.photos.length === 0 && (
+                                <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-semibold shadow-md">
+                                  <svg className="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  Primary
+                                </div>
+                              )}
+                              
+                              {/* Hover Overlay */}
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (formData.photos.length === 0) {
+                                      handlePrimaryImageChange(index)
+                                    }
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 bg-white text-gray-800 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                                >
+                                  {formData.primaryImageIndex === index && formData.photos.length === 0 ? '✓ Primary' : 'Set Primary'}
+                                </button>
+                              </div>
+                              
+                              {/* Photo Number */}
+                              <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-full">
+                                {index + 1}
+                              </div>
+                            </div>
+                            
+                            {/* Photo Name */}
+                            <p className="text-xs text-gray-600 mt-2 text-center truncate font-medium">
+                              {photo.alt}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Instructions */}
+                      <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          <strong>💡 Tip:</strong> Click on any existing photo to set it as primary. Upload new photos below to add more images.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Photo Preview with Primary Selection */}
                   {formData.photos.length > 0 && (
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg">

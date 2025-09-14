@@ -1,5 +1,5 @@
 import { BaseRepository } from './BaseRepository'
-import { Vehicle } from '@/types'
+import { Vehicle, VehiclePhoto } from '@/types'
 
 /**
  * Vehicle Repository
@@ -171,7 +171,7 @@ export class VehicleRepository extends BaseRepository {
   /**
    * Parse vehicle photos from database JSON string
    */
-  private parsePhotos(photosJson: string): any[] {
+  private parsePhotos(photosJson: string): VehiclePhoto[] {
     try {
       let photosData: any[] = []
       
@@ -200,7 +200,16 @@ export class VehicleRepository extends BaseRepository {
         }
       }
       
-      return photosData
+      // Convert to proper VehiclePhoto objects
+      return photosData.map((photo: any) => ({
+        id: photo.id,
+        vehicleId: photo.vehicleId,
+        url: photo.url,
+        alt: photo.alt || '',
+        isPrimary: Boolean(photo.isPrimary),
+        order: photo.order || 0,
+        createdAt: new Date(photo.createdAt || Date.now())
+      }))
         .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
         .map((photo: any) => ({
           id: photo.id,
