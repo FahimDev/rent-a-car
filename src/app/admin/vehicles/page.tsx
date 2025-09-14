@@ -136,6 +136,20 @@ export default function VehicleManagement() {
     setFormData(prev => ({ ...prev, primaryImageIndex: index }))
   }
 
+  const handleRemovePhoto = (index: number) => {
+    setFormData(prev => {
+      const newPhotos = prev.photos.filter((_, i) => i !== index)
+      const newPrimaryIndex = prev.primaryImageIndex >= newPhotos.length 
+        ? Math.max(0, newPhotos.length - 1)
+        : prev.primaryImageIndex
+      return { 
+        ...prev, 
+        photos: newPhotos, 
+        primaryImageIndex: newPrimaryIndex 
+      }
+    })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -441,32 +455,77 @@ export default function VehicleManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="photos">Vehicle Photos</Label>
-                  <Input
-                    id="photos"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Upload multiple photos to showcase the vehicle (up to 10 images)
-                  </p>
+                  <Label htmlFor="photos" className="text-base font-semibold text-gray-900">
+                    Vehicle Photos <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                    <Input
+                      id="photos"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                    <label htmlFor="photos" className="cursor-pointer">
+                      <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                        </div>
+                        <p className="text-lg font-medium text-gray-900 mb-2">
+                          {formData.photos.length > 0 
+                            ? `${formData.photos.length} photo(s) selected` 
+                            : 'Click to upload multiple photos'
+                          }
+                        </p>
+                        <p className="text-sm text-gray-500 mb-4">
+                          Upload up to 10 high-quality images (JPEG, PNG, WebP)
+                        </p>
+                        <Button type="button" variant="outline" className="px-6 py-2">
+                          Choose Photos
+                        </Button>
+                      </div>
+                    </label>
+                  </div>
+                  {formData.photos.length > 0 && (
+                    <p className="text-sm text-green-600 mt-2 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      {formData.photos.length} photo(s) ready to upload
+                    </p>
+                  )}
                   
                   {/* Photo Preview with Primary Selection */}
                   {formData.photos.length > 0 && (
-                    <div className="mt-4">
-                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                        Select Primary Image:
-                      </Label>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-4">
+                        <Label className="text-base font-semibold text-gray-900">
+                          Photo Preview & Primary Selection
+                        </Label>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-sm text-gray-500">
+                            {formData.photos.length} of 10 photos
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, photos: [], primaryImageIndex: 0 }))}
+                            className="text-sm text-red-600 hover:text-red-700 font-medium px-3 py-1 rounded-md hover:bg-red-50 transition-colors"
+                          >
+                            Clear All
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                         {formData.photos.map((photo, index) => (
-                          <div key={index} className="relative">
-                            <div className={`relative border-2 rounded-lg overflow-hidden cursor-pointer transition-all ${
+                          <div key={index} className="relative group">
+                            <div className={`relative border-2 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
                               formData.primaryImageIndex === index 
-                                ? 'border-blue-500 ring-2 ring-blue-200' 
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-blue-500 ring-4 ring-blue-100 shadow-lg' 
+                                : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
                             }`}>
                               <Image
                                 src={URL.createObjectURL(photo)}
@@ -476,26 +535,66 @@ export default function VehicleManagement() {
                                 className="w-full h-32 object-cover"
                                 onClick={() => handlePrimaryImageChange(index)}
                               />
+                              
+                              {/* Primary Badge */}
                               {formData.primaryImageIndex === index && (
-                                <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                                <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-semibold shadow-md">
+                                  <svg className="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
                                   Primary
                                 </div>
                               )}
-                              <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all flex items-center justify-center">
+                              
+                              {/* Hover Overlay */}
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
                                 <button
                                   type="button"
                                   onClick={() => handlePrimaryImageChange(index)}
-                                  className="opacity-0 hover:opacity-100 bg-white text-gray-800 px-3 py-1 rounded-full text-xs font-medium transition-all"
+                                  className="opacity-0 group-hover:opacity-100 bg-white text-gray-800 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                                 >
-                                  {formData.primaryImageIndex === index ? 'Primary' : 'Set Primary'}
+                                  {formData.primaryImageIndex === index ? '✓ Primary' : 'Set Primary'}
                                 </button>
                               </div>
+                              
+                              {/* Photo Number */}
+                              <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-full">
+                                {index + 1}
+                              </div>
+                              
+                              {/* Remove Button */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleRemovePhoto(index)
+                                }}
+                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-600 shadow-lg"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 text-center truncate">
+                            
+                            {/* Photo Name */}
+                            <p className="text-xs text-gray-600 mt-2 text-center truncate font-medium">
                               {photo.name}
+                            </p>
+                            
+                            {/* File Size */}
+                            <p className="text-xs text-gray-400 text-center">
+                              {(photo.size / 1024 / 1024).toFixed(1)} MB
                             </p>
                           </div>
                         ))}
+                      </div>
+                      
+                      {/* Instructions */}
+                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          <strong>💡 Tip:</strong> Click on any photo to set it as the primary image. The primary image will be displayed first in the vehicle gallery.
+                        </p>
                       </div>
                     </div>
                   )}

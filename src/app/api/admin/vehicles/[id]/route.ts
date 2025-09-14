@@ -118,35 +118,35 @@ export async function PUT(
       for (let i = 0; i < 10; i++) { // Allow up to 10 photos
         const photoFile = formData.get(`photo_${i}`) as File
         if (photoFile && photoFile.size > 0) {
-        // Validate the image file
-        if (!validateImageFile(photoFile)) {
-          const response = NextResponse.json({ 
-            error: `Invalid image file: ${photoFile.name}. Please upload a valid image (JPEG, PNG, WebP) under 5MB.` 
-          }, { status: 400 })
-          return withCORS(response)
-        }
-        
-        try {
-          // Save the uploaded file to filesystem
-          const fileUrl = await saveUploadedFile(photoFile, id, i)
+          // Validate the image file
+          if (!validateImageFile(photoFile)) {
+            const response = NextResponse.json({ 
+              error: `Invalid image file: ${photoFile.name}. Please upload a valid image (JPEG, PNG, WebP) under 5MB.` 
+            }, { status: 400 })
+            return withCORS(response)
+          }
           
-          // Create photo record in database
-          const photo = await vehicleService.addVehiclePhoto(id, {
-            url: fileUrl,
-            alt: `${updatedVehicle.name} - Photo ${i + 1}`,
-            order: i,
-            isPrimary: false
-          })
-          newPhotos.push(photo)
-        } catch (error) {
-          console.error('Error saving photo:', error)
-          const response = NextResponse.json({ 
-            error: `Failed to save image: ${photoFile.name}` 
-          }, { status: 500 })
-          return withCORS(response)
+          try {
+            // Save the uploaded file to filesystem
+            const fileUrl = await saveUploadedFile(photoFile, id, i)
+            
+            // Create photo record in database
+            const photo = await vehicleService.addVehiclePhoto(id, {
+              url: fileUrl,
+              alt: `${updatedVehicle.name} - Photo ${i + 1}`,
+              order: i,
+              isPrimary: false
+            })
+            newPhotos.push(photo)
+          } catch (error) {
+            console.error('Error saving photo:', error)
+            const response = NextResponse.json({ 
+              error: `Failed to save image: ${photoFile.name}` 
+            }, { status: 500 })
+            return withCORS(response)
+          }
         }
       }
-    }
     }
 
     // Get updated vehicle with all photos
