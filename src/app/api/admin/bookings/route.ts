@@ -28,7 +28,9 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.json({
       bookings: result.bookings,
-      pagination: result.pagination
+      total: result.total,
+      page: page || 1,
+      limit: limit || 10
     })
     return withCORS(response)
   } catch (error) {

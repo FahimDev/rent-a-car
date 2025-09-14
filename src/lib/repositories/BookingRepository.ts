@@ -326,4 +326,11 @@ export class BookingRepository extends BaseRepository {
     const result = await this.select(sql, [vehicleId])
     return this.mapRowsToBookings(result)
   }
+
+  /**
+   * Map database rows to Booking objects
+   */
+  private mapRowsToBookings(rows: any[]): Booking[] {
+    return rows.map(row => this.mapBookingResult(row))
+  }
 }

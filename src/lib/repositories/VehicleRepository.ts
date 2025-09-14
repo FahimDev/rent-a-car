@@ -221,7 +221,18 @@ export class VehicleRepository extends BaseRepository {
    * Get all vehicles (for admin)
    */
   async getAllVehicles(): Promise<Vehicle[]> {
-    const sql = 'SELECT * FROM vehicles ORDER BY createdAt DESC'
+    const sql = `
+      SELECT v.*,
+             GROUP_CONCAT(
+               CASE WHEN vp.id IS NOT NULL 
+               THEN json_object('id', vp.id, 'url', vp.url, 'alt', vp.alt, 'isPrimary', vp.isPrimary, 'order', vp."order", 'createdAt', vp.createdAt)
+               END
+             ) as photos_json
+      FROM vehicles v
+      LEFT JOIN vehicle_photos vp ON v.id = vp.vehicleId
+      GROUP BY v.id
+      ORDER BY v.createdAt DESC
+    `
     const result = await this.select(sql, [])
     return this.mapRowsToVehicles(result)
   }

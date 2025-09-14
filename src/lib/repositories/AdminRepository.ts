@@ -41,6 +41,25 @@ export class AdminRepository extends BaseRepository {
   }
 
   /**
+   * Find admin with password for authentication
+   */
+  async findByUsernameWithPassword(username: string): Promise<{ id: string; username: string; password: string; role: string } | null> {
+    const sql = `
+      SELECT id, username, password, role
+      FROM admins 
+      WHERE username = $1
+    `
+    
+    const results = await this.select(sql, [username])
+    
+    if (results.length === 0) {
+      return null
+    }
+
+    return results[0]
+  }
+
+  /**
    * Update admin last login time
    */
   async updateLastLogin(id: string): Promise<boolean> {

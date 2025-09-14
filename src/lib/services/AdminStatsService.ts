@@ -30,10 +30,10 @@ export class AdminStatsService {
     }
 
     return {
-      totalBookings: totalBookingsResult.data[0]?.count || 0,
-      pendingBookings: pendingBookingsResult.data[0]?.count || 0,
-      totalVehicles: totalVehiclesResult.data[0]?.count || 0,
-      totalPassengers: totalPassengersResult.data[0]?.count || 0
+      totalBookings: totalBookingsResult.data?.[0]?.count || 0,
+      pendingBookings: pendingBookingsResult.data?.[0]?.count || 0,
+      totalVehicles: totalVehiclesResult.data?.[0]?.count || 0,
+      totalPassengers: totalPassengersResult.data?.[0]?.count || 0
     }
   }
 }

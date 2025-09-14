@@ -148,6 +148,14 @@
       "dest": "/api/admin/vehicles/[id]?nxtPid=$nxtPid"
     },
     {
+      "src": "^/api/bookings/(?<nxtPid>[^/]+?)(?:\\.rsc)(?:/)?$",
+      "dest": "/api/bookings/[id].rsc?nxtPid=$nxtPid"
+    },
+    {
+      "src": "^/api/bookings/(?<nxtPid>[^/]+?)(?:/)?$",
+      "dest": "/api/bookings/[id]?nxtPid=$nxtPid"
+    },
+    {
       "src": "^/api/vehicles/(?<nxtPid>[^/]+?)(?:\\.rsc)(?:/)?$",
       "dest": "/api/vehicles/[id].rsc?nxtPid=$nxtPid"
     },
@@ -159,7 +167,7 @@
       "handle": "hit"
     },
     {
-      "src": "/_next/static/(?:[^/]+/pages|pages|chunks|runtime|css|image|media|BckIQ9hOvRCHEMWxGFCWe)/.+",
+      "src": "/_next/static/(?:[^/]+/pages|pages|chunks|runtime|css|image|media|kkKG7ux8fWxwQgHUyWND4)/.+",
       "headers": {
         "cache-control": "public,max-age=31536000,immutable"
       },

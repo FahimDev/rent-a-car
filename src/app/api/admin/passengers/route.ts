@@ -29,15 +29,16 @@ export async function GET(request: NextRequest) {
     
     // Get passengers with pagination
     const result = await passengerService.getPassengers({ 
-      search: search || undefined,
-      verified: verified ? verified === 'true' : undefined,
+      isVerified: verified ? verified === 'true' : undefined,
       page, 
       limit 
     })
 
     const response = NextResponse.json({
       passengers: result.passengers,
-      pagination: result.pagination
+      total: result.total,
+      page: page || 1,
+      limit: limit || 10
     })
     return withCORS(response)
   } catch (error) {
@@ -65,7 +66,6 @@ export async function PATCH(request: NextRequest) {
     
     // Update passenger
     const passenger = await passengerService.updatePassenger(passengerId, {
-      isVerified,
       name,
       email
     })

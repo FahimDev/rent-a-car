@@ -40,12 +40,12 @@ export async function apiCall<T = any>(
     const response = await fetch(url, defaultOptions)
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+      const errorData = await response.json().catch(() => ({})) as any
       throw new Error(errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`)
     }
 
     const data = await response.json()
-    return data
+    return data as T
   } catch (error) {
     console.error(`API call failed for ${endpoint}:`, error)
     throw error

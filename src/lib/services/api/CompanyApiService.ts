@@ -1,4 +1,4 @@
-import { apiGet, ApiResponse } from '@/lib/utils/api'
+import { apiCall } from '@/lib/api/utils'
 
 /**
  * Company information interface
@@ -26,13 +26,13 @@ export class CompanyApiService {
    * @returns Promise<CompanyInfo | null> Company info or null if not found
    */
   static async getCompanyInfo(): Promise<CompanyInfo | null> {
-    const response = await apiGet<ApiResponse<CompanyInfo>>('/api/company')
+    const response = await apiCall<CompanyInfo>('/api/company')
     
-    if (!response || !response.success) {
+    if (!response) {
       return null
     }
     
-    return response.data || null
+    return response || null
   }
 
   /**

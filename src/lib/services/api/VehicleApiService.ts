@@ -1,4 +1,4 @@
-import { apiGet, ApiResponse } from '@/lib/utils/api'
+import { apiCall } from '@/lib/api/utils'
 import { Vehicle } from '@/types'
 
 /**
@@ -13,13 +13,13 @@ export class VehicleApiService {
    */
   static async getAvailableVehicles(type?: string): Promise<Vehicle[]> {
     const endpoint = type ? `/api/vehicles?type=${encodeURIComponent(type)}` : '/api/vehicles'
-    const response = await apiGet<ApiResponse<{ vehicles: Vehicle[] }>>(endpoint)
+    const response = await apiCall<{ vehicles: Vehicle[] }>(endpoint)
     
-    if (!response || !response.success) {
+    if (!response) {
       return []
     }
     
-    return response.data?.vehicles || []
+    return response.vehicles || []
   }
 
   /**
@@ -37,12 +37,12 @@ export class VehicleApiService {
    * @returns Promise<Vehicle | null> Vehicle or null if not found
    */
   static async getVehicleById(id: string): Promise<Vehicle | null> {
-    const response = await apiGet<ApiResponse<Vehicle>>(`/api/vehicles/${id}`)
+    const response = await apiCall<Vehicle>(`/api/vehicles/${id}`)
     
-    if (!response || !response.success) {
+    if (!response) {
       return null
     }
     
-    return response.data || null
+    return response || null
   }
 }

@@ -53,19 +53,7 @@ export class AdminService {
    * Get admin with password (for authentication)
    */
   private async getAdminWithPassword(username: string): Promise<{ id: string; username: string; password: string; role: string } | null> {
-    const sql = `
-      SELECT id, username, password, role
-      FROM admins 
-      WHERE username = $1
-    `
-    
-    const results = await this.adminRepository.select(sql, [username])
-    
-    if (results.length === 0) {
-      return null
-    }
-
-    return results[0]
+    return this.adminRepository.findByUsernameWithPassword(username)
   }
 
   /**
