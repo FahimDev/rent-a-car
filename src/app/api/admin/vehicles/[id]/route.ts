@@ -64,11 +64,19 @@ export async function PUT(
 
     // Parse request data (JSON or FormData)
     const contentType = request.headers.get('content-type') || ''
-    let name: string, type: string, capacity: number, pricePerDay: number, description: string, features: string, isAvailable: boolean
+    let name: string, type: string, capacity: number, pricePerDay: number, description: string, features: string | string[], isAvailable: boolean
     
     if (contentType.includes('application/json')) {
       // Handle JSON request
-      const body = await request.json()
+      const body = await request.json() as {
+        name: string
+        type: string
+        capacity: number
+        pricePerDay: number
+        description: string
+        features: string[] | string
+        isAvailable: boolean
+      }
       name = body.name
       type = body.type
       capacity = body.capacity

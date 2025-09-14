@@ -1,5 +1,5 @@
 {
-  "timestamp": 1757819792702,
+  "timestamp": 1757821390088,
   "outputDir": ".vercel/output/static/_worker.js",
   "versions": {
     "@cloudflare/next-on-pages": "1.13.16"
@@ -22,7 +22,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -51,7 +51,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -80,7 +80,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -109,7 +109,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -138,7 +138,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -152,7 +152,7 @@
             ]
           },
           "outputPath": "__next-on-pages-dist__/functions/admin/vehicles.func.js",
-          "outputByteSize": 65801
+          "outputByteSize": 69229
         },
         {
           "relativePath": "/api/admin/bookings/[id].func",
@@ -167,7 +167,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -196,7 +196,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -225,7 +225,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -254,7 +254,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -283,7 +283,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -312,7 +312,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -326,7 +326,7 @@
             ]
           },
           "outputPath": "__next-on-pages-dist__/functions/api/admin/vehicles/[id].func.js",
-          "outputByteSize": 37309
+          "outputByteSize": 37605
         },
         {
           "relativePath": "/api/admin/vehicles.func",
@@ -341,7 +341,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -370,7 +370,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -399,7 +399,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -428,7 +428,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -457,7 +457,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -486,7 +486,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -515,7 +515,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -544,7 +544,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -573,7 +573,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -602,7 +602,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -632,7 +632,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -1264,11 +1264,11 @@
               ".next/server/middleware-build-manifest.js": ".next/server/middleware-build-manifest.js",
               ".next/server/middleware-react-loadable-manifest.js": ".next/server/middleware-react-loadable-manifest.js",
               ".next/react-loadable-manifest.json": ".next/react-loadable-manifest.json",
-              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/app-path-routes-manifest.json": ".next/app-path-routes-manifest.json",
+              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/server/server-reference-manifest.js": ".next/server/server-reference-manifest.js",
-              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/BUILD_ID": ".next/BUILD_ID",
+              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/server/next-font-manifest.js": ".next/server/next-font-manifest.js",
               ".next/server/next-font-manifest.json": ".next/server/next-font-manifest.json",
               ".next/required-server-files.json": ".next/required-server-files.json",
@@ -1925,11 +1925,11 @@
               ".next/server/middleware-build-manifest.js": ".next/server/middleware-build-manifest.js",
               ".next/server/middleware-react-loadable-manifest.js": ".next/server/middleware-react-loadable-manifest.js",
               ".next/react-loadable-manifest.json": ".next/react-loadable-manifest.json",
-              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/app-path-routes-manifest.json": ".next/app-path-routes-manifest.json",
+              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/server/server-reference-manifest.js": ".next/server/server-reference-manifest.js",
-              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/BUILD_ID": ".next/BUILD_ID",
+              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/server/next-font-manifest.js": ".next/server/next-font-manifest.js",
               ".next/server/next-font-manifest.json": ".next/server/next-font-manifest.json",
               ".next/required-server-files.json": ".next/required-server-files.json",
@@ -2585,11 +2585,11 @@
               ".next/server/middleware-build-manifest.js": ".next/server/middleware-build-manifest.js",
               ".next/server/middleware-react-loadable-manifest.js": ".next/server/middleware-react-loadable-manifest.js",
               ".next/react-loadable-manifest.json": ".next/react-loadable-manifest.json",
-              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/app-path-routes-manifest.json": ".next/app-path-routes-manifest.json",
+              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/server/server-reference-manifest.js": ".next/server/server-reference-manifest.js",
-              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/BUILD_ID": ".next/BUILD_ID",
+              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/server/next-font-manifest.js": ".next/server/next-font-manifest.js",
               ".next/server/next-font-manifest.json": ".next/server/next-font-manifest.json",
               ".next/required-server-files.json": ".next/required-server-files.json",
@@ -3247,11 +3247,11 @@
               ".next/server/middleware-build-manifest.js": ".next/server/middleware-build-manifest.js",
               ".next/server/middleware-react-loadable-manifest.js": ".next/server/middleware-react-loadable-manifest.js",
               ".next/react-loadable-manifest.json": ".next/react-loadable-manifest.json",
-              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/app-path-routes-manifest.json": ".next/app-path-routes-manifest.json",
+              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/server/server-reference-manifest.js": ".next/server/server-reference-manifest.js",
-              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/BUILD_ID": ".next/BUILD_ID",
+              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/server/next-font-manifest.js": ".next/server/next-font-manifest.js",
               ".next/server/next-font-manifest.json": ".next/server/next-font-manifest.json",
               ".next/required-server-files.json": ".next/required-server-files.json",
@@ -3907,11 +3907,11 @@
               ".next/server/middleware-build-manifest.js": ".next/server/middleware-build-manifest.js",
               ".next/server/middleware-react-loadable-manifest.js": ".next/server/middleware-react-loadable-manifest.js",
               ".next/react-loadable-manifest.json": ".next/react-loadable-manifest.json",
-              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/app-path-routes-manifest.json": ".next/app-path-routes-manifest.json",
+              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/server/server-reference-manifest.js": ".next/server/server-reference-manifest.js",
-              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/BUILD_ID": ".next/BUILD_ID",
+              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/server/next-font-manifest.js": ".next/server/next-font-manifest.js",
               ".next/server/next-font-manifest.json": ".next/server/next-font-manifest.json",
               ".next/required-server-files.json": ".next/required-server-files.json",
@@ -4565,11 +4565,11 @@
               ".next/server/middleware-build-manifest.js": ".next/server/middleware-build-manifest.js",
               ".next/server/middleware-react-loadable-manifest.js": ".next/server/middleware-react-loadable-manifest.js",
               ".next/react-loadable-manifest.json": ".next/react-loadable-manifest.json",
-              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/app-path-routes-manifest.json": ".next/app-path-routes-manifest.json",
+              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/server/server-reference-manifest.js": ".next/server/server-reference-manifest.js",
-              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/BUILD_ID": ".next/BUILD_ID",
+              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/server/next-font-manifest.js": ".next/server/next-font-manifest.js",
               ".next/server/next-font-manifest.json": ".next/server/next-font-manifest.json",
               ".next/required-server-files.json": ".next/required-server-files.json",
@@ -4613,7 +4613,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4639,7 +4639,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4665,7 +4665,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4691,7 +4691,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4717,7 +4717,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4743,7 +4743,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4769,7 +4769,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4795,7 +4795,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4821,7 +4821,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4847,7 +4847,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4873,7 +4873,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4899,7 +4899,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4925,7 +4925,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4951,7 +4951,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -4977,7 +4977,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -5003,7 +5003,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -5029,7 +5029,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -5055,7 +5055,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -5081,7 +5081,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -5107,7 +5107,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -5133,7 +5133,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -5159,7 +5159,7 @@
               "version": "15.4.6"
             },
             "environment": {
-              "__NEXT_BUILD_ID": "kkKG7ux8fWxwQgHUyWND4",
+              "__NEXT_BUILD_ID": "5Y9NaP861YEGQCSwGAo9e",
               "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GtVAMhebuULZTDuAo+Efn1wG8cFVrZVo2w9HbBq+Gkc=",
               "__NEXT_PREVIEW_MODE_ID": "66c3fa5b03e0f19d7cbd3606c5bc6fed",
               "__NEXT_PREVIEW_MODE_SIGNING_KEY": "c282e45f3ea05138f1b7893e927337d98340df6f169077db30a0ed938522ae18",
@@ -5786,11 +5786,11 @@
               ".next/server/middleware-build-manifest.js": ".next/server/middleware-build-manifest.js",
               ".next/server/middleware-react-loadable-manifest.js": ".next/server/middleware-react-loadable-manifest.js",
               ".next/react-loadable-manifest.json": ".next/react-loadable-manifest.json",
-              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/app-path-routes-manifest.json": ".next/app-path-routes-manifest.json",
+              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/server/server-reference-manifest.js": ".next/server/server-reference-manifest.js",
-              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/BUILD_ID": ".next/BUILD_ID",
+              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/server/next-font-manifest.js": ".next/server/next-font-manifest.js",
               ".next/server/next-font-manifest.json": ".next/server/next-font-manifest.json",
               ".next/required-server-files.json": ".next/required-server-files.json",
@@ -6432,11 +6432,11 @@
               ".next/server/middleware-build-manifest.js": ".next/server/middleware-build-manifest.js",
               ".next/server/middleware-react-loadable-manifest.js": ".next/server/middleware-react-loadable-manifest.js",
               ".next/react-loadable-manifest.json": ".next/react-loadable-manifest.json",
-              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/app-path-routes-manifest.json": ".next/app-path-routes-manifest.json",
+              ".next/app-build-manifest.json": ".next/app-build-manifest.json",
               ".next/server/server-reference-manifest.js": ".next/server/server-reference-manifest.js",
-              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/BUILD_ID": ".next/BUILD_ID",
+              ".next/server/server-reference-manifest.json": ".next/server/server-reference-manifest.json",
               ".next/server/next-font-manifest.js": ".next/server/next-font-manifest.js",
               ".next/server/next-font-manifest.json": ".next/server/next-font-manifest.json",
               ".next/required-server-files.json": ".next/required-server-files.json",
@@ -6472,6 +6472,8 @@
       "/_app.rsc.json",
       "/_document.rsc.json",
       "/_error.rsc.json",
+      "/_next/static/5Y9NaP861YEGQCSwGAo9e/_buildManifest.js",
+      "/_next/static/5Y9NaP861YEGQCSwGAo9e/_ssgManifest.js",
       "/_next/static/chunks/497-da13984416318f79.js",
       "/_next/static/chunks/4bd1b696-cf72ae8a39fa05aa.js",
       "/_next/static/chunks/568-89429dc8ea6b4350.js",
@@ -6485,7 +6487,7 @@
       "/_next/static/chunks/app/admin/login/page-6233a2ac6a8f7d65.js",
       "/_next/static/chunks/app/admin/page-c20e141770abf16e.js",
       "/_next/static/chunks/app/admin/passengers/page-92722a90c7394380.js",
-      "/_next/static/chunks/app/admin/vehicles/page-405d64c4716833bf.js",
+      "/_next/static/chunks/app/admin/vehicles/page-18711e1fb00d67e7.js",
       "/_next/static/chunks/app/api/admin/bookings/[id]/route-c20e141770abf16e.js",
       "/_next/static/chunks/app/api/admin/bookings/route-c20e141770abf16e.js",
       "/_next/static/chunks/app/api/admin/login/route-c20e141770abf16e.js",
@@ -6512,9 +6514,7 @@
       "/_next/static/chunks/pages/_error-03529f2c21436739.js",
       "/_next/static/chunks/polyfills-42372ed130431b0a.js",
       "/_next/static/chunks/webpack-be1eb085eb95ea67.js",
-      "/_next/static/css/9d7c44e25c39d65e.css",
-      "/_next/static/kkKG7ux8fWxwQgHUyWND4/_buildManifest.js",
-      "/_next/static/kkKG7ux8fWxwQgHUyWND4/_ssgManifest.js",
+      "/_next/static/css/f8e04929b0a748fd.css",
       "/_next/static/media/19cfc7226ec3afaa-s.woff2",
       "/_next/static/media/21350d82a1f187e9-s.woff2",
       "/_next/static/media/8e9860b6e62d6359-s.woff2",
@@ -7313,7 +7313,7 @@
           "consumers": 11,
           "groupedPath": "25390590094c7e0c03d591a60c00eeb8",
           "newDest": "__next-on-pages-dist__/webpack/25390590094c7e0c03d591a60c00eeb8.js",
-          "byteLength": 25951,
+          "byteLength": 26044,
           "consumersList": [
             "/api/admin/bookings.func/index.js",
             "/api/admin/bookings/[id].func/index.js",
@@ -9575,7 +9575,7 @@
         "3783": {
           "consumers": 1,
           "inlined": true,
-          "byteLength": 14091,
+          "byteLength": 14380,
           "consumersList": [
             "/api/admin/vehicles/[id].func/index.js"
           ]
@@ -14768,7 +14768,7 @@
           "consumers": 1,
           "groupedPath": "38366c413ca9638cd9e4d498705d9290",
           "inlined": true,
-          "byteLength": 14407,
+          "byteLength": 17830,
           "consumersList": [
             "/admin/vehicles.func/index.js"
           ]
