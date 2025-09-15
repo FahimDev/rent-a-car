@@ -22,6 +22,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import { api } from '@/lib/api/utils'
+import { VehicleGridSkeleton, VehicleLoader } from '@/components/ui/VehicleLoader'
 
 // Helper functions to call API endpoints
   async function getCompanyInfo() {
@@ -80,26 +81,36 @@ export default function HomePage() {
   })
   
   const [vehicles, setVehicles] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [vehiclesLoading, setVehiclesLoading] = useState(true)
+  const [companyLoading, setCompanyLoading] = useState(true)
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadCompanyData = async () => {
       try {
-        const [companyData, vehiclesData] = await Promise.all([
-          getCompanyInfo(),
-          getVehicles()
-        ])
-        
+        const companyData = await getCompanyInfo()
         setCompanyInfo(companyData)
+      } catch (error) {
+        // Handle error silently
+      } finally {
+        setCompanyLoading(false)
+      }
+    }
+
+    const loadVehiclesData = async () => {
+      try {
+        const vehiclesData = await getVehicles()
         setVehicles(vehiclesData)
       } catch (error) {
         // Handle error silently
       } finally {
-        setLoading(false)
+        setVehiclesLoading(false)
       }
     }
 
-    loadData()
+    // Load company data first (faster)
+    loadCompanyData()
+    // Load vehicles data separately
+    loadVehiclesData()
   }, [])
 
   const services = [
@@ -156,16 +167,6 @@ export default function HomePage() {
     }
   ]
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen">
@@ -173,15 +174,30 @@ export default function HomePage() {
       <header className="absolute top-0 left-0 right-0 z-50 p-4">
         <div className="container-mobile">
           <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              {/* Logo only visible on desktop */}
+              <div className="hidden sm:block w-20 h-20">
+                <img 
+                  src="/logo.webp" 
+                  alt="Rent-A-Car Bangladesh Logo" 
+                  className="w-full h-full object-contain drop-shadow-lg"
+                />
+              </div>
+              <div className="text-white/90 text-sm sm:text-lg font-semibold hidden sm:block">
+                {companyInfo.name}
+              </div>
+              {/* Mobile: Show company name only */}
+              <div className="sm:hidden text-white/90 text-sm font-semibold">
+                {companyInfo.name}
+              </div>
+            </div>
             <Link href="/admin/login">
-              <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
-                <Shield className="mr-2 h-4 w-4" />
-                Admin Login
+              <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10 text-xs sm:text-sm">
+                <Shield className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Admin Login</span>
+                <span className="sm:hidden">Admin</span>
               </Button>
             </Link>
-            <div className="text-white/60 text-sm">
-              {companyInfo.name}
-            </div>
           </div>
         </div>
       </header>
@@ -217,6 +233,20 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Mobile Logo Section - Pokéball Center Style */}
+      <div className="sm:hidden relative">
+        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="w-28 h-28 bg-white rounded-full shadow-xl border-4 border-gray-200 flex items-center justify-center">
+            <img 
+              src="/logo.webp" 
+              alt="Rent-A-Car Bangladesh Logo" 
+              className="w-24 h-24 object-contain"
+            />
+          </div>
+        </div>
+        <div className="h-12 bg-white"></div>
+      </div>
 
       {/* Features Section */}
       <section className="py-16 bg-white">
@@ -291,7 +321,10 @@ export default function HomePage() {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {vehicles.map((vehicle: any) => (
+              {vehiclesLoading ? (
+                <VehicleGridSkeleton count={3} />
+              ) : vehicles.length > 0 ? (
+                vehicles.map((vehicle: any) => (
                 <Card key={vehicle.id} className="card-mobile overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   <div className="aspect-video bg-gray-200 flex items-center justify-center">
                     {vehicle.photos.length > 0 ? (
@@ -319,7 +352,16 @@ export default function HomePage() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                ))
+              ) : (
+                <div className="col-span-full flex justify-center">
+                  <VehicleLoader 
+                    size="lg" 
+                    text="No vehicles available" 
+                    className="py-8"
+                  />
+                </div>
+              )}
             </div>
             <div className="text-center mt-8">
               <Link href="/vehicles">
@@ -371,31 +413,89 @@ export default function HomePage() {
       </section>
 
       {/* Location Section */}
-      {companyInfo.latitude && companyInfo.longitude && (
-        <section className="py-16 bg-gray-50">
-          <div className="container-mobile">
-            <div className="text-center mb-12">
-              <h2 className="heading-responsive font-bold text-gray-900 mb-4">
-                Our Location
-              </h2>
-              <p className="text-responsive text-gray-600 max-w-2xl mx-auto">
-                Visit our office or find us on the map.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="aspect-video bg-gray-200 flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Google Maps Integration</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Latitude: {companyInfo.latitude}, Longitude: {companyInfo.longitude}
-                  </p>
+      <section className="py-16 bg-gray-50">
+        <div className="container-mobile">
+          <div className="text-center mb-12">
+            <h2 className="heading-responsive font-bold text-gray-900 mb-4">
+              Our Location
+            </h2>
+            <p className="text-responsive text-gray-600 max-w-2xl mx-auto">
+              Visit our office in Chittagong or find us on the map for easy navigation.
+            </p>
+          </div>
+          
+          {/* Business Info Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card className="card-mobile text-center">
+              <CardContent className="p-6">
+                <MapPin className="h-8 w-8 text-primary mx-auto mb-3" />
+                <h3 className="font-semibold text-gray-900 mb-2">Address</h3>
+                <p className="text-sm text-gray-600">
+                  Chittagong, Bangladesh
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="card-mobile text-center">
+              <CardContent className="p-6">
+                <Clock className="h-8 w-8 text-primary mx-auto mb-3" />
+                <h3 className="font-semibold text-gray-900 mb-2">Business Hours</h3>
+                <p className="text-sm text-gray-600">
+                  24/7 Service Available
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="card-mobile text-center">
+              <CardContent className="p-6">
+                <div className="h-8 w-8 text-primary mx-auto mb-3">
+                  <div 
+                    className="w-full h-full bg-primary"
+                    style={{
+                      maskImage: 'url(/bangladesh.svg)',
+                      maskSize: 'contain',
+                      maskRepeat: 'no-repeat',
+                      maskPosition: 'center',
+                      WebkitMaskImage: 'url(/bangladesh.svg)',
+                      WebkitMaskSize: 'contain',
+                      WebkitMaskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center'
+                    }}
+                  />
                 </div>
-              </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Service Area</h3>
+                <p className="text-sm text-gray-600">
+                  All over Bangladesh
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Interactive Map */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="aspect-video w-full">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5203.548905356438!2d91.85144059999999!3d22.351691699999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30ad27b7e726a8c7%3A0xd705bc7c4ebcc2b6!2sChittagong%20Rent%20A%20Car!5e1!3m2!1sen!2sbd!4v1757965102645!5m2!1sen!2sbd" 
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full h-full"
+                title="Chittagong Rent A Car Location"
+              />
             </div>
           </div>
-        </section>
-      )}
+          
+          {/* Map Instructions */}
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-600">
+              Click on the map to open in Google Maps for directions
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-gray-900 to-black text-white">

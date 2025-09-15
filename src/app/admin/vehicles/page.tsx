@@ -77,6 +77,7 @@ export default function VehicleManagement() {
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<VehicleFormData>({
     name: '',
     type: '',
@@ -138,7 +139,34 @@ export default function VehicleManagement() {
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    setFormData(prev => ({ ...prev, photos: files, primaryImageIndex: 0 }))
+    
+    // Validate files for mobile compatibility
+    const validFiles: File[] = []
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    
+    for (const file of files) {
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`Invalid file type: ${file.name}. Please use JPEG, PNG, or WebP images.`)
+        continue
+      }
+      
+      if (file.size > maxSize) {
+        toast.error(`File too large: ${file.name}. Please use images under 5MB.`)
+        continue
+      }
+      
+      validFiles.push(file)
+    }
+    
+    if (validFiles.length > 0) {
+      setFormData(prev => ({ ...prev, photos: validFiles, primaryImageIndex: 0 }))
+      if (validFiles.length !== files.length) {
+        toast.error(`Only ${validFiles.length} of ${files.length} files were valid and added.`)
+      }
+    } else if (files.length > 0) {
+      toast.error('No valid image files were selected.')
+    }
   }
 
   const handlePrimaryImageChange = (index: number) => {
@@ -162,17 +190,36 @@ export default function VehicleManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Validate required fields
+    if (!formData.name.trim()) {
+      toast.error('Vehicle name is required')
+      return
+    }
+    if (!formData.type) {
+      toast.error('Vehicle type is required')
+      return
+    }
+    if (!formData.pricePerDay || formData.pricePerDay <= 0) {
+      toast.error('Valid price per day is required')
+      return
+    }
+    if (!formData.description.trim()) {
+      toast.error('Vehicle description is required')
+      return
+    }
+    
+    setIsSubmitting(true)
+    
     try {
-      const token = localStorage.getItem('adminToken')
       const formDataToSend = new FormData()
       
       // Add form fields
-      formDataToSend.append('name', formData.name)
+      formDataToSend.append('name', formData.name.trim())
       formDataToSend.append('type', formData.type)
       formDataToSend.append('capacity', formData.capacity.toString())
       formDataToSend.append('pricePerDay', formData.pricePerDay.toString())
-      formDataToSend.append('description', formData.description)
-      formDataToSend.append('features', formData.features)
+      formDataToSend.append('description', formData.description.trim())
+      formDataToSend.append('features', formData.features.trim())
       formDataToSend.append('isAvailable', formData.isAvailable.toString())
       
       // Add photos
@@ -193,31 +240,30 @@ export default function VehicleManagement() {
       
       formDataToSend.append('primaryImageIndex', primaryImageIndex.toString())
 
-      const url = editingVehicle 
-        ? `/api/admin/vehicles/${editingVehicle.id}`
-        : '/api/admin/vehicles'
-      
-      const method = editingVehicle ? 'PUT' : 'POST'
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formDataToSend
-      })
-
-      if (response.ok) {
-        toast.success(editingVehicle ? 'Vehicle updated successfully' : 'Vehicle added successfully')
-        setShowAddForm(false)
-        setEditingVehicle(null)
-        resetForm()
-        fetchVehicles()
+      if (editingVehicle) {
+        const response = await api.admin.updateVehicle(editingVehicle.id, formDataToSend)
+        if (response) {
+          toast.success('Vehicle updated successfully')
+          setShowAddForm(false)
+          setEditingVehicle(null)
+          resetForm()
+          fetchVehicles()
+        }
       } else {
-        const error = await response.json() as ErrorApiResponse
-        toast.error(error.message || 'Failed to save vehicle')
+        const response = await api.admin.createVehicle(formDataToSend)
+        if (response) {
+          toast.success('Vehicle added successfully')
+          setShowAddForm(false)
+          resetForm()
+          fetchVehicles()
+        }
       }
     } catch (error) {
       console.error('Error saving vehicle:', error)
-      toast.error('Failed to save vehicle')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save vehicle'
+      toast.error(errorMessage)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -327,29 +373,31 @@ export default function VehicleManagement() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container-mobile py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <Link href="/admin/dashboard">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="btn-mobile">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
+                  <span className="hidden sm:inline">Back to Dashboard</span>
+                  <span className="sm:hidden">Back</span>
                 </Button>
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Vehicle Management</h1>
-                <p className="text-sm text-gray-600">Manage your fleet of vehicles</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Vehicle Management</h1>
+                <p className="text-xs sm:text-sm text-gray-600">Manage your fleet of vehicles</p>
               </div>
             </div>
-            <Button 
+            <Button
               onClick={() => {
                 setShowAddForm(true)
                 setEditingVehicle(null)
                 resetForm()
               }}
-              className="bg-primary-600 hover:bg-primary-700"
+              className="bg-primary-600 hover:bg-primary-700 btn-mobile w-full sm:w-auto"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Vehicle
+              <span className="hidden sm:inline">Add Vehicle</span>
+              <span className="sm:hidden">Add</span>
             </Button>
           </div>
         </div>
@@ -389,15 +437,18 @@ export default function VehicleManagement() {
         {/* Add/Edit Form */}
         {showAddForm && (
           <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>{editingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}</CardTitle>
-              <CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center text-lg sm:text-xl">
+                <Car className="h-5 w-5 mr-2" />
+                {editingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
+              </CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 {editingVehicle ? 'Update vehicle information' : 'Add a new vehicle to your fleet'}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className="p-4 sm:p-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <Label htmlFor="name">Vehicle Name</Label>
                     <Input
@@ -405,6 +456,7 @@ export default function VehicleManagement() {
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       placeholder="e.g., Toyota Camry 2023"
+                      className="btn-mobile"
                       required
                     />
                   </div>
@@ -414,7 +466,7 @@ export default function VehicleManagement() {
                       id="type"
                       value={formData.type}
                       onChange={(e) => handleTypeChange(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 btn-mobile"
                       required
                     >
                       <option value="">Select type</option>
@@ -428,6 +480,8 @@ export default function VehicleManagement() {
                     <Input
                       id="capacity"
                       type="number"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={formData.capacity || ''}
                       onChange={(e) => {
                         const value = e.target.value
@@ -436,6 +490,8 @@ export default function VehicleManagement() {
                       }}
                       min="1"
                       max="20"
+                      placeholder="Enter capacity"
+                      className="btn-mobile"
                       required
                     />
                   </div>
@@ -444,6 +500,8 @@ export default function VehicleManagement() {
                     <Input
                       id="pricePerDay"
                       type="number"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={formData.pricePerDay || ''}
                       onChange={(e) => {
                         const value = e.target.value
@@ -452,6 +510,8 @@ export default function VehicleManagement() {
                       }}
                       min="0"
                       step="0.01"
+                      placeholder="Enter daily rental price"
+                      className="btn-mobile"
                       required
                     />
                   </div>
@@ -464,7 +524,7 @@ export default function VehicleManagement() {
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="Describe the vehicle features, condition, etc."
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 btn-mobile"
                     rows={3}
                     required
                   />
@@ -477,6 +537,7 @@ export default function VehicleManagement() {
                     value={formData.features}
                     onChange={(e) => handleInputChange('features', e.target.value)}
                     placeholder="e.g., AC, GPS, Bluetooth, Leather Seats"
+                    className="btn-mobile"
                   />
                 </div>
 
@@ -484,7 +545,7 @@ export default function VehicleManagement() {
                   <Label htmlFor="photos" className="text-base font-semibold text-gray-900">
                     Vehicle Photos <span className="text-red-500">*</span>
                   </Label>
-                  <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                  <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center hover:border-gray-400 transition-colors">
                     <Input
                       id="photos"
                       type="file"
@@ -492,24 +553,34 @@ export default function VehicleManagement() {
                       accept="image/*"
                       onChange={handlePhotoChange}
                       className="hidden"
+                      disabled={isSubmitting}
                     />
-                    <label htmlFor="photos" className="cursor-pointer">
+                    <label htmlFor="photos" className={`cursor-pointer ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}>
                       <div className="flex flex-col items-center">
                         <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                           <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                           </svg>
                         </div>
-                        <p className="text-lg font-medium text-gray-900 mb-2">
-                          {formData.photos.length > 0 
-                            ? `${formData.photos.length} photo(s) selected` 
-                            : 'Click to upload multiple photos'
-                          }
+                        <p className="text-base sm:text-lg font-medium text-gray-900 mb-2">
+                          {isSubmitting ? (
+                            <span className="flex items-center justify-center">
+                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Processing photos...
+                            </span>
+                          ) : formData.photos.length > 0 ? (
+                            `${formData.photos.length} photo(s) selected`
+                          ) : (
+                            'Tap to upload photos'
+                          )}
                         </p>
-                        <p className="text-sm text-gray-500 mb-4">
-                          Upload up to 10 high-quality images (JPEG, PNG, WebP)
+                        <p className="text-xs sm:text-sm text-gray-500 mb-4">
+                          Upload up to 10 images (JPEG, PNG, WebP)
                         </p>
-                        <Button type="button" variant="outline" className="px-6 py-2">
+                        <Button type="button" variant="outline" className="px-4 sm:px-6 py-2 btn-mobile">
                           Choose Photos
                         </Button>
                       </div>
@@ -536,7 +607,7 @@ export default function VehicleManagement() {
                         </span>
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                         {formData.existingPhotos.map((photo, index) => (
                           <div key={photo.id} className="relative group">
                             <div className={`relative border-2 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
@@ -627,7 +698,7 @@ export default function VehicleManagement() {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                         {formData.photos.map((photo, index) => (
                           <div key={index} className="relative group">
                             <div className={`relative border-2 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
@@ -719,7 +790,7 @@ export default function VehicleManagement() {
                   <Label htmlFor="isAvailable">Available for booking</Label>
                 </div>
 
-                <div className="flex justify-end space-x-4">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
                   <Button
                     type="button"
                     variant="outline"
@@ -728,11 +799,26 @@ export default function VehicleManagement() {
                       setEditingVehicle(null)
                       resetForm()
                     }}
+                    className="btn-mobile"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-primary-600 hover:bg-primary-700">
-                    {editingVehicle ? 'Update Vehicle' : 'Add Vehicle'}
+                  <Button 
+                    type="submit" 
+                    className="bg-primary-600 hover:bg-primary-700 btn-mobile"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {editingVehicle ? 'Updating...' : 'Adding...'}
+                      </>
+                    ) : (
+                      editingVehicle ? 'Update Vehicle' : 'Add Vehicle'
+                    )}
                   </Button>
                 </div>
               </form>

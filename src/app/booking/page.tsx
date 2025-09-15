@@ -23,6 +23,7 @@ import Link from 'next/link'
 import { VEHICLE_TYPES } from '@/types'
 import { formatDate, formatTime, validatePhoneNumber, formatPhoneNumber } from '@/lib/utils'
 import { api } from '@/lib/api/utils'
+import { LocationPinLoader, SimpleLocationPinLoader } from '@/components/ui/LocationPinLoader'
 
 interface BookingFormData {
   // Step 1: Date, Time, Trip Type
@@ -82,6 +83,7 @@ function BookingPageContent() {
   const [formData, setFormData] = useState<BookingFormData>(initialFormData)
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLocating, setIsLocating] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Get vehicle from URL params
@@ -194,6 +196,21 @@ function BookingPageContent() {
     }
   }
 
+  const handleLocationDetection = async () => {
+    setIsLocating(true)
+    
+    // Simulate location detection delay
+    setTimeout(() => {
+      // In a real app, you would use the browser's geolocation API here
+      // navigator.geolocation.getCurrentPosition((position) => {
+      //   // Handle location data
+      // })
+      
+      setIsLocating(false)
+      // You could set a default location or show a map picker
+    }, 2000)
+  }
+
   const handleSubmit = async () => {
     // Validate all steps except vehicle selection (optional)
     if (!validateStep(1) || !validateStep(2) || !validateStep(3)) return
@@ -250,7 +267,32 @@ function BookingPageContent() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container-mobile py-4">
-          <div className="flex items-center justify-between">
+          {/* Mobile Layout */}
+          <div className="flex flex-col sm:hidden space-y-3">
+            <div className="flex items-center justify-between">
+              <Link href="/">
+                <Button variant="ghost" size="sm" className="text-xs">
+                  <ArrowLeft className="h-4 w-4 mr-1" />
+                  Back
+                </Button>
+              </Link>
+              <div className="w-14 h-14">
+                <img 
+                  src="/logo.webp" 
+                  alt="Rent-A-Car Bangladesh Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="w-16"></div> {/* Spacer for centering */}
+            </div>
+            <div className="text-center">
+              <h1 className="text-lg font-bold text-gray-900">Book Your Ride</h1>
+              <p className="text-xs text-gray-600">Complete your booking in 4 simple steps</p>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden sm:flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/">
                 <Button variant="ghost" size="sm">
@@ -258,6 +300,13 @@ function BookingPageContent() {
                   Back to Home
                 </Button>
               </Link>
+              <div className="w-16 h-16">
+                <img 
+                  src="/logo.webp" 
+                  alt="Rent-A-Car Bangladesh Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Book Your Ride</h1>
                 <p className="text-sm text-gray-600">Complete your booking in 4 simple steps</p>
@@ -332,6 +381,7 @@ function BookingPageContent() {
                           onChange={(e) => handleInputChange('bookingDate', e.target.value)}
                           min={new Date().toISOString().split('T')[0]}
                           className="input-mobile"
+                          disabled={isSubmitting}
                         />
                         {errors.bookingDate && (
                           <p className="text-sm text-red-600 mt-1">{errors.bookingDate}</p>
@@ -345,6 +395,7 @@ function BookingPageContent() {
                           value={formData.pickupTime}
                           onChange={(e) => handleInputChange('pickupTime', e.target.value)}
                           className="input-mobile"
+                          disabled={isSubmitting}
                         />
                         {errors.pickupTime && (
                           <p className="text-sm text-red-600 mt-1">{errors.pickupTime}</p>
@@ -357,11 +408,12 @@ function BookingPageContent() {
                         <button
                           type="button"
                           onClick={() => handleInputChange('tripType', 'single')}
+                          disabled={isSubmitting}
                           className={`p-4 rounded-lg border-2 text-left transition-all ${
                             formData.tripType === 'single'
                               ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200 hover:border-primary-300'
-                          }`}
+                          } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <div className="flex items-center">
                             <Navigation className="h-5 w-5 mr-2" />
@@ -374,11 +426,12 @@ function BookingPageContent() {
                         <button
                           type="button"
                           onClick={() => handleInputChange('tripType', 'round')}
+                          disabled={isSubmitting}
                           className={`p-4 rounded-lg border-2 text-left transition-all ${
                             formData.tripType === 'round'
                               ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200 hover:border-primary-300'
-                          }`}
+                          } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <div className="flex items-center">
                             <Navigation className="h-5 w-5 mr-2" />
@@ -396,8 +449,41 @@ function BookingPageContent() {
                 {/* Step 2: Locations */}
                 {currentStep === 2 && (
                   <>
+                    {/* Location Detection Section */}
+                    {isLocating && (
+                      <div className="mb-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                        <LocationPinLoader 
+                          size="md" 
+                          text="Detecting your location..." 
+                          className="mx-auto"
+                        />
+                      </div>
+                    )}
+                    
                     <div>
-                      <Label htmlFor="pickupLocation">Pickup Location *</Label>
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="pickupLocation">Pickup Location *</Label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleLocationDetection}
+                          disabled={isLocating || isSubmitting}
+                          className="text-xs px-3 py-1"
+                        >
+                          {isLocating ? (
+                            <>
+                              <SimpleLocationPinLoader size="sm" text="" className="flex-row space-x-1" />
+                              <span className="ml-1">Detecting...</span>
+                            </>
+                          ) : (
+                            <>
+                              <MapPin className="h-3 w-3 mr-1" />
+                              Detect
+                            </>
+                          )}
+                        </Button>
+                      </div>
                       <Input
                         id="pickupLocation"
                         type="text"
@@ -405,6 +491,7 @@ function BookingPageContent() {
                         value={formData.pickupLocation}
                         onChange={(e) => handleInputChange('pickupLocation', e.target.value)}
                         className="input-mobile"
+                        disabled={isSubmitting || isLocating}
                       />
                       {errors.pickupLocation && (
                         <p className="text-sm text-red-600 mt-1">{errors.pickupLocation}</p>
@@ -419,6 +506,7 @@ function BookingPageContent() {
                         value={formData.dropoffLocation}
                         onChange={(e) => handleInputChange('dropoffLocation', e.target.value)}
                         className="input-mobile"
+                        disabled={isSubmitting}
                       />
                       {errors.dropoffLocation && (
                         <p className="text-sm text-red-600 mt-1">{errors.dropoffLocation}</p>
@@ -439,6 +527,7 @@ function BookingPageContent() {
                         value={formData.passengerName}
                         onChange={(e) => handleInputChange('passengerName', e.target.value)}
                         className="input-mobile"
+                        disabled={isSubmitting}
                       />
                       {errors.passengerName && (
                         <p className="text-sm text-red-600 mt-1">{errors.passengerName}</p>
@@ -453,6 +542,7 @@ function BookingPageContent() {
                         value={formData.passengerPhone}
                         onChange={(e) => handleInputChange('passengerPhone', e.target.value)}
                         className="input-mobile"
+                        disabled={isSubmitting}
                       />
                       {errors.passengerPhone && (
                         <p className="text-sm text-red-600 mt-1">{errors.passengerPhone}</p>
@@ -467,6 +557,7 @@ function BookingPageContent() {
                         value={formData.passengerEmail}
                         onChange={(e) => handleInputChange('passengerEmail', e.target.value)}
                         className="input-mobile"
+                        disabled={isSubmitting}
                       />
                       {errors.passengerEmail && (
                         <p className="text-sm text-red-600 mt-1">{errors.passengerEmail}</p>
@@ -530,7 +621,7 @@ function BookingPageContent() {
                   <Button
                     variant="outline"
                     onClick={handlePrevious}
-                    disabled={currentStep === 1}
+                    disabled={currentStep === 1 || isSubmitting}
                     className="btn-mobile"
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
@@ -538,7 +629,11 @@ function BookingPageContent() {
                   </Button>
                   
                   {currentStep < 4 ? (
-                    <Button onClick={handleNext} className="btn-mobile">
+                    <Button 
+                      onClick={handleNext} 
+                      disabled={isSubmitting}
+                      className="btn-mobile"
+                    >
                       Next
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
@@ -548,7 +643,14 @@ function BookingPageContent() {
                       disabled={isSubmitting}
                       className="btn-mobile"
                     >
-                      {isSubmitting ? 'Creating Booking...' : 'Confirm Booking'}
+                      {isSubmitting ? (
+                        <>
+                          <LocationPinLoader size="sm" text="" className="flex-row space-x-2" />
+                          <span>Creating Booking...</span>
+                        </>
+                      ) : (
+                        'Confirm Booking'
+                      )}
                     </Button>
                   )}
                 </div>
@@ -590,6 +692,22 @@ function BookingPageContent() {
           </div>
         </div>
       </div>
+
+      {/* Full Screen Location Loader Overlay */}
+      {isSubmitting && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full text-center">
+            <LocationPinLoader 
+              size="lg" 
+              text="Processing your booking..." 
+              className="mx-auto"
+            />
+            <p className="text-sm text-gray-600 mt-4">
+              Please wait while we confirm your booking details
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

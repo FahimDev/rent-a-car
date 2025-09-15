@@ -17,9 +17,11 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { VEHICLE_TYPES, Vehicle } from '@/types'
+import { VehicleGridSkeleton, VehicleLoader } from '@/components/ui/VehicleLoader'
 
 interface VehicleGalleryProps {
   vehicles: Vehicle[]
+  loading?: boolean
 }
 
 function getVehicleIcon(type: string) {
@@ -35,7 +37,7 @@ function getVehicleIcon(type: string) {
   }
 }
 
-export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
+export default function VehicleGallery({ vehicles, loading = false }: VehicleGalleryProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('')
 
@@ -50,17 +52,49 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="container-mobile py-6">
-          <div className="flex items-center justify-between">
+        <div className="container-mobile py-4 sm:py-6">
+          {/* Mobile Layout */}
+          <div className="flex flex-col sm:hidden space-y-4">
+            <div className="flex items-center justify-between">
+              <Link href="/" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+                <span>Back</span>
+              </Link>
+              <div className="w-16 h-16">
+                <img 
+                  src="/logo.webp" 
+                  alt="Rent-A-Car Bangladesh Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="w-16"></div> {/* Spacer for centering */}
+            </div>
+            <div className="text-center">
+              <h1 className="text-xl font-bold text-gray-900">Our Vehicle Fleet</h1>
+              <p className="text-gray-600 text-sm">Choose your perfect ride</p>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden sm:flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
                 <ArrowLeft className="w-5 h-5" />
                 <span>Back to Home</span>
               </Link>
             </div>
-            <div className="text-center">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Our Vehicle Fleet</h1>
-              <p className="text-gray-600 mt-1">Choose your perfect ride</p>
+            <div className="flex items-center space-x-4">
+              <div className="w-20 h-20">
+                <img 
+                  src="/logo.webp" 
+                  alt="Rent-A-Car Bangladesh Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="text-center">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Our Vehicle Fleet</h1>
+                <p className="text-gray-600 mt-1">Choose your perfect ride</p>
+              </div>
             </div>
             <div className="w-24"></div> {/* Spacer for centering */}
           </div>
@@ -114,7 +148,9 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
         </div>
 
         {/* Vehicles Grid */}
-        {filteredVehicles.length > 0 ? (
+        {loading ? (
+          <VehicleGridSkeleton count={6} />
+        ) : filteredVehicles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVehicles.map((vehicle) => (
               <Card key={vehicle.id} className="card-mobile overflow-hidden hover:shadow-xl transition-all duration-300 group">
@@ -216,8 +252,11 @@ export default function VehicleGallery({ vehicles }: VehicleGalleryProps) {
           </div>
         ) : (
           <div className="text-center py-12">
-            <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No vehicles found</h3>
+            <VehicleLoader 
+              size="lg" 
+              text="No vehicles found" 
+              className="mx-auto mb-4"
+            />
             <p className="text-gray-600 mb-4">
               Try adjusting your search or filter criteria
             </p>

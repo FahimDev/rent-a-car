@@ -341,11 +341,16 @@ export class VehicleRepository extends BaseRepository {
   }
 
   /**
-   * Delete vehicle
+   * Delete vehicle and all associated photos
    */
   async deleteVehicle(id: string): Promise<boolean> {
-    const sql = 'DELETE FROM vehicles WHERE id = $1'
-    const changes = await this.delete(sql, [id])
+    // First delete all associated photos
+    const deletePhotosSql = 'DELETE FROM vehicle_photos WHERE vehicleId = $1'
+    await this.delete(deletePhotosSql, [id])
+    
+    // Then delete the vehicle
+    const deleteVehicleSql = 'DELETE FROM vehicles WHERE id = $1'
+    const changes = await this.delete(deleteVehicleSql, [id])
     return changes > 0
   }
 }

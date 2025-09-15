@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { api } from '@/lib/api/utils'
+import { VehicleGridSkeleton, VehicleLoader } from '@/components/ui/VehicleLoader'
 import VehicleGallery from './VehicleGallery'
 
 export const runtime = 'edge'
@@ -72,18 +73,7 @@ function VehiclesPageContent() {
     loadVehicles()
   }, [searchParams])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading vehicles...</p>
-        </div>
-      </div>
-    )
-  }
-
-  return <VehicleGallery vehicles={vehicles} />
+  return <VehicleGallery vehicles={vehicles} loading={loading} />
 }
 
 export default function VehiclesPage() {
