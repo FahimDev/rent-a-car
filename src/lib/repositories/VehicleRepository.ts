@@ -239,6 +239,7 @@ export class VehicleRepository extends BaseRepository {
              ) as photos_json
       FROM vehicles v
       LEFT JOIN vehicle_photos vp ON v.id = vp.vehicleId
+      WHERE v.id != 'pending-assignment'
       GROUP BY v.id
       ORDER BY v.createdAt DESC
     `

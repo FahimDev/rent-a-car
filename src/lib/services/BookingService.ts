@@ -3,6 +3,7 @@ import { PassengerRepository } from '../repositories/PassengerRepository'
 import { VehicleRepository } from '../repositories/VehicleRepository'
 import { Booking, Passenger, BookingFormData } from '@/types'
 import { formatPhoneNumber, validatePhoneNumber } from '@/lib/utils'
+import { maskPassengerData } from '@/lib/utils/masking'
 
 /**
  * Booking Service
@@ -290,5 +291,72 @@ export class BookingService {
    */
   async getBookingsByVehicleId(vehicleId: string): Promise<Booking[]> {
     return this.bookingRepository.findByVehicleId(vehicleId)
+  }
+
+  /**
+   * Get booking by ID with masked passenger data (for public access)
+   */
+  async getBookingByIdMasked(id: string): Promise<Booking | null> {
+    const booking = await this.bookingRepository.findById(id)
+    if (!booking) return null
+
+    // Mask passenger data if passenger exists
+    if (booking.passenger) {
+      booking.passenger = {
+        ...booking.passenger,
+        name: maskPassengerData(booking.passenger).name,
+        phone: maskPassengerData(booking.passenger).phone,
+        email: maskPassengerData(booking.passenger).email
+      }
+    }
+
+    return booking
+  }
+
+  /**
+   * Get bookings by passenger ID with masked passenger data (for public access)
+   */
+  async getBookingsByPassengerIdMasked(passengerId: string): Promise<Booking[]> {
+    const bookings = await this.bookingRepository.findByPassengerId(passengerId)
+    
+    return bookings.map(booking => {
+      if (booking.passenger) {
+        booking.passenger = {
+          ...booking.passenger,
+          name: maskPassengerData(booking.passenger).name,
+          phone: maskPassengerData(booking.passenger).phone,
+          email: maskPassengerData(booking.passenger).email
+        }
+      }
+      return booking
+    })
+  }
+
+  /**
+   * Get all bookings with masked passenger data (for public access)
+   */
+  async getAllBookingsMasked(options: {
+    page?: number
+    limit?: number
+    status?: string
+  } = {}): Promise<{ bookings: Booking[], total: number }> {
+    const { bookings, total } = await this.bookingRepository.findAll(options)
+    
+    const maskedBookings = bookings.map(booking => {
+      if (booking.passenger) {
+        booking.passenger = {
+          ...booking.passenger,
+          name: maskPassengerData(booking.passenger).name,
+          phone: maskPassengerData(booking.passenger).phone,
+          email: maskPassengerData(booking.passenger).email
+        }
+      }
+      return booking
+    })
+
+    return {
+      bookings: maskedBookings,
+      total
+    }
   }
 }

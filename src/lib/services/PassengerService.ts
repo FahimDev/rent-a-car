@@ -2,6 +2,7 @@ import { PassengerRepository } from '../repositories/PassengerRepository'
 import { BookingRepository } from '../repositories/BookingRepository'
 import { Passenger } from '@/types'
 import { formatPhoneNumber, validatePhoneNumber } from '@/lib/utils'
+import { maskPassengerData } from '@/lib/utils/masking'
 
 /**
  * Passenger Service
@@ -259,6 +260,60 @@ export class PassengerService {
     return {
       passengers: paginatedPassengers,
       total: filteredPassengers.length
+    }
+  }
+
+  /**
+   * Get passenger by ID with masked data (for public access)
+   */
+  async getPassengerByIdMasked(id: string): Promise<Passenger | null> {
+    const passenger = await this.passengerRepository.findById(id)
+    if (!passenger) return null
+
+    return {
+      ...passenger,
+      name: maskPassengerData(passenger).name,
+      phone: maskPassengerData(passenger).phone,
+      email: maskPassengerData(passenger).email
+    }
+  }
+
+  /**
+   * Get passenger by phone with masked data (for public access)
+   */
+  async getPassengerByPhoneMasked(phone: string): Promise<Passenger | null> {
+    const formattedPhone = formatPhoneNumber(phone)
+    const passenger = await this.passengerRepository.findByPhone(formattedPhone)
+    if (!passenger) return null
+
+    return {
+      ...passenger,
+      name: maskPassengerData(passenger).name,
+      phone: maskPassengerData(passenger).phone,
+      email: maskPassengerData(passenger).email
+    }
+  }
+
+  /**
+   * Get all passengers with masked data (for public access)
+   */
+  async getPassengersMasked(options: {
+    page?: number
+    limit?: number
+    isVerified?: boolean
+  } = {}): Promise<{ passengers: Passenger[], total: number }> {
+    const { passengers, total } = await this.passengerRepository.findAll(options)
+    
+    const maskedPassengers = passengers.map(passenger => ({
+      ...passenger,
+      name: maskPassengerData(passenger).name,
+      phone: maskPassengerData(passenger).phone,
+      email: maskPassengerData(passenger).email
+    }))
+
+    return {
+      passengers: maskedPassengers,
+      total
     }
   }
 }

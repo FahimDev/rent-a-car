@@ -40,8 +40,8 @@ export async function GET(
     // Get booking service
     const bookingService = ServiceFactory.getBookingService()
 
-    // Fetch booking using service layer
-    const booking = await bookingService.getBookingById(id)
+    // Fetch booking using service layer with masked passenger data (for public access)
+    const booking = await bookingService.getBookingByIdMasked(id)
 
     if (!booking) {
       const response = NextResponse.json(

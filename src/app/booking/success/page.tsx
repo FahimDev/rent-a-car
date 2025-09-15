@@ -27,6 +27,34 @@ interface SuccessPageProps {
   searchParams: Promise<{ id?: string }>
 }
 
+// Helper function to get company info (same as landing page)
+async function getCompanyInfo() {
+  const fallbackData = {
+    id: 'default',
+    name: 'Rent-A-Car Bangladesh',
+    tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
+    description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
+    phone: '+8801234567893',
+    email: 'info@rentacar.com',
+    whatsapp: '+8801234567893',
+    latitude: 23.8103,
+    longitude: 90.4125,
+    address: 'Dhaka, Bangladesh'
+  }
+
+  try {
+    const response = await api.company.getInfo()
+    
+    if (response.success && response.data) {
+      return response.data
+    }
+    
+    return fallbackData
+  } catch (error) {
+    return fallbackData
+  }
+}
+
 async function getBooking(id: string) {
   console.log('🚀 [BOOKING SUCCESS] Starting booking fetch...', { id })
   
@@ -61,34 +89,50 @@ async function getBooking(id: string) {
 function BookingSuccessPageContent() {
   const searchParams = useSearchParams()
   const [booking, setBooking] = useState<any>(null)
+  const [companyInfo, setCompanyInfo] = useState({
+    id: 'default',
+    name: 'Rent-A-Car Bangladesh',
+    tagline: 'আপনার যাত্রার জন্য নির্ভরযোগ্য পরিবহন | Reliable Transportation for Your Journey',
+    description: 'We provide premium car rental services across Bangladesh with professional drivers and well-maintained vehicles.',
+    phone: '+8801234567893',
+    email: 'info@rentacar.com',
+    whatsapp: '+8801234567893',
+    latitude: 23.8103,
+    longitude: 90.4125,
+    address: 'Dhaka, Bangladesh'
+  })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadBooking = async () => {
-      console.log('🚀 [BOOKING SUCCESS] useEffect - Loading booking...')
+    const loadData = async () => {
+      console.log('🚀 [BOOKING SUCCESS] useEffect - Loading data...')
       const id = searchParams?.get('id')
       
-      if (!id) {
-        console.log('🚀 [BOOKING SUCCESS] No booking ID provided')
-        setLoading(false)
-        return
-      }
-      
       try {
-        const bookingData = await getBooking(id)
-        console.log('🚀 [BOOKING SUCCESS] Booking loaded:', {
-          hasBooking: !!bookingData,
-          bookingId: bookingData?.id
-        })
-        setBooking(bookingData)
+        const [companyData, bookingData] = await Promise.all([
+          getCompanyInfo(),
+          id ? getBooking(id) : Promise.resolve(null)
+        ])
+        
+        setCompanyInfo(companyData)
+        
+        if (id) {
+          console.log('🚀 [BOOKING SUCCESS] Booking loaded:', {
+            hasBooking: !!bookingData,
+            bookingId: bookingData?.id
+          })
+          setBooking(bookingData)
+        } else {
+          console.log('🚀 [BOOKING SUCCESS] No booking ID provided')
+        }
       } catch (error) {
-        console.error('🚀 [BOOKING SUCCESS] Error loading booking:', error)
+        console.error('🚀 [BOOKING SUCCESS] Error loading data:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    loadBooking()
+    loadData()
   }, [searchParams])
 
   if (loading) {
@@ -160,7 +204,7 @@ function BookingSuccessPageContent() {
                 Booking Confirmed! 🎉
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                Thank you for choosing Rent-A-Car Bangladesh. Your booking has been successfully created and we&apos;ll contact you soon.
+                Thank you for choosing {companyInfo.name}. Your booking has been successfully created and we&apos;ll contact you soon.
               </p>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p className="text-blue-800 font-medium">
@@ -267,7 +311,7 @@ function BookingSuccessPageContent() {
                     <Phone className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-sm text-gray-600">Phone</p>
-                      <p className="font-medium">{formatPhoneNumber(booking.passenger?.phone || '')}</p>
+                      <p className="font-medium">{booking.passenger?.phone || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -336,14 +380,14 @@ function BookingSuccessPageContent() {
                   <Phone className="h-5 w-5 text-primary-500" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <p className="text-sm text-gray-600">+8801234567890</p>
+                    <p className="text-sm text-gray-600">{companyInfo.phone}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <MessageCircle className="h-5 w-5 text-primary-500" />
                   <div>
                     <p className="font-medium">WhatsApp</p>
-                    <p className="text-sm text-gray-600">+8801234567890</p>
+                    <p className="text-sm text-gray-600">{companyInfo.whatsapp}</p>
                   </div>
                 </div>
               </div>
