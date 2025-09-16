@@ -28,7 +28,7 @@ export class PassengerRepository extends BaseRepository {
       passengerData.phone,
       passengerData.name || null,
       passengerData.email || null,
-      passengerData.isVerified || false,
+      passengerData.isVerified === true ? 1 : 0,
       now.toISOString(),
       now.toISOString()
     ])
@@ -133,7 +133,7 @@ export class PassengerRepository extends BaseRepository {
     }
     if (updateData.isVerified !== undefined) {
       fields.push(`isVerified = $${paramIndex}`)
-      values.push(updateData.isVerified)
+      values.push(updateData.isVerified === true ? 1 : 0)
       paramIndex++
     }
 
@@ -162,7 +162,7 @@ export class PassengerRepository extends BaseRepository {
       WHERE phone = $3
     `
     
-    const affectedRows = await this.update(sql, [isVerified, new Date().toISOString(), phone])
+    const affectedRows = await this.update(sql, [isVerified ? 1 : 0, new Date().toISOString(), phone])
     return affectedRows > 0
   }
 
@@ -219,7 +219,7 @@ export class PassengerRepository extends BaseRepository {
       phone: row.phone,
       name: row.name,
       email: row.email,
-      isVerified: Boolean(row.isVerified),
+      isVerified: row.isVerified === 1 || row.isVerified === true || row.isVerified === 'true' || row.isVerified === '1',
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt)
     }

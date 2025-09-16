@@ -284,31 +284,71 @@ export default function AdminBookings() {
         )}
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
+          {/* Results info */}
+          <div className="text-sm text-gray-600">
+            Showing {bookings.length} bookings
+            {totalPages > 1 && (
+              <span className="ml-2">
+                (Page {currentPage} of {totalPages})
+              </span>
+            )}
+          </div>
+          
+          {/* Pagination controls */}
+          {totalPages > 1 && (
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
+                className="btn-mobile"
               >
                 Previous
               </Button>
-              <span className="text-sm text-gray-600">
-                Page {currentPage} of {totalPages}
-              </span>
+              <div className="flex items-center space-x-1">
+                {/* Page numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum
+                  if (totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+                  
+                  // Ensure pageNum is within valid range
+                  if (pageNum < 1 || pageNum > totalPages) return null
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNum)}
+                      className="btn-mobile w-8 h-8 p-0"
+                    >
+                      {pageNum}
+                    </Button>
+                  )
+                }).filter(Boolean)}
+              </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
+                className="btn-mobile"
               >
                 Next
               </Button>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

@@ -30,7 +30,10 @@ export async function GET(request: NextRequest) {
       bookings: result.bookings,
       total: result.total,
       page: page || 1,
-      limit: limit || 10
+      limit: limit || 10,
+      pagination: {
+        pages: Math.ceil((result.total || 0) / (limit || 10))
+      }
     })
     return withCORS(response)
   } catch (error) {
