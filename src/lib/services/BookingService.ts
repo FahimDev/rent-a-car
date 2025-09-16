@@ -92,6 +92,7 @@ export class BookingService {
    */
   async getBookings(options: {
     status?: string
+    passengerId?: string
     page?: number
     limit?: number
   } = {}): Promise<{ bookings: Booking[], total: number }> {

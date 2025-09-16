@@ -377,20 +377,28 @@ function BookingSuccessPageContent() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center space-x-3">
+                <a 
+                  href={`tel:${companyInfo.phone}`}
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   <Phone className="h-5 w-5 text-primary-500" />
                   <div>
                     <p className="font-medium">Phone</p>
                     <p className="text-sm text-gray-600">{companyInfo.phone}</p>
                   </div>
-                </div>
-                <div className="flex items-center space-x-3">
+                </a>
+                <a 
+                  href={`https://wa.me/${companyInfo.whatsapp?.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   <MessageCircle className="h-5 w-5 text-primary-500" />
                   <div>
                     <p className="font-medium">WhatsApp</p>
                     <p className="text-sm text-gray-600">{companyInfo.whatsapp}</p>
                   </div>
-                </div>
+                </a>
               </div>
             </CardContent>
           </Card>

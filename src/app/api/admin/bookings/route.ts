@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     // Get query parameters
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
+    const passengerId = searchParams.get('passengerId')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest) {
     // Get bookings with pagination
     const result = await bookingService.getBookings({ 
       status: status || undefined, 
+      passengerId: passengerId || undefined,
       page, 
       limit 
     })

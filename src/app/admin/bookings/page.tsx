@@ -1,26 +1,29 @@
 'use client'
 export const runtime = "edge";
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { 
-  Calendar, 
-  Search, 
-  Filter, 
   ArrowLeft,
-  Phone,
-  MessageCircle,
-  Eye,
+  Calendar,
   Clock,
   MapPin,
   Car,
-  User
+  User,
+  Phone,
+  Mail,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Search,
+  Filter
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { api } from '@/lib/api/utils'
+import { getCountryFromPhone } from '@/lib/countryUtils'
 
 interface Booking {
   id: string
@@ -37,12 +40,12 @@ interface Booking {
     name: string
     phone: string
     email?: string
+    isVerified: boolean
   }
   vehicle: {
     id: string
     name: string
     type: string
-    capacity: number
   }
 }
 
@@ -55,30 +58,32 @@ interface BookingsApiResponse {
 
 export default function AdminBookings() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [passengerId, setPassengerId] = useState<string | null>(null)
 
   const fetchBookings = useCallback(async () => {
     try {
       const data = await api.admin.getBookings({
         page: currentPage,
         limit: 10,
-        status: statusFilter !== 'all' ? statusFilter : undefined
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        passengerId: passengerId || undefined
       })
 
       setBookings(data.bookings || [])
       setTotalPages(data.pagination?.pages || 1)
     } catch (error) {
-      console.error('Error fetching bookings:', error)
       toast.error('Failed to load bookings')
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, statusFilter])
+  }, [currentPage, statusFilter, passengerId])
 
   useEffect(() => {
     // Check if admin is logged in
@@ -88,8 +93,14 @@ export default function AdminBookings() {
       return
     }
 
+    // Get passenger ID from URL params
+    const passengerParam = searchParams?.get('passenger')
+    if (passengerParam) {
+      setPassengerId(passengerParam)
+    }
+
     fetchBookings()
-  }, [router, currentPage, statusFilter, fetchBookings])
+  }, [router, currentPage, statusFilter, passengerId, fetchBookings, searchParams])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-BD', {
@@ -109,11 +120,18 @@ export default function AdminBookings() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'confirmed': return 'bg-green-100 text-green-800'
-      case 'completed': return 'bg-blue-100 text-blue-800'
-      case 'cancelled': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'completed':
+        return 'bg-green-100 text-green-800'
+      case 'confirmed':
+        return 'bg-blue-100 text-blue-800'
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'fake':
+        return 'bg-orange-100 text-orange-800'
+      case 'cancelled':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
@@ -121,8 +139,10 @@ export default function AdminBookings() {
     const matchesSearch = 
       booking.passenger.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.passenger.phone.includes(searchTerm) ||
-      booking.vehicle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.pickupLocation.toLowerCase().includes(searchTerm.toLowerCase())
+      (booking.passenger.email && booking.passenger.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.pickupLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (booking.dropoffLocation && booking.dropoffLocation.toLowerCase().includes(searchTerm.toLowerCase()))
     
     return matchesSearch
   })
@@ -145,15 +165,19 @@ export default function AdminBookings() {
         <div className="container-mobile py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link href="/admin/dashboard">
+              <Link href={passengerId ? "/admin/passengers" : "/admin/dashboard"}>
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
+                  Back to {passengerId ? "Passengers" : "Dashboard"}
                 </Button>
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Booking Management</h1>
-                <p className="text-sm text-gray-600">View and manage all bookings</p>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {passengerId ? "Passenger Bookings" : "All Bookings"}
+                </h1>
+                <p className="text-sm text-gray-600">
+                  {passengerId ? "View all bookings for this passenger" : "View and manage all bookings"}
+                </p>
               </div>
             </div>
           </div>
@@ -168,7 +192,7 @@ export default function AdminBookings() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search bookings by passenger, vehicle, or location..."
+                  placeholder="Search bookings by passenger, phone, email, ID, or location..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -187,6 +211,7 @@ export default function AdminBookings() {
                 <option value="confirmed">Confirmed</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
+                <option value="fake">Fake Booking</option>
               </select>
             </div>
           </div>
@@ -195,78 +220,122 @@ export default function AdminBookings() {
         {/* Bookings List */}
         {filteredBookings.length > 0 ? (
           <div className="space-y-4">
-            {filteredBookings.map((booking) => (
-              <Card key={booking.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <h3 className="font-semibold text-lg text-gray-900">
-                          {booking.passenger.name}
-                        </h3>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
-                          {booking.status}
-                        </span>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-2" />
-                          <span>{formatDate(booking.bookingDate)}</span>
+            {filteredBookings.map((booking) => {
+              const country = getCountryFromPhone(booking.passenger.phone)
+              return (
+                <Card key={booking.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <h3 className="font-semibold text-lg text-gray-900">
+                            Booking #{booking.id}
+                          </h3>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                            {booking.status}
+                          </span>
+                          {booking.notes && (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              Has Notes
+                            </span>
+                          )}
                         </div>
-                        <div className="flex items-center">
-                          <Clock className="h-4 w-4 mr-2" />
-                          <span>{formatTime(booking.pickupTime)}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Car className="h-4 w-4 mr-2" />
-                          <span>{booking.vehicle.name}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-2" />
-                          <span className="truncate">{booking.pickupLocation}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-3 text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <User className="h-4 w-4 mr-2" />
-                          <span>{booking.passenger.phone}</span>
-                        </div>
-                        {booking.dropoffLocation && (
-                          <div className="mt-1">
-                            <span className="font-medium">Drop-off:</span> {booking.dropoffLocation}
+
+                        {/* Passenger Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-600 mb-2">Passenger Information</h4>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <User className="h-4 w-4 text-gray-400" />
+                                <span className="text-sm">{booking.passenger.name}</span>
+                                {booking.passenger.isVerified ? (
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-red-500" />
+                                )}
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Phone className="h-4 w-4 text-gray-400" />
+                                <span className="text-sm">{booking.passenger.phone}</span>
+                                {country && (
+                                  <div className="flex items-center space-x-1 px-2 py-1 bg-blue-50 border border-blue-200 rounded-md">
+                                    <span className="text-sm">{country.flag}</span>
+                                    <span className="text-xs font-medium text-blue-700">{country.name}</span>
+                                  </div>
+                                )}
+                              </div>
+                              {booking.passenger.email && (
+                                <div className="flex items-center space-x-2">
+                                  <Mail className="h-4 w-4 text-gray-400" />
+                                  <span className="text-sm">{booking.passenger.email}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        )}
+
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-600 mb-2">Booking Details</h4>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <Calendar className="h-4 w-4 text-gray-400" />
+                                <span className="text-sm">{formatDate(booking.bookingDate)}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Clock className="h-4 w-4 text-gray-400" />
+                                <span className="text-sm">{formatTime(booking.pickupTime)}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <MapPin className="h-4 w-4 text-gray-400" />
+                                <span className="text-sm">{booking.pickupLocation}</span>
+                              </div>
+                              {booking.dropoffLocation && (
+                                <div className="flex items-center space-x-2">
+                                  <MapPin className="h-4 w-4 text-gray-400" />
+                                  <span className="text-sm">{booking.dropoffLocation}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center space-x-2">
+                                <Car className="h-4 w-4 text-gray-400" />
+                                <span className="text-sm">{booking.vehicle.name} ({booking.vehicle.type})</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Notes */}
                         {booking.notes && (
-                          <div className="mt-1">
-                            <span className="font-medium">Notes:</span> {booking.notes}
+                          <div className="mb-4">
+                            <h4 className="text-sm font-medium text-gray-600 mb-2">Notes</h4>
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                              <p className="text-sm text-gray-700">{booking.notes}</p>
+                            </div>
                           </div>
                         )}
+
+                        {/* Trip Type */}
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium">Trip Type:</span> {booking.tripType} trip
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 ml-4">
+                        <Link href={`/admin/bookings/${booking.id}`}>
+                          <Button variant="outline" size="sm">
+                            View Details
+                          </Button>
+                        </Link>
+                        <a href={`tel:${booking.passenger.phone}`}>
+                          <Button variant="outline" size="sm">
+                            <Phone className="h-4 w-4" />
+                          </Button>
+                        </a>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center space-x-2 ml-4">
-                      <Link href={`/admin/bookings/${booking.id}`}>
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                      <a href={`tel:${booking.passenger.phone}`}>
-                        <Button variant="outline" size="sm">
-                          <Phone className="h-4 w-4" />
-                        </Button>
-                      </a>
-                      <a href={`https://wa.me/${booking.passenger.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer">
-                        <Button variant="outline" size="sm">
-                          <MessageCircle className="h-4 w-4" />
-                        </Button>
-                      </a>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         ) : (
           <div className="text-center py-12">
@@ -277,7 +346,7 @@ export default function AdminBookings() {
             <p className="text-gray-600">
               {searchTerm || statusFilter !== 'all' 
                 ? 'Try adjusting your search or filter criteria.'
-                : 'Bookings will appear here once customers start making reservations.'
+                : 'Bookings will appear here once passengers start making reservations.'
               }
             </p>
           </div>

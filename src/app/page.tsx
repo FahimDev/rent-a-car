@@ -16,7 +16,10 @@ import {
   Users,
   Star,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Menu,
+  FileText,
+  X
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -82,6 +85,7 @@ export default function HomePage() {
   
   const [vehicles, setVehicles] = useState<any[]>([])
   const [vehiclesLoading, setVehiclesLoading] = useState(true)
+  const [showNavMenu, setShowNavMenu] = useState(false)
   const [companyLoading, setCompanyLoading] = useState(true)
 
   useEffect(() => {
@@ -174,22 +178,32 @@ export default function HomePage() {
       <header className="absolute top-0 left-0 right-0 z-50 p-4">
         <div className="container-mobile">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              {/* Logo only visible on desktop */}
-              <div className="hidden sm:block w-20 h-20">
-                <img 
-                  src="/logo.webp" 
-                  alt="Rent-A-Car Bangladesh Logo" 
-                  className="w-full h-full object-contain drop-shadow-lg"
-                />
-              </div>
-              <div className="text-white/90 text-sm sm:text-lg font-semibold hidden sm:block">
-                {companyInfo.name}
-              </div>
-              {/* Mobile: Show company name only */}
-              <div className="sm:hidden text-white/90 text-sm font-semibold">
-                {companyInfo.name}
-              </div>
+            <div className="flex items-center">
+              {/* Desktop: Clickable Logo for Navigation */}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="hidden sm:block p-0 hover:bg-white/10 rounded-lg"
+                onClick={() => setShowNavMenu(true)}
+              >
+                <div className="w-20 h-20">
+                  <img 
+                    src="/logo.webp" 
+                    alt="Rent-A-Car Bangladesh Logo" 
+                    className="w-full h-full object-contain drop-shadow-lg"
+                  />
+                </div>
+              </Button>
+              
+              {/* Mobile: Navigation Menu Icon positioned more to the left */}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="sm:hidden text-white/80 hover:text-white hover:bg-white/10 p-2 -ml-2"
+                onClick={() => setShowNavMenu(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
             </div>
             <Link href="/admin/login">
               <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10 text-xs sm:text-sm">
@@ -387,27 +401,38 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
+            <a 
+              href={`tel:${companyInfo.phone}`}
+              className="text-center p-6 rounded-lg hover:bg-white/10 transition-colors group"
+            >
               <div className="flex justify-center mb-4">
-                <Phone className="h-8 w-8" />
+                <Phone className="h-8 w-8 group-hover:scale-110 transition-transform" />
               </div>
               <h3 className="font-semibold mb-2">Phone</h3>
               <p className="opacity-90">{companyInfo.phone}</p>
-            </div>
-            <div className="text-center">
+            </a>
+            <a 
+              href={`mailto:${companyInfo.email}`}
+              className="text-center p-6 rounded-lg hover:bg-white/10 transition-colors group"
+            >
               <div className="flex justify-center mb-4">
-                <Mail className="h-8 w-8" />
+                <Mail className="h-8 w-8 group-hover:scale-110 transition-transform" />
               </div>
               <h3 className="font-semibold mb-2">Email</h3>
               <p className="opacity-90">{companyInfo.email}</p>
-            </div>
-            <div className="text-center">
+            </a>
+            <a 
+              href={`https://wa.me/${companyInfo.whatsapp?.replace(/\D/g, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center p-6 rounded-lg hover:bg-white/10 transition-colors group"
+            >
               <div className="flex justify-center mb-4">
-                <MessageCircle className="h-8 w-8" />
+                <MessageCircle className="h-8 w-8 group-hover:scale-110 transition-transform" />
               </div>
               <h3 className="font-semibold mb-2">WhatsApp</h3>
               <p className="opacity-90">{companyInfo.whatsapp}</p>
-            </div>
+            </a>
           </div>
         </div>
       </section>
@@ -522,6 +547,121 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Side Navigation Bar */}
+      <div className={`fixed inset-0 z-50 transition-all duration-300 ease-in-out ${showNavMenu ? 'visible' : 'invisible'}`}>
+        {/* Backdrop */}
+        <div 
+          className={`absolute inset-0 bg-black transition-opacity duration-300 ${showNavMenu ? 'opacity-50' : 'opacity-0'}`}
+          onClick={() => setShowNavMenu(false)}
+        />
+        
+        {/* Side Navbar */}
+        <div className={`absolute left-0 top-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${showNavMenu ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Navigation</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowNavMenu(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="flex-1 p-6 overflow-y-auto">
+              <div className="space-y-2">
+                <Link href="/" onClick={() => setShowNavMenu(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-12 text-left">
+                    <Car className="h-5 w-5 mr-3" />
+                    <div>
+                      <div className="font-medium">Home</div>
+                      <div className="text-sm text-gray-500">Main page</div>
+                    </div>
+                  </Button>
+                </Link>
+                
+                <Link href="/vehicles" onClick={() => setShowNavMenu(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-12 text-left">
+                    <Car className="h-5 w-5 mr-3" />
+                    <div>
+                      <div className="font-medium">Our Vehicles</div>
+                      <div className="text-sm text-gray-500">Browse fleet</div>
+                    </div>
+                  </Button>
+                </Link>
+                
+                <Link href="/booking" onClick={() => setShowNavMenu(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-12 text-left">
+                    <Clock className="h-5 w-5 mr-3" />
+                    <div>
+                      <div className="font-medium">Book Now</div>
+                      <div className="text-sm text-gray-500">Make reservation</div>
+                    </div>
+                  </Button>
+                </Link>
+                
+                <Link href="/terms" onClick={() => setShowNavMenu(false)}>
+                  <Button variant="ghost" className="w-full justify-start h-12 text-left">
+                    <FileText className="h-5 w-5 mr-3" />
+                    <div>
+                      <div className="font-medium">Terms & Conditions</div>
+                      <div className="text-sm text-gray-500">Legal information</div>
+                    </div>
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Coming Soon Section */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <p className="text-sm text-gray-500 mb-4 font-medium">Coming Soon</p>
+                <div className="space-y-2">
+                  <Button variant="ghost" className="w-full justify-start h-12 text-left text-gray-400" disabled>
+                    <FileText className="h-5 w-5 mr-3" />
+                    <div>
+                      <div className="font-medium">Privacy Policy</div>
+                      <div className="text-sm text-gray-400">Data protection</div>
+                    </div>
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start h-12 text-left text-gray-400" disabled>
+                    <Users className="h-5 w-5 mr-3" />
+                    <div>
+                      <div className="font-medium">About Us</div>
+                      <div className="text-sm text-gray-400">Our story</div>
+                    </div>
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start h-12 text-left text-gray-400" disabled>
+                    <MessageCircle className="h-5 w-5 mr-3" />
+                    <div>
+                      <div className="font-medium">Contact</div>
+                      <div className="text-sm text-gray-400">Get in touch</div>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-200 bg-gray-50">
+              <div className="text-center">
+                <div className="w-12 h-12 mx-auto mb-3">
+                  <img 
+                    src="/logo.webp" 
+                    alt={`${companyInfo.name} Logo`} 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <p className="text-sm text-gray-600 font-medium">{companyInfo.name}</p>
+                <p className="text-xs text-gray-500">{companyInfo.tagline?.split('|')[1]?.trim() || 'Reliable Transportation'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

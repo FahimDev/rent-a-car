@@ -33,6 +33,7 @@ interface Passenger {
     id: string
     bookingDate: string
     status: string
+    notes?: string
     vehicle: {
       name: string
       type: string
@@ -242,28 +243,45 @@ export default function AdminPassengers() {
                       {passenger.bookings.length > 0 && (
                         <div>
                           <h4 className="text-sm font-medium text-gray-900 mb-2">Recent Bookings:</h4>
-                          <div className="space-y-1">
+                          <div className="space-y-2">
                             {passenger.bookings.slice(0, 3).map((booking) => (
-                              <div key={booking.id} className="flex items-center justify-between text-sm">
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-gray-600">{formatDate(booking.bookingDate)}</span>
-                                  <span className="text-gray-500">•</span>
-                                  <span className="text-gray-600">{booking.vehicle.name}</span>
+                              <Link 
+                                key={booking.id} 
+                                href={`/admin/bookings/${booking.id}`}
+                                className="block p-2 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+                              >
+                                <div className="flex items-center justify-between text-sm">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-gray-600">{formatDate(booking.bookingDate)}</span>
+                                    <span className="text-gray-500">•</span>
+                                    <span className="text-gray-600">{booking.vehicle.name}</span>
+                                  </div>
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    booking.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                    booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                                    booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                    booking.status === 'fake' ? 'bg-orange-100 text-orange-800' :
+                                    'bg-red-100 text-red-800'
+                                  }`}>
+                                    {booking.status}
+                                  </span>
                                 </div>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  booking.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                  booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
-                                  booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-red-100 text-red-800'
-                                }`}>
-                                  {booking.status}
-                                </span>
-                              </div>
+                                {booking.notes && (
+                                  <div className="mt-1 text-xs text-gray-500">
+                                    <span className="font-medium">Notes:</span> {booking.notes}
+                                  </div>
+                                )}
+                              </Link>
                             ))}
                             {passenger.bookings.length > 3 && (
-                              <p className="text-xs text-gray-500">
-                                +{passenger.bookings.length - 3} more booking{passenger.bookings.length - 3 !== 1 ? 's' : ''}
-                              </p>
+                              <Link 
+                                href={`/admin/bookings?passenger=${passenger.id}`}
+                                className="block p-2 rounded-lg border border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors text-center"
+                              >
+                                <p className="text-xs text-gray-500">
+                                  +{passenger.bookings.length - 3} more booking{passenger.bookings.length - 3 !== 1 ? 's' : ''} (click to view all)
+                                </p>
+                              </Link>
                             )}
                           </div>
                         </div>

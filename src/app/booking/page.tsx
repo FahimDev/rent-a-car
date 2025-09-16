@@ -20,8 +20,11 @@ import {
   Navigation
 } from 'lucide-react'
 import Link from 'next/link'
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+import './phone-input.css'
 import { VEHICLE_TYPES } from '@/types'
-import { formatDate, formatTime, validatePhoneNumber, formatPhoneNumber } from '@/lib/utils'
+import { formatDate, formatTime, validatePhoneNumber, formatPhoneNumber, getPhoneValidationMessage } from '@/lib/utils'
 import { api } from '@/lib/api/utils'
 import { LocationPinLoader, SimpleLocationPinLoader } from '@/components/ui/LocationPinLoader'
 
@@ -166,7 +169,8 @@ function BookingPageContent() {
         if (!formData.passengerPhone) {
           newErrors.passengerPhone = 'Phone number is required'
         } else if (!validatePhoneNumber(formData.passengerPhone)) {
-          newErrors.passengerPhone = 'Please enter a valid phone number'
+          const validationMessage = getPhoneValidationMessage(formData.passengerPhone)
+          newErrors.passengerPhone = validationMessage || 'Please enter a valid phone number'
         }
         if (formData.passengerEmail && !/\S+@\S+\.\S+/.test(formData.passengerEmail)) {
           newErrors.passengerEmail = 'Please enter a valid email address'
@@ -219,12 +223,9 @@ function BookingPageContent() {
     setIsSubmitting(true)
     
     try {
-      // Format phone number
-      const formattedPhone = formatPhoneNumber(formData.passengerPhone)
-      
+      // Phone number is already formatted by react-phone-input-2
       const bookingData = {
         ...formData,
-        passengerPhone: formattedPhone,
         bookingDate: new Date(formData.bookingDate).toISOString(),
         // If no vehicle is selected, use a placeholder for admin assignment
         vehicleId: formData.vehicleId || 'pending-assignment'
@@ -535,17 +536,36 @@ function BookingPageContent() {
                     </div>
                     <div>
                       <Label htmlFor="passengerPhone">Phone Number *</Label>
-                      <Input
-                        id="passengerPhone"
-                        type="tel"
-                        placeholder="+8801234567890"
-                        value={formData.passengerPhone}
-                        onChange={(e) => handleInputChange('passengerPhone', e.target.value)}
-                        className="input-mobile"
-                        disabled={isSubmitting}
-                      />
+                      <div className="relative">
+                        <PhoneInput
+                          country={'bd'}
+                          value={formData.passengerPhone}
+                          onChange={(value) => handleInputChange('passengerPhone', value)}
+                          placeholder="Enter phone number"
+                          disabled={isSubmitting}
+                          enableSearch={true}
+                          searchPlaceholder="Search countries..."
+                          preferredCountries={['bd', 'us', 'gb', 'in', 'au', 'ca']}
+                          onlyCountries={['bd', 'us', 'gb', 'in', 'au', 'ca', 'de', 'fr', 'it', 'es', 'jp', 'kr', 'cn', 'sg', 'my', 'th', 'id', 'ph', 'vn', 'ae', 'sa', 'eg', 'za', 'ng', 'ke', 'gh', 'ma', 'dz', 'tn', 'ly', 'sd', 'et', 'ug', 'tz', 'rw', 'bi', 'mw', 'zm', 'zw', 'bw', 'na', 'sz', 'ls', 'mg', 'mu', 'sc', 'km', 'dj', 'so', 'er', 'ss', 'cf', 'td', 'ne', 'ml', 'bf', 'ci', 'lr', 'sl', 'gn', 'gw', 'gm', 'sn', 'mr', 'cv', 'st', 'gq', 'ga', 'cg', 'cd', 'ao', 'cm']}
+                          disableCountryCode={false}
+                          disableDropdown={false}
+                          countryCodeEditable={false}
+                        />
+                        {/* Bangladesh indicator */}
+                        {formData.passengerPhone.startsWith('+880') && (
+                          <div className="absolute -top-6 right-0 text-xs text-blue-600 font-medium">
+                            🇧🇩 Bangladesh
+                          </div>
+                        )}
+                      </div>
                       {errors.passengerPhone && (
                         <p className="text-sm text-red-600 mt-1">{errors.passengerPhone}</p>
+                      )}
+                      {/* Help text for Bangladesh */}
+                      {formData.passengerPhone.startsWith('+880') && !errors.passengerPhone && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Enter 10 digits starting with 1 (e.g., 1712345678)
+                        </p>
                       )}
                     </div>
                     <div>
@@ -598,7 +618,7 @@ function BookingPageContent() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Phone:</span>
-                          <span className="font-medium">{formatPhoneNumber(formData.passengerPhone)}</span>
+                          <span className="font-medium">{formData.passengerPhone}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Vehicle:</span>

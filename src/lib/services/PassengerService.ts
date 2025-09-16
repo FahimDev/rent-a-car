@@ -98,6 +98,7 @@ export class PassengerService {
             id: booking.id,
             bookingDate: booking.bookingDate,
             status: booking.status,
+            notes: booking.notes,
             vehicle: {
               name: booking.vehicle.name,
               type: booking.vehicle.type

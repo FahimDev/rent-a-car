@@ -23,8 +23,37 @@ export function formatPhoneNumber(phone: string): string {
 
 export function validatePhoneNumber(phone: string): boolean {
   const cleaned = phone.replace(/\D/g, '')
-  // Bangladesh phone number validation
-  return cleaned.length >= 10 && cleaned.length <= 15
+  
+  // Special validation for Bangladesh phone numbers
+  if (cleaned.startsWith('880')) {
+    // Bangladesh: +880 followed by 10 digits (total 13 digits)
+    // After removing +880, should have exactly 10 digits
+    const bdNumber = cleaned.substring(3) // Remove 880
+    return bdNumber.length === 10 && bdNumber.startsWith('1')
+  }
+  
+  // International phone number validation (7-15 digits)
+  return cleaned.length >= 7 && cleaned.length <= 15
+}
+
+export function getPhoneValidationMessage(phone: string): string {
+  const cleaned = phone.replace(/\D/g, '')
+  
+  // Special validation for Bangladesh phone numbers
+  if (cleaned.startsWith('880')) {
+    const bdNumber = cleaned.substring(3) // Remove 880
+    if (bdNumber.length < 10) {
+      return 'Bangladesh phone number must have 10 digits after the country code'
+    }
+    if (bdNumber.length > 10) {
+      return 'Bangladesh phone number should have exactly 10 digits after the country code'
+    }
+    if (!bdNumber.startsWith('1')) {
+      return 'Bangladesh mobile numbers should start with 1'
+    }
+  }
+  
+  return ''
 }
 
 export function generateBookingReference(): string {

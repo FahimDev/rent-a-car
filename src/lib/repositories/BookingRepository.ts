@@ -83,18 +83,31 @@ export class BookingRepository extends BaseRepository {
    */
   async findAll(options: {
     status?: string
+    passengerId?: string
     page?: number
     limit?: number
   } = {}): Promise<{ bookings: Booking[], total: number }> {
-    const { status, page = 1, limit = 10 } = options
+    const { status, passengerId, page = 1, limit = 10 } = options
     const offset = (page - 1) * limit
 
     let whereClause = ''
     let params: any[] = []
+    let paramCount = 0
 
     if (status) {
       whereClause = 'WHERE b.status = $1'
       params.push(status)
+      paramCount++
+    }
+
+    if (passengerId) {
+      if (whereClause) {
+        whereClause += ' AND b.passengerId = $' + (paramCount + 1)
+      } else {
+        whereClause = 'WHERE b.passengerId = $1'
+      }
+      params.push(passengerId)
+      paramCount++
     }
 
     const sql = `

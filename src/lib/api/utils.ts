@@ -144,10 +144,11 @@ export const api = {
       })
     },
 
-    async getBookings(filters?: { status?: string; page?: number; limit?: number }): Promise<{ bookings: any[]; pagination: any }> {
+    async getBookings(filters?: { status?: string; passengerId?: string; page?: number; limit?: number }): Promise<{ bookings: any[]; pagination: any }> {
       const token = localStorage.getItem('adminToken')
       const params = new URLSearchParams()
       if (filters?.status) params.append('status', filters.status)
+      if (filters?.passengerId) params.append('passengerId', filters.passengerId)
       if (filters?.page) params.append('page', filters.page.toString())
       if (filters?.limit) params.append('limit', filters.limit.toString())
       

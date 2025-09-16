@@ -29,6 +29,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { api } from '@/lib/api/utils'
+import { getCountryFromPhone } from '@/lib/countryUtils'
 
 interface Booking {
   id: string
@@ -289,6 +290,15 @@ export default function BookingDetail() {
                   </div>
                 </Button>
               </a>
+              {(() => {
+                const country = getCountryFromPhone(booking.passenger.phone)
+                return country ? (
+                  <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-md">
+                    <span className="text-sm">{country.flag}</span>
+                    <span className="text-xs font-medium text-gray-700 hidden sm:inline">{country.name}</span>
+                  </div>
+                ) : null
+              })()}
             </div>
           </div>
         </div>
@@ -361,8 +371,27 @@ export default function BookingDetail() {
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-gray-600">Phone</Label>
-                    <p className="text-base sm:text-lg font-semibold">{booking.passenger.phone}</p>
+                    <div className="flex items-center space-x-2">
+                      <p className="text-base sm:text-lg font-semibold">{booking.passenger.phone}</p>
+                    </div>
                   </div>
+                  {(() => {
+                    const country = getCountryFromPhone(booking.passenger.phone)
+                    return country ? (
+                      <div className="sm:col-span-2">
+                        <Label className="text-sm font-medium text-gray-600">Country Information</Label>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <div className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                            <span className="text-2xl">{country.flag}</span>
+                            <div>
+                              <p className="text-sm font-semibold text-gray-900">{country.name}</p>
+                              <p className="text-xs text-gray-600">Country Code: {country.code}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null
+                  })()}
                   {booking.passenger.email && (
                     <div className="sm:col-span-2">
                       <Label className="text-sm font-medium text-gray-600">Email</Label>
