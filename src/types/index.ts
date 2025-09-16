@@ -42,7 +42,7 @@ export interface Booking {
   tripType: 'single' | 'round'
   pickupLocation: string
   dropoffLocation?: string
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'fake'
   notes?: string
   createdAt: Date
   updatedAt: Date

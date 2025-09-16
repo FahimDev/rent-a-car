@@ -256,12 +256,13 @@ function BookingSuccessPageContent() {
                     <p className="text-sm text-gray-600 mb-1">Pickup Location</p>
                     <p className="font-medium">{booking.pickupLocation}</p>
                   </div>
-                  {booking.dropoffLocation && (
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Drop-off Location</p>
-                      <p className="font-medium">{booking.dropoffLocation}</p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Drop-off Location</p>
+                    <p className="font-medium">
+                      {booking.dropoffLocation || 
+                       (booking.tripType === 'single' ? 'To be determined' : 'Not specified')}
+                    </p>
+                  </div>
                 </div>
               </div>
 

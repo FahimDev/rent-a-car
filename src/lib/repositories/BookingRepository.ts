@@ -17,7 +17,7 @@ export class BookingRepository extends BaseRepository {
     tripType: 'single' | 'round'
     pickupLocation: string
     dropoffLocation?: string
-    status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+    status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'fake'
     notes?: string
   }): Promise<Booking> {
     const sql = `
@@ -164,7 +164,7 @@ export class BookingRepository extends BaseRepository {
   /**
    * Update booking status
    */
-  async updateStatus(id: string, status: 'pending' | 'confirmed' | 'completed' | 'cancelled'): Promise<boolean> {
+  async updateStatus(id: string, status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'fake'): Promise<boolean> {
     const sql = `
       UPDATE bookings 
       SET status = $1, updatedAt = $2
@@ -184,7 +184,7 @@ export class BookingRepository extends BaseRepository {
     tripType?: 'single' | 'round'
     pickupLocation?: string
     dropoffLocation?: string
-    status?: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+    status?: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'fake'
     notes?: string
   }): Promise<boolean> {
     const fields = []

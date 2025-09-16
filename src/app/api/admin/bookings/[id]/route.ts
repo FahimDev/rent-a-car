@@ -6,7 +6,7 @@ import { withCORS } from '@/lib/api/cors'
 export const runtime = 'edge'
 
 interface UpdateBookingRequest {
-  status?: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+  status?: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'fake'
   notes?: string
 }
 

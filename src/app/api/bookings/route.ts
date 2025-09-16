@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       pickupTime,
       tripType: tripType as 'single' | 'round',
       pickupLocation,
-      dropoffLocation: tripType === 'round' ? dropoffLocation : undefined,
+      dropoffLocation: dropoffLocation || undefined, // Both single and round trips can have drop-off location
       passengerName,
       passengerPhone,
       passengerEmail,

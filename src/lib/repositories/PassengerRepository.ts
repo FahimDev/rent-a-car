@@ -153,7 +153,7 @@ export class PassengerRepository extends BaseRepository {
   }
 
   /**
-   * Update passenger verification status
+   * Update passenger verification status by phone
    */
   async updateVerificationStatus(phone: string, isVerified: boolean): Promise<boolean> {
     const sql = `
@@ -163,6 +163,20 @@ export class PassengerRepository extends BaseRepository {
     `
     
     const affectedRows = await this.update(sql, [isVerified ? 1 : 0, new Date().toISOString(), phone])
+    return affectedRows > 0
+  }
+
+  /**
+   * Update passenger verification status by ID
+   */
+  async updateVerificationStatusById(id: string, isVerified: boolean): Promise<boolean> {
+    const sql = `
+      UPDATE passengers 
+      SET isVerified = $1, updatedAt = $2
+      WHERE id = $3
+    `
+    
+    const affectedRows = await this.update(sql, [isVerified ? 1 : 0, new Date().toISOString(), id])
     return affectedRows > 0
   }
 

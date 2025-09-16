@@ -136,7 +136,7 @@ export class BookingService {
     tripType?: 'single' | 'round'
     pickupLocation?: string
     dropoffLocation?: string
-    status?: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+    status?: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'fake'
     notes?: string
   }): Promise<Booking> {
     const booking = await this.bookingRepository.findById(id)
@@ -145,6 +145,28 @@ export class BookingService {
     }
 
     const updated = await this.bookingRepository.updateBooking(id, updateData)
+    
+    // If status is being changed to 'confirmed', automatically verify the passenger's phone number
+    if (updateData.status === 'confirmed' && booking.passenger) {
+      try {
+        await this.passengerRepository.updateVerificationStatusById(booking.passenger.id, true)
+        console.log(`✅ [BOOKING SERVICE] Auto-verified passenger ${booking.passenger.id} phone number for confirmed booking ${id}`)
+      } catch (error) {
+        console.error(`❌ [BOOKING SERVICE] Failed to auto-verify passenger phone number for booking ${id}:`, error)
+        // Don't throw error here - booking update should still succeed even if verification fails
+      }
+    }
+    
+    // If status is being changed to 'fake', automatically unverify the passenger's phone number
+    if (updateData.status === 'fake' && booking.passenger) {
+      try {
+        await this.passengerRepository.updateVerificationStatusById(booking.passenger.id, false)
+        console.log(`🚫 [BOOKING SERVICE] Auto-unverified passenger ${booking.passenger.id} phone number for fake booking ${id}`)
+      } catch (error) {
+        console.error(`❌ [BOOKING SERVICE] Failed to auto-unverify passenger phone number for booking ${id}:`, error)
+        // Don't throw error here - booking update should still succeed even if unverification fails
+      }
+    }
     
     // Return the updated booking (even if no changes were made, the booking still exists)
     return this.bookingRepository.findById(id) as Promise<Booking>
