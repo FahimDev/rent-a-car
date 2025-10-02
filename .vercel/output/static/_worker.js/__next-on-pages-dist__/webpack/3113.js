@@ -1,1 +1,0 @@
-var e={},d=(o,r,s)=>(e.__chunk_3113=(_,a,t)=>{"use strict";t.d(a,{A:()=>l});let l=(0,t(283).A)("mail",[["path",{d:"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7",key:"132q7q"}],["rect",{x:"2",y:"4",width:"20",height:"16",rx:"2",key:"izxlao"}]])},e);export{d as __getNamedExports};

@@ -3,6 +3,7 @@ import { BookingService } from './BookingService'
 import { PassengerService } from './PassengerService'
 import { AdminService } from './AdminService'
 import { AdminStatsService } from './AdminStatsService'
+import { WhatsAppNotificationService } from './WhatsAppNotificationService'
 import { VehicleRepository } from '../repositories/VehicleRepository'
 import { BookingRepository } from '../repositories/BookingRepository'
 import { PassengerRepository } from '../repositories/PassengerRepository'
@@ -19,6 +20,7 @@ export class ServiceFactory {
   private static passengerService: PassengerService | null = null
   private static adminService: AdminService | null = null
   private static adminStatsService: AdminStatsService | null = null
+  private static whatsappNotificationService: WhatsAppNotificationService | null = null
 
   /**
    * Get vehicle service instance (singleton)
@@ -82,6 +84,16 @@ export class ServiceFactory {
   }
 
   /**
+   * Get WhatsApp notification service instance (singleton)
+   */
+  static getWhatsAppNotificationService(): WhatsAppNotificationService {
+    if (!this.whatsappNotificationService) {
+      this.whatsappNotificationService = new WhatsAppNotificationService()
+    }
+    return this.whatsappNotificationService
+  }
+
+  /**
    * Reset services (useful for testing)
    */
   static reset(): void {
@@ -90,5 +102,6 @@ export class ServiceFactory {
     this.passengerService = null
     this.adminService = null
     this.adminStatsService = null
+    this.whatsappNotificationService = null
   }
 }

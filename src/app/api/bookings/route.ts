@@ -62,7 +62,8 @@ export async function POST(request: NextRequest) {
 
     // Send WhatsApp notification (if configured)
     try {
-      await sendWhatsAppNotification(booking)
+      const whatsappService = ServiceFactory.getWhatsAppNotificationService()
+      await whatsappService.sendBookingNotification(booking)
     } catch (error) {
       console.error('WhatsApp notification failed:', error)
       // Don't fail the booking if notification fails
@@ -133,61 +134,3 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function sendWhatsAppNotification(booking: any) {
-  const whatsappApiKey = process.env.WHATSAPP_API_KEY
-  const whatsappPhone = process.env.WHATSAPP_PHONE_NUMBER
-  const adminPhone = process.env.NEXT_PUBLIC_COMPANY_WHATSAPP
-
-  if (!whatsappApiKey || !whatsappPhone || !adminPhone) {
-    console.log('WhatsApp configuration missing, skipping notification')
-    return
-  }
-
-  const bookingUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/bookings/${booking.id}`
-  
-  const message = `🚗 *New Booking Received!*
-
-📋 *Booking Details:*
-• ID: ${booking.id}
-• Date: ${booking.bookingDate.toLocaleDateString()}
-• Time: ${booking.pickupTime}
-• Trip: ${booking.tripType === 'single' ? 'Single Trip' : 'Round Trip'}
-
-👤 *Passenger:*
-• Name: ${booking.passenger.name}
-• Phone: ${booking.passenger.phone}
-
-🚙 *Vehicle:*
-• ${booking.vehicle.name}
-• Type: ${booking.vehicle.type}
-• Capacity: ${booking.vehicle.capacity}
-
-📍 *Locations:*
-• Pickup: ${booking.pickupLocation}
-${booking.dropoffLocation ? `• Drop-off: ${booking.dropoffLocation}` : ''}
-
-🔗 View details: ${bookingUrl}`
-
-  try {
-    const response = await fetch(`https://api.whatsapp.com/send`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${whatsappApiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        to: adminPhone,
-        message: message
-      })
-    })
-
-    if (response.ok) {
-      console.log('WhatsApp notification sent successfully')
-      // Note: In a production system, you might want to log this to a database
-      // For now, we'll just log it to the console
-    }
-  } catch (error) {
-    console.error('WhatsApp API error:', error)
-    throw error
-  }
-}
