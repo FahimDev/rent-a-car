@@ -254,6 +254,133 @@ The application uses Cloudflare D1 (SQLite-compatible) with the following schema
 - **Company Info**: Company details for landing page
 - **Notifications**: WhatsApp notification tracking
 
+## 🗄️ Database Migration Guide
+
+### Remote Database Migration Process
+
+This guide documents how to apply database schema changes to your remote Cloudflare D1 database.
+
+#### Prerequisites
+- Wrangler CLI installed and authenticated
+- Database ID from your `wrangler.jsonc` configuration
+- SQL migration files ready
+
+#### Step-by-Step Migration Process
+
+1. **Create Migration File**
+   ```bash
+   # Create a new migration file
+   touch migrations/your_migration_name.sql
+   ```
+
+2. **Write SQL Migration**
+   ```sql
+   -- Example: Add new column
+   ALTER TABLE vehicles ADD COLUMN new_column TEXT;
+   
+   -- Example: Create index
+   CREATE INDEX idx_vehicles_new_column ON vehicles(new_column);
+   
+   -- Example: Update existing data
+   UPDATE vehicles SET new_column = 'default_value' WHERE new_column IS NULL;
+   ```
+
+3. **Apply Migration to Remote Database**
+   ```bash
+   # Apply migration to remote Cloudflare D1 database
+   wrangler d1 execute car-rental-db --remote --file=migrations/your_migration_name.sql
+   ```
+
+4. **Verify Migration Success**
+   ```bash
+   # Check table structure
+   wrangler d1 execute car-rental-db --remote --command="PRAGMA table_info(vehicles);"
+   
+   # Check indexes
+   wrangler d1 execute car-rental-db --remote --command="SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='vehicles';"
+   
+   # Verify data
+   wrangler d1 execute car-rental-db --remote --command="SELECT * FROM vehicles LIMIT 5;"
+   ```
+
+#### Common Migration Commands
+
+```bash
+# Apply single migration file
+wrangler d1 execute car-rental-db --remote --file=migrations/migration.sql
+
+# Execute single SQL command
+wrangler d1 execute car-rental-db --remote --command="ALTER TABLE vehicles ADD COLUMN test_column TEXT;"
+
+# Run multiple commands from file
+wrangler d1 execute car-rental-db --remote --file=migrations/complex_migration.sql
+
+# Check database schema
+wrangler d1 execute car-rental-db --remote --command=".schema"
+
+# List all tables
+wrangler d1 execute car-rental-db --remote --command="SELECT name FROM sqlite_master WHERE type='table';"
+```
+
+#### Migration Best Practices
+
+1. **Always backup before major changes**
+   ```bash
+   # Export current data (optional backup)
+   wrangler d1 export car-rental-db --output=backup-$(date +%Y%m%d).sql
+   ```
+
+2. **Test migrations locally first**
+   ```bash
+   # Test on local database first
+   wrangler d1 execute car-rental-db --file=migrations/your_migration.sql
+   ```
+
+3. **Use transactions for complex migrations**
+   ```sql
+   BEGIN TRANSACTION;
+   -- Your migration SQL here
+   COMMIT;
+   ```
+
+4. **Verify results after migration**
+   ```bash
+   # Check specific data
+   wrangler d1 execute car-rental-db --remote --command="SELECT COUNT(*) FROM vehicles;"
+   
+   # Check new columns
+   wrangler d1 execute car-rental-db --remote --command="SELECT id, name, new_column FROM vehicles LIMIT 3;"
+   ```
+
+#### Troubleshooting
+
+```bash
+# Check if database exists
+wrangler d1 list
+
+# Check database binding
+wrangler d1 info car-rental-db
+
+# View recent queries
+wrangler d1 execute car-rental-db --remote --command="SELECT * FROM sqlite_master WHERE type='table';"
+```
+
+#### Example: Adding Soft Delete Feature
+
+```bash
+# 1. Create migration file
+echo "-- Add soft delete functionality
+ALTER TABLE vehicles ADD COLUMN deletedAt TEXT;
+CREATE INDEX idx_vehicles_deleted_at ON vehicles(deletedAt);
+UPDATE vehicles SET deletedAt = NULL WHERE deletedAt IS NULL;" > migrations/add_soft_delete.sql
+
+# 2. Apply to remote database
+wrangler d1 execute car-rental-db --remote --file=migrations/add_soft_delete.sql
+
+# 3. Verify success
+wrangler d1 execute car-rental-db --remote --command="PRAGMA table_info(vehicles);"
+```
+
 ## 🤝 Contributing
 
 This project follows clean architecture principles. When contributing:

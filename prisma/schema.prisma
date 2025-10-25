@@ -25,17 +25,18 @@ model Admin {
 }
 
 model Vehicle {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
-  type        String   // "sedan", "noah", "hiace"
+  type        String    // "sedan", "noah", "hiace"
   capacity    Int
   pricePerDay Float
   description String?
-  features    String?  // JSON string of features
-  isAvailable Boolean  @default(true)
+  features    String?   // JSON string of features
+  isAvailable Boolean   @default(true)
   adminId     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   photos      VehiclePhoto[]
   bookings    Booking[]

@@ -225,7 +225,6 @@ export async function DELETE(
     
     // Get vehicle service
     const vehicleService = ServiceFactory.getVehicleService()
-    const bookingService = ServiceFactory.getBookingService()
     
     // Check if vehicle exists
     const vehicle = await vehicleService.getVehicleById(id)
@@ -234,32 +233,15 @@ export async function DELETE(
       return withCORS(response)
     }
 
-    // Check if vehicle has any bookings
-    const bookings = await bookingService.getBookingsByVehicleId(id)
-    if (bookings.length > 0) {
-      const response = NextResponse.json({ 
-        error: 'Cannot delete vehicle with existing bookings' 
-      }, { status: 400 })
-      return withCORS(response)
-    }
-
-    // Delete vehicle photos and files
-    if (vehicle.photos && vehicle.photos.length > 0) {
-      for (const photo of vehicle.photos) {
-        await deleteUploadedFile(photo.url)
-        await vehicleService.deleteVehiclePhoto(photo.id)
-      }
-    }
-
-    // Delete vehicle
-    const deleted = await vehicleService.deleteVehicle(id)
+    // Soft delete vehicle (this preserves booking records)
+    const deleted = await vehicleService.softDeleteVehicle(id)
     if (!deleted) {
       const response = NextResponse.json({ error: 'Failed to delete vehicle' }, { status: 500 })
       return withCORS(response)
     }
 
     const response = NextResponse.json({ 
-      message: 'Vehicle deleted successfully' 
+      message: 'Vehicle deleted successfully (soft delete - booking records preserved)' 
     })
     return withCORS(response)
   } catch (error) {

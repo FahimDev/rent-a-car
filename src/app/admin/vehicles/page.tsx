@@ -31,6 +31,7 @@ interface Vehicle {
   description: string
   features: string[]
   isAvailable: boolean
+  deletedAt?: string
   photos: {
     id: string
     url: string
@@ -290,7 +291,7 @@ export default function VehicleManagement() {
   }
 
   const handleDelete = async (vehicleId: string) => {
-    if (!confirm('Are you sure you want to delete this vehicle?')) return
+    if (!confirm('Are you sure you want to delete this vehicle? This will hide it from the dashboard but preserve booking records.')) return
 
     try {
       const token = localStorage.getItem('adminToken')
@@ -300,10 +301,23 @@ export default function VehicleManagement() {
       })
 
       if (response.ok) {
-        toast.success('Vehicle deleted successfully')
+        const result = await response.json()
+        toast.success(result.message || 'Vehicle deleted successfully (soft delete - booking records preserved)')
         fetchVehicles()
       } else {
-        toast.error('Failed to delete vehicle')
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Delete error:', errorData)
+        
+        // Handle specific error cases
+        if (errorData.error === 'Vehicle is already deleted') {
+          toast.error('This vehicle has already been deleted')
+          fetchVehicles() // Refresh the list to remove the deleted vehicle
+        } else if (errorData.error === 'Vehicle not found') {
+          toast.error('Vehicle not found - it may have been deleted')
+          fetchVehicles() // Refresh the list
+        } else {
+          toast.error(errorData.error || 'Failed to delete vehicle')
+        }
       }
     } catch (error) {
       console.error('Error deleting vehicle:', error)

@@ -202,20 +202,53 @@ export class VehicleService {
   }
 
   /**
-   * Delete vehicle
+   * Soft delete vehicle (recommended)
    */
-  async deleteVehicle(id: string): Promise<boolean> {
-    // Check if vehicle exists
-    const vehicle = await this.vehicleRepository.getVehicleById(id)
+  async softDeleteVehicle(id: string): Promise<boolean> {
+    // Check if vehicle exists (including soft-deleted ones)
+    const vehicle = await this.vehicleRepository.getVehicleById(id, true)
     if (!vehicle) {
       throw new Error('Vehicle not found')
     }
 
-    // Delete vehicle from repository
-    await this.vehicleRepository.deleteVehicle(id)
-    
-    // Verify deletion by trying to fetch the vehicle
-    const deletedVehicle = await this.vehicleRepository.getVehicleById(id)
-    return !deletedVehicle
+    // Check if already soft deleted
+    if (vehicle.deletedAt) {
+      throw new Error('Vehicle is already deleted')
+    }
+
+    // Soft delete vehicle from repository
+    return await this.vehicleRepository.softDeleteVehicle(id)
+  }
+
+  /**
+   * Hard delete vehicle (use with caution - only if no bookings exist)
+   */
+  async hardDeleteVehicle(id: string): Promise<boolean> {
+    // Check if vehicle exists (including soft-deleted ones)
+    const vehicle = await this.vehicleRepository.getVehicleById(id, true)
+    if (!vehicle) {
+      throw new Error('Vehicle not found')
+    }
+
+    // Hard delete vehicle from repository
+    return await this.vehicleRepository.hardDeleteVehicle(id)
+  }
+
+  /**
+   * Restore soft-deleted vehicle
+   */
+  async restoreVehicle(id: string): Promise<boolean> {
+    return await this.vehicleRepository.restoreVehicle(id)
+  }
+
+  /**
+   * Get vehicle by ID (including soft-deleted for booking records)
+   */
+  async getVehicleByIdForBooking(id: string): Promise<Vehicle | null> {
+    if (!id || id.trim() === '') {
+      throw new Error('Vehicle ID is required')
+    }
+
+    return this.vehicleRepository.getVehicleById(id, true) // includeDeleted = true
   }
 }

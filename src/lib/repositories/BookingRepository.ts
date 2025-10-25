@@ -49,7 +49,7 @@ export class BookingRepository extends BaseRepository {
   }
 
   /**
-   * Find booking by ID
+   * Find booking by ID (includes soft-deleted vehicles for historical records)
    */
   async findById(id: string): Promise<Booking | null> {
     const sql = `
@@ -62,6 +62,7 @@ export class BookingRepository extends BaseRepository {
         v.capacity as vehicle_capacity, v.pricePerDay as vehicle_pricePerDay,
         v.description as vehicle_description, v.features as vehicle_features,
         v.isAvailable as vehicle_isAvailable, v.adminId as vehicle_adminId,
+        v.deletedAt as vehicle_deletedAt,
         v.createdAt as vehicle_createdAt, v.updatedAt as vehicle_updatedAt
       FROM bookings b
       LEFT JOIN passengers p ON b.passengerId = p.id
@@ -300,6 +301,7 @@ export class BookingRepository extends BaseRepository {
         features: row.vehicle_features ? JSON.parse(row.vehicle_features) : [],
         isAvailable: Boolean(row.vehicle_isAvailable),
         adminId: row.vehicle_adminId,
+        deletedAt: row.vehicle_deletedAt ? new Date(row.vehicle_deletedAt) : undefined,
         createdAt: new Date(row.vehicle_createdAt),
         updatedAt: new Date(row.vehicle_updatedAt),
         photos: [] // Photos would need separate query

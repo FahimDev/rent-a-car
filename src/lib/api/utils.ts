@@ -258,6 +258,14 @@ export const api = {
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(data)
                   })
+                },
+
+                async restoreVehicle(id: string): Promise<{ message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ message: string }>(`/api/admin/vehicles/${id}/restore`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
                 }
               }
             }

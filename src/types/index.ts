@@ -8,6 +8,7 @@ export interface Vehicle {
   features?: string[]
   isAvailable: boolean
   adminId?: string
+  deletedAt?: Date
   createdAt: Date
   updatedAt: Date
   photos: VehiclePhoto[]

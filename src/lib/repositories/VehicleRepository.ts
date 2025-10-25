@@ -19,7 +19,7 @@ export class VehicleRepository extends BaseRepository {
              ) as photos_json
       FROM vehicles v
       LEFT JOIN vehicle_photos vp ON v.id = vp.vehicleId
-      WHERE v.isAvailable = 1
+      WHERE v.isAvailable = 1 AND v.deletedAt IS NULL
     `
     
     const params: any[] = []
@@ -39,10 +39,10 @@ export class VehicleRepository extends BaseRepository {
   }
 
   /**
-   * Get vehicle by ID
+   * Get vehicle by ID (includes soft-deleted vehicles for booking records)
    */
-  async getVehicleById(id: string): Promise<Vehicle | null> {
-    const sql = `
+  async getVehicleById(id: string, includeDeleted: boolean = false): Promise<Vehicle | null> {
+    let sql = `
       SELECT v.*, 
              GROUP_CONCAT(
                CASE WHEN vp.id IS NOT NULL 
@@ -52,24 +52,31 @@ export class VehicleRepository extends BaseRepository {
       FROM vehicles v
       LEFT JOIN vehicle_photos vp ON v.id = vp.vehicleId
       WHERE v.id = $1
-      GROUP BY v.id
     `
+    
+    const params = [id]
+    
+    if (!includeDeleted) {
+      sql += ' AND v.deletedAt IS NULL'
+    }
+    
+    sql += ' GROUP BY v.id'
 
-    const rows = await this.select(sql, [id])
+    const rows = await this.select(sql, params)
     return rows.length > 0 ? this.mapRowToVehicle(rows[0]) : null
   }
 
   /**
-   * Get total vehicle count
+   * Get total vehicle count (excluding soft-deleted)
    */
   async getVehicleCount(): Promise<number> {
-    const sql = 'SELECT COUNT(*) as count FROM vehicles'
+    const sql = 'SELECT COUNT(*) as count FROM vehicles WHERE deletedAt IS NULL'
     const rows = await this.select(sql)
     return rows[0]?.count || 0
   }
 
   /**
-   * Get vehicles by admin ID
+   * Get vehicles by admin ID (excluding soft-deleted)
    */
   async getVehiclesByAdmin(adminId: string): Promise<Vehicle[]> {
     const sql = `
@@ -81,7 +88,7 @@ export class VehicleRepository extends BaseRepository {
              ) as photos_json
       FROM vehicles v
       LEFT JOIN vehicle_photos vp ON v.id = vp.vehicleId
-      WHERE v.adminId = $1
+      WHERE v.adminId = $1 AND v.deletedAt IS NULL
       GROUP BY v.id
       ORDER BY v.createdAt DESC
     `
@@ -155,6 +162,7 @@ export class VehicleRepository extends BaseRepository {
       features: row.features ? JSON.parse(row.features) : [],
       isAvailable: Boolean(row.isAvailable),
       adminId: row.adminId,
+      deletedAt: row.deletedAt ? new Date(row.deletedAt) : undefined,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
       photos: []
@@ -227,7 +235,7 @@ export class VehicleRepository extends BaseRepository {
   }
 
   /**
-   * Get all vehicles (for admin)
+   * Get all vehicles (for admin) - excluding soft-deleted
    */
   async getAllVehicles(): Promise<Vehicle[]> {
     const sql = `
@@ -239,7 +247,7 @@ export class VehicleRepository extends BaseRepository {
              ) as photos_json
       FROM vehicles v
       LEFT JOIN vehicle_photos vp ON v.id = vp.vehicleId
-      WHERE v.id != 'pending-assignment'
+      WHERE v.id != 'pending-assignment' AND v.deletedAt IS NULL
       GROUP BY v.id
       ORDER BY v.createdAt DESC
     `
@@ -341,9 +349,22 @@ export class VehicleRepository extends BaseRepository {
   }
 
   /**
-   * Delete vehicle and all associated photos
+   * Soft delete vehicle (set deletedAt timestamp)
    */
-  async deleteVehicle(id: string): Promise<boolean> {
+  async softDeleteVehicle(id: string): Promise<boolean> {
+    const sql = `
+      UPDATE vehicles 
+      SET deletedAt = datetime('now'), updatedAt = datetime('now')
+      WHERE id = $1
+    `
+    const changes = await this.update(sql, [id])
+    return changes > 0
+  }
+
+  /**
+   * Hard delete vehicle and all associated photos (use with caution)
+   */
+  async hardDeleteVehicle(id: string): Promise<boolean> {
     // First delete all associated photos
     const deletePhotosSql = 'DELETE FROM vehicle_photos WHERE vehicleId = $1'
     await this.delete(deletePhotosSql, [id])
@@ -351,6 +372,19 @@ export class VehicleRepository extends BaseRepository {
     // Then delete the vehicle
     const deleteVehicleSql = 'DELETE FROM vehicles WHERE id = $1'
     const changes = await this.delete(deleteVehicleSql, [id])
+    return changes > 0
+  }
+
+  /**
+   * Restore soft-deleted vehicle
+   */
+  async restoreVehicle(id: string): Promise<boolean> {
+    const sql = `
+      UPDATE vehicles 
+      SET deletedAt = NULL, updatedAt = datetime('now')
+      WHERE id = $1
+    `
+    const changes = await this.update(sql, [id])
     return changes > 0
   }
 }
