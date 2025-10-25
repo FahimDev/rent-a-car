@@ -15,7 +15,12 @@ import {
   Phone,
   MessageCircle,
   MapPin,
-  Clock
+  Clock,
+  Settings,
+  UserPlus,
+  Lock,
+  Menu,
+  X
 } from 'lucide-react'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
@@ -65,6 +70,7 @@ export default function AdminDashboard() {
   })
   const [recentBookings, setRecentBookings] = useState<RecentBooking[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     // Check if admin is logged in
@@ -139,19 +145,103 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Mobile Side Navigation Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 w-80 bg-white shadow-xl">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              
+              <div className="space-y-3">
+                <Link href="/admin/vehicles" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Car className="h-4 w-4 mr-2" />
+                    Manage Vehicles
+                  </Button>
+                </Link>
+                <Link href="/admin/bookings" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    View All Bookings
+                  </Button>
+                </Link>
+                <Link href="/admin/passengers" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Users className="h-4 w-4 mr-2" />
+                    Manage Passengers
+                  </Button>
+                </Link>
+                <Link href="/admin/admins" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-start">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Manage Admins
+                  </Button>
+                </Link>
+                <Link href="/admin/password" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Lock className="h-4 w-4 mr-2" />
+                    Change Password
+                  </Button>
+                </Link>
+                <Link href="/admin/vehicles" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="w-full justify-start">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Vehicle
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container-mobile py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-sm text-gray-600">Manage your car rental business</p>
-            </div>
             <div className="flex items-center space-x-4">
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p className="text-sm text-gray-600">Manage your car rental business</p>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
               <Link href="/admin/vehicles">
                 <Button variant="outline" size="sm">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Vehicle
+                </Button>
+              </Link>
+              <Link href="/admin/password">
+                <Button variant="outline" size="sm">
+                  <Lock className="h-4 w-4 mr-2" />
+                  Change Password
                 </Button>
               </Link>
               <Button variant="outline" size="sm" onClick={handleLogout}>
@@ -159,6 +249,15 @@ export default function AdminDashboard() {
                 Logout
               </Button>
             </div>
+            {/* Mobile Logout Button */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleLogout}
+              className="md:hidden"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
@@ -304,8 +403,8 @@ export default function AdminDashboard() {
             </Card>
           </div>
 
-          {/* Quick Actions */}
-          <div>
+          {/* Quick Actions - Hidden on mobile, shown on desktop */}
+          <div className="hidden lg:block">
             <Card className="card-mobile mb-6">
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
@@ -328,6 +427,18 @@ export default function AdminDashboard() {
                   <Button variant="outline" className="w-full justify-start">
                     <Users className="h-4 w-4 mr-2" />
                     Manage Passengers
+                  </Button>
+                </Link>
+                <Link href="/admin/admins" className="block">
+                  <Button variant="outline" className="w-full justify-start">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Manage Admins
+                  </Button>
+                </Link>
+                <Link href="/admin/password" className="block">
+                  <Button variant="outline" className="w-full justify-start">
+                    <Lock className="h-4 w-4 mr-2" />
+                    Change Password
                   </Button>
                 </Link>
               </CardContent>
@@ -356,6 +467,32 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Mobile System Status - Shown only on mobile */}
+        <div className="lg:hidden mt-8">
+          <Card className="card-mobile">
+            <CardHeader>
+              <CardTitle>System Status</CardTitle>
+              <CardDescription>Current system health</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Database</span>
+                  <span className="text-sm font-medium text-green-600">Online</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">WhatsApp API</span>
+                  <span className="text-sm font-medium text-yellow-600">Configure</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Last Backup</span>
+                  <span className="text-sm font-medium text-gray-600">Today</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

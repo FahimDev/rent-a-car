@@ -1,6 +1,6 @@
 import { AdminRepository } from '../repositories/AdminRepository'
 import { Admin } from '@/types'
-import { comparePassword, signJWT } from '@/lib/auth'
+import { comparePassword, signJWT, hashPassword } from '@/lib/auth'
 
 export class AdminService {
   private adminRepository: AdminRepository
@@ -61,5 +61,68 @@ export class AdminService {
    */
   async getAdminById(id: string): Promise<Admin | null> {
     return this.adminRepository.findById(id)
+  }
+
+  /**
+   * Update admin password
+   */
+  async updatePassword(adminId: string, currentPassword: string, newPassword: string): Promise<boolean> {
+    // Get admin by ID first
+    const admin = await this.adminRepository.findById(adminId)
+    if (!admin) {
+      throw new Error('Admin not found')
+    }
+
+    // Get admin with password for verification using the same method as login
+    const adminWithPassword = await this.getAdminWithPassword(admin.username)
+    
+    if (!adminWithPassword) {
+      throw new Error('Admin credentials not found')
+    }
+
+    // Verify current password using the same method as login
+    const isValidPassword = await comparePassword(currentPassword, adminWithPassword.password)
+    if (!isValidPassword) {
+      throw new Error('Current password is incorrect')
+    }
+
+    // Hash new password
+    const hashedNewPassword = await hashPassword(newPassword)
+
+    // Update password
+    return this.adminRepository.updatePassword(adminId, hashedNewPassword)
+  }
+
+  /**
+   * Create new admin
+   */
+  async createAdmin(adminData: {
+    username: string
+    password: string
+    email?: string
+    phone?: string
+    role?: string
+  }): Promise<Admin> {
+    // Check if username already exists
+    const usernameExists = await this.adminRepository.usernameExists(adminData.username)
+    if (usernameExists) {
+      throw new Error('Username already exists')
+    }
+
+    // Hash password
+    const hashedPassword = await hashPassword(adminData.password)
+
+    // Create admin
+    return this.adminRepository.create({
+      ...adminData,
+      password: hashedPassword
+    })
+  }
+
+  /**
+   * Get all admins
+   */
+  async getAllAdmins(): Promise<Admin[]> {
+    return this.adminRepository.getAll()
   }
 }

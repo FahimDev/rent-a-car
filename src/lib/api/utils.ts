@@ -233,6 +233,31 @@ export const api = {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                   })
+                },
+
+                async updatePassword(data: { currentPassword: string; newPassword: string }): Promise<{ message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ message: string }>('/api/admin/password', {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                  })
+                },
+
+                async getAdmins(): Promise<{ admins: any[] }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ admins: any[] }>('/api/admin/admins', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
+                },
+
+                async createAdmin(data: { username: string; password: string; email?: string; phone?: string; role?: string }): Promise<{ admin: any; message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ admin: any; message: string }>('/api/admin/admins', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                  })
                 }
               }
             }

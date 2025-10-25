@@ -74,6 +74,88 @@ export class AdminRepository extends BaseRepository {
   }
 
   /**
+   * Update admin password
+   */
+  async updatePassword(id: string, hashedPassword: string): Promise<boolean> {
+    const sql = `
+      UPDATE admins 
+      SET password = $1, updatedAt = $2
+      WHERE id = $3
+    `
+    
+    const affectedRows = await this.update(sql, [hashedPassword, new Date().toISOString(), id])
+    return affectedRows > 0
+  }
+
+  /**
+   * Create new admin
+   */
+  async create(adminData: {
+    username: string
+    password: string
+    email?: string
+    phone?: string
+    role?: string
+  }): Promise<Admin> {
+    const sql = `
+      INSERT INTO admins (id, username, password, email, phone, role, createdAt, updatedAt)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `
+    
+    const id = crypto.randomUUID()
+    const now = new Date().toISOString()
+    
+    await this.insert(sql, [
+      id,
+      adminData.username,
+      adminData.password,
+      adminData.email || null,
+      adminData.phone || null,
+      adminData.role || 'admin',
+      now,
+      now
+    ])
+
+    return this.mapAdminResult({
+      id,
+      username: adminData.username,
+      email: adminData.email,
+      phone: adminData.phone,
+      role: adminData.role || 'admin',
+      createdAt: now,
+      updatedAt: now
+    })
+  }
+
+  /**
+   * Check if username exists
+   */
+  async usernameExists(username: string): Promise<boolean> {
+    const sql = `
+      SELECT COUNT(*) as count
+      FROM admins 
+      WHERE username = $1
+    `
+    
+    const results = await this.select(sql, [username])
+    return results[0]?.count > 0
+  }
+
+  /**
+   * Get all admins
+   */
+  async getAll(): Promise<Admin[]> {
+    const sql = `
+      SELECT id, username, email, phone, role, createdAt, updatedAt
+      FROM admins 
+      ORDER BY createdAt DESC
+    `
+    
+    const results = await this.select(sql, [])
+    return results.map(row => this.mapAdminResult(row))
+  }
+
+  /**
    * Map database result to Admin object
    */
   private mapAdminResult(row: any): Admin {
