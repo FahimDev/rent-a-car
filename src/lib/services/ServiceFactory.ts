@@ -4,6 +4,9 @@ import { PassengerService } from './PassengerService'
 import { AdminService } from './AdminService'
 import { AdminStatsService } from './AdminStatsService'
 import { WhatsAppNotificationService } from './WhatsAppNotificationService'
+import { TelegramNotificationService } from './TelegramNotificationService'
+import { UnifiedNotificationService } from './UnifiedNotificationService'
+import { NotificationConfigService } from './NotificationConfigService'
 import { VehicleRepository } from '../repositories/VehicleRepository'
 import { BookingRepository } from '../repositories/BookingRepository'
 import { PassengerRepository } from '../repositories/PassengerRepository'
@@ -21,6 +24,9 @@ export class ServiceFactory {
   private static adminService: AdminService | null = null
   private static adminStatsService: AdminStatsService | null = null
   private static whatsappNotificationService: WhatsAppNotificationService | null = null
+  private static telegramNotificationService: TelegramNotificationService | null = null
+  private static unifiedNotificationService: UnifiedNotificationService | null = null
+  private static notificationConfigService: NotificationConfigService | null = null
 
   /**
    * Get vehicle service instance (singleton)
@@ -94,6 +100,40 @@ export class ServiceFactory {
   }
 
   /**
+   * Get Telegram notification service instance (singleton)
+   */
+  static getTelegramNotificationService(): TelegramNotificationService {
+    if (!this.telegramNotificationService) {
+      const config = this.getNotificationConfigService().getTelegramConfig()
+      this.telegramNotificationService = new TelegramNotificationService(
+        config.botToken,
+        config.chatId
+      )
+    }
+    return this.telegramNotificationService
+  }
+
+  /**
+   * Get unified notification service instance (singleton)
+   */
+  static getUnifiedNotificationService(): UnifiedNotificationService {
+    if (!this.unifiedNotificationService) {
+      this.unifiedNotificationService = new UnifiedNotificationService()
+    }
+    return this.unifiedNotificationService
+  }
+
+  /**
+   * Get notification configuration service instance (singleton)
+   */
+  static getNotificationConfigService(): NotificationConfigService {
+    if (!this.notificationConfigService) {
+      this.notificationConfigService = NotificationConfigService.getInstance()
+    }
+    return this.notificationConfigService
+  }
+
+  /**
    * Reset services (useful for testing)
    */
   static reset(): void {
@@ -103,5 +143,8 @@ export class ServiceFactory {
     this.adminService = null
     this.adminStatsService = null
     this.whatsappNotificationService = null
+    this.telegramNotificationService = null
+    this.unifiedNotificationService = null
+    this.notificationConfigService = null
   }
 }

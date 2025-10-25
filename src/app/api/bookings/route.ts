@@ -60,12 +60,18 @@ export async function POST(request: NextRequest) {
     // Create booking using service layer
     const booking = await bookingService.createBooking(bookingData)
 
-    // Send WhatsApp notification (if configured)
+    // Send notification via configured method (Telegram by default, WhatsApp if configured)
     try {
-      const whatsappService = ServiceFactory.getWhatsAppNotificationService()
-      await whatsappService.sendBookingNotification(booking)
+      const unifiedNotificationService = ServiceFactory.getUnifiedNotificationService()
+      const result = await unifiedNotificationService.sendBookingConfirmation(booking)
+      
+      if (result.success) {
+        console.log(`Booking notification sent via: ${result.methods.join(', ')}`)
+      } else {
+        console.warn('Notification failed:', result.errors.join(', '))
+      }
     } catch (error) {
-      console.error('WhatsApp notification failed:', error)
+      console.error('Notification service failed:', error)
       // Don't fail the booking if notification fails
     }
 

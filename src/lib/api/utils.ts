@@ -266,6 +266,39 @@ export const api = {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` }
                   })
+                },
+
+                // Notification management
+                async getNotificationConfig(): Promise<{ config: any }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ config: any }>('/api/admin/notifications/config', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
+                },
+
+                async updateNotificationConfig(config: any): Promise<{ message: string; config: any }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ message: string; config: any }>('/api/admin/notifications/config', {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ config })
+                  })
+                },
+
+                async testNotification(): Promise<{ success: boolean; message: string; methods?: string[]; errors?: string[] }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ success: boolean; message: string; methods?: string[]; errors?: string[] }>('/api/admin/notifications/test', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
+                },
+
+                async validateNotification(): Promise<{ validation: any; message: string }> {
+                  const token = localStorage.getItem('adminToken')
+                  return apiCall<{ validation: any; message: string }>('/api/admin/notifications/validate', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                  })
                 }
               }
             }

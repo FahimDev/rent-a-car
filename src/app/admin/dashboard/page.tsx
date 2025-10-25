@@ -14,6 +14,7 @@ import {
   Eye,
   Phone,
   MessageCircle,
+  MessageSquare,
   MapPin,
   Clock,
   Settings,
@@ -56,6 +57,21 @@ interface StatsApiResponse {
   totalPassengers: number
 }
 
+interface NotificationConfig {
+  defaultMethod: 'telegram' | 'whatsapp'
+  telegram: {
+    enabled: boolean
+    botToken: string
+    chatId: string
+  }
+  whatsapp: {
+    enabled: boolean
+    apiUrl: string
+    accessToken: string
+    phoneNumberId: string
+  }
+}
+
 interface BookingsApiResponse {
   bookings: RecentBooking[]
 }
@@ -69,6 +85,7 @@ export default function AdminDashboard() {
     totalPassengers: 0
   })
   const [recentBookings, setRecentBookings] = useState<RecentBooking[]>([])
+  const [notificationConfig, setNotificationConfig] = useState<NotificationConfig | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -85,13 +102,15 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [statsData, bookingsData] = await Promise.all([
+      const [statsData, bookingsData, notificationData] = await Promise.all([
         api.admin.getStats(),
-        api.admin.getBookings({ limit: 5 })
+        api.admin.getBookings({ limit: 5 }),
+        api.admin.getNotificationConfig().catch(() => ({ config: null })) // Don't fail if notification config fails
       ])
 
       setStats(statsData)
       setRecentBookings(bookingsData.bookings || [])
+      setNotificationConfig(notificationData.config)
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
       toast.error('Failed to load dashboard data')
@@ -194,6 +213,12 @@ export default function AdminDashboard() {
                   <Button variant="outline" className="w-full justify-start">
                     <Lock className="h-4 w-4 mr-2" />
                     Change Password
+                  </Button>
+                </Link>
+                <Link href="/admin/notifications" className="block" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-start">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Notification Settings
                   </Button>
                 </Link>
                 <Link href="/admin/vehicles" className="block" onClick={() => setIsMobileMenuOpen(false)}>
@@ -441,6 +466,12 @@ export default function AdminDashboard() {
                     Change Password
                   </Button>
                 </Link>
+                <Link href="/admin/notifications" className="block">
+                  <Button variant="outline" className="w-full justify-start">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Notification Settings
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
@@ -462,6 +493,45 @@ export default function AdminDashboard() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Last Backup</span>
                     <span className="text-sm font-medium text-gray-600">Today</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="card-mobile">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Notification Status
+                </CardTitle>
+                <CardDescription>Current notification configuration</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Default Method</span>
+                    <span className="text-sm font-medium text-blue-600 capitalize">
+                      {notificationConfig?.defaultMethod || 'Telegram'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Telegram</span>
+                    <span className={`text-sm font-medium ${
+                      notificationConfig?.telegram?.enabled ? 'text-green-600' : 'text-gray-600'
+                    }`}>
+                      {notificationConfig?.telegram?.enabled ? 'Active' : 'Disabled'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">WhatsApp</span>
+                    <span className={`text-sm font-medium ${
+                      notificationConfig?.whatsapp?.enabled ? 'text-green-600' : 'text-gray-600'
+                    }`}>
+                      {notificationConfig?.whatsapp?.enabled ? 'Active' : 'Disabled'}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-2">
+                    📱 Notifications will be sent via {notificationConfig?.defaultMethod || 'Telegram'} to your configured destination
                   </div>
                 </div>
               </CardContent>
