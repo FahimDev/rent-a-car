@@ -1,7 +1,7 @@
 import { Booking } from '@/types'
 import { TelegramNotificationService } from './TelegramNotificationService'
 import { WhatsAppNotificationService } from './WhatsAppNotificationService'
-import { NotificationConfigService, NotificationMethod } from './NotificationConfigService'
+import { NotificationConfigService, NotificationMethod, NotificationConfig } from './NotificationConfigService'
 
 /**
  * Unified Notification Service
@@ -11,34 +11,31 @@ import { NotificationConfigService, NotificationMethod } from './NotificationCon
 export class UnifiedNotificationService {
   private telegramService: TelegramNotificationService | null = null
   private whatsappService: WhatsAppNotificationService | null = null
-  private configService: NotificationConfigService
 
   constructor() {
-    this.configService = NotificationConfigService.getInstance()
     this.initializeServices()
   }
 
   /**
-   * Initialize notification services based on configuration
+   * Initialize notification services based on environment variables
    */
   private initializeServices(): void {
-    const config = this.configService.getConfig()
-
-    // Initialize Telegram service if enabled
-    if (config.telegram.enabled && config.telegram.botToken && config.telegram.chatId) {
-      this.telegramService = new TelegramNotificationService(
-        config.telegram.botToken,
-        config.telegram.chatId
-      )
+    // Initialize Telegram service from environment variables
+    const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN
+    const telegramChatId = process.env.TELEGRAM_CHAT_ID
+    
+    if (telegramBotToken && telegramChatId && 
+        telegramBotToken !== 'your_bot_token_here' && 
+        telegramChatId !== 'your_chat_id_here') {
+      this.telegramService = new TelegramNotificationService(telegramBotToken, telegramChatId)
     }
 
-    // Initialize WhatsApp service if enabled
-    if (config.whatsapp.enabled && config.whatsapp.apiUrl && config.whatsapp.accessToken) {
-      this.whatsappService = new WhatsAppNotificationService(
-        config.whatsapp.apiUrl,
-        config.whatsapp.accessToken,
-        config.whatsapp.phoneNumberId
-      )
+    // Initialize WhatsApp service from environment variables
+    const whatsappApiKey = process.env.WHATSAPP_API_KEY
+    const whatsappPhoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
+    
+    if (whatsappApiKey && whatsappPhoneNumberId) {
+      this.whatsappService = new WhatsAppNotificationService()
     }
   }
 
@@ -87,7 +84,7 @@ export class UnifiedNotificationService {
       errors: []
     }
 
-    const activeMethods = this.getActiveMethodsForUpdates()
+    const activeMethods = this.getActiveMethodsForBookings()
     
     if (activeMethods.length === 0) {
       results.errors.push('No notification methods configured for updates')
@@ -122,7 +119,7 @@ export class UnifiedNotificationService {
       errors: []
     }
 
-    const activeMethods = this.configService.getActiveMethods()
+    const activeMethods = this.getActiveMethodsForBookings()
     
     if (activeMethods.length === 0) {
       results.errors.push('No notification methods configured')
@@ -168,9 +165,9 @@ export class UnifiedNotificationService {
       case 'whatsapp':
         if (!this.whatsappService) return false
         if (type === 'booking') {
-          return await this.whatsappService.sendBookingConfirmation(booking)
+          return await this.whatsappService.sendBookingNotification(booking)
         } else {
-          return await this.whatsappService.sendBookingUpdate(booking, updateType || 'update')
+          return await this.whatsappService.sendBookingNotification(booking)
         }
       
       default:
@@ -200,14 +197,15 @@ export class UnifiedNotificationService {
    * Get active methods for booking notifications
    */
   private getActiveMethodsForBookings(): NotificationMethod[] {
-    const config = this.configService.getConfig()
     const methods: NotificationMethod[] = []
 
-    if (config.telegram.enabled && config.telegram.enabledForBookings) {
+    // Check if Telegram is configured via environment variables
+    if (this.telegramService) {
       methods.push('telegram')
     }
 
-    if (config.whatsapp.enabled && config.whatsapp.enabledForBookings) {
+    // Check if WhatsApp is configured via environment variables
+    if (this.whatsappService) {
       methods.push('whatsapp')
     }
 
@@ -217,77 +215,9 @@ export class UnifiedNotificationService {
   /**
    * Get active methods for update notifications
    */
-  private getActiveMethodsForUpdates(): NotificationMethod[] {
-    const config = this.configService.getConfig()
-    const methods: NotificationMethod[] = []
 
-    if (config.telegram.enabled && config.telegram.enabledForUpdates) {
-      methods.push('telegram')
-    }
 
-    if (config.whatsapp.enabled && config.whatsapp.enabledForUpdates) {
-      methods.push('whatsapp')
-    }
 
-    return methods
-  }
-
-  /**
-   * Update notification configuration
-   */
-  updateConfiguration(newConfig: Partial<NotificationConfig>): void {
-    this.configService.updateConfig(newConfig)
-    this.initializeServices() // Reinitialize services with new config
-  }
-
-  /**
-   * Get current configuration
-   */
-  getConfiguration() {
-    return this.configService.getConfig()
-  }
-
-  /**
-   * Validate notification configuration
-   */
-  async validateConfiguration(): Promise<ValidationResult> {
-    const config = this.configService.getConfig()
-    const result: ValidationResult = {
-      telegram: { valid: false, error: null },
-      whatsapp: { valid: false, error: null }
-    }
-
-    // Validate Telegram
-    if (config.telegram.enabled) {
-      try {
-        const isValid = await TelegramNotificationService.validateConfiguration(
-          config.telegram.botToken,
-          config.telegram.chatId
-        )
-        result.telegram.valid = isValid
-        if (!isValid) {
-          result.telegram.error = 'Invalid bot token or chat ID'
-        }
-      } catch (error) {
-        result.telegram.error = error instanceof Error ? error.message : 'Validation failed'
-      }
-    }
-
-    // Validate WhatsApp
-    if (config.whatsapp.enabled) {
-      try {
-        const isValid = await this.whatsappService?.sendTestMessage() || false
-        result.whatsapp.valid = isValid
-        if (!isValid) {
-          result.whatsapp.error = 'Invalid API configuration'
-        }
-      } catch (error) {
-        result.whatsapp.error = error instanceof Error ? error.message : 'Validation failed'
-      }
-    }
-
-    return result
-  }
 }
 
 export interface NotificationResult {
