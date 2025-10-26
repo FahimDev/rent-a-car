@@ -65,7 +65,7 @@ export class TelegramNotificationService {
 • Date: ${new Date(booking.createdAt).toLocaleDateString('en-BD')}
 
 👤 *Passenger:*
-• Name: ${passenger.name}
+• Name: ${passenger.name || 'Not provided'}
 • Phone: ${passenger.phone}
 • Email: ${passenger.email || 'Not provided'}
 
@@ -124,7 +124,7 @@ export class TelegramNotificationService {
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
+        const errorData = await response.json().catch(() => ({})) as { error?: string; description?: string }
         console.error('Telegram API error:', errorData)
         return false
       }
