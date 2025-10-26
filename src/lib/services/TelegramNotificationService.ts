@@ -56,7 +56,7 @@ export class TelegramNotificationService {
    * Format booking information into Telegram message
    */
   private formatBookingMessage(booking: Booking): string {
-    const { passenger, vehicle, pickupDate, returnDate, pickupLocation, returnLocation, totalAmount } = booking
+    const { passenger, vehicle, bookingDate, pickupTime, tripType, pickupLocation, dropoffLocation } = booking
 
     return `🚗 *New Booking Confirmed*
 
@@ -75,11 +75,9 @@ export class TelegramNotificationService {
 • Price: ৳${vehicle.pricePerDay}/day
 
 📅 *Trip Details:*
-• Pickup: ${pickupDate} at ${pickupLocation}
-• Return: ${returnDate} at ${returnLocation}
-• Duration: ${this.calculateDuration(pickupDate, returnDate)} days
-
-💰 *Total Amount: ৳${totalAmount}*
+• Pickup: ${new Date(bookingDate).toLocaleDateString('en-BD')} at ${pickupTime}
+• Location: ${pickupLocation}${dropoffLocation ? ` → ${dropoffLocation}` : ''}
+• Trip Type: ${tripType === 'single' ? 'One-way' : 'Round trip'}
 
 📞 *Contact:* ${passenger.phone}
 ⏰ *Booked at:* ${new Date(booking.createdAt).toLocaleString('en-BD')}`
@@ -131,7 +129,7 @@ export class TelegramNotificationService {
         return false
       }
 
-      const result = await response.json()
+      const result = await response.json() as { ok?: boolean }
       return result.ok === true
     } catch (error) {
       console.error('Error sending Telegram message:', error)
@@ -173,7 +171,7 @@ export class TelegramNotificationService {
         return false
       }
 
-      const result = await response.json()
+      const result = await response.json() as { ok?: boolean; description?: string }
       if (!result.ok) {
         console.error('Telegram bot validation failed:', result.description)
         return false

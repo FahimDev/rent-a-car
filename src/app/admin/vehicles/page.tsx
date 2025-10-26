@@ -301,11 +301,11 @@ export default function VehicleManagement() {
       })
 
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json() as { message?: string }
         toast.success(result.message || 'Vehicle deleted successfully (soft delete - booking records preserved)')
         fetchVehicles()
       } else {
-        const errorData = await response.json().catch(() => ({}))
+        const errorData = await response.json().catch(() => ({})) as { error?: string }
         console.error('Delete error:', errorData)
         
         // Handle specific error cases

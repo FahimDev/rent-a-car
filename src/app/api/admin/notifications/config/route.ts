@@ -35,7 +35,7 @@ export async function PUT(request: NextRequest) {
     // Verify admin authentication
     const { adminId } = await verifyTokenFromRequest(request)
     
-    const body = await request.json()
+    const body = await request.json() as { config?: any }
     const { config } = body
 
     if (!config) {
@@ -44,11 +44,9 @@ export async function PUT(request: NextRequest) {
     }
 
     const notificationConfigService = ServiceFactory.getNotificationConfigService()
-    const unifiedNotificationService = ServiceFactory.getUnifiedNotificationService()
 
     // Update configuration
     notificationConfigService.updateConfig(config)
-    unifiedNotificationService.updateConfiguration(config)
 
     const response = NextResponse.json({ 
       message: 'Notification configuration updated successfully',
